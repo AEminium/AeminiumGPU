@@ -1,0 +1,123 @@
+package aeminium.gpu.lists;
+
+import java.util.Arrays;
+
+import aeminium.gpu.lists.properties.operations.Mapper;
+import aeminium.gpu.lists.properties.operations.Reducer;
+
+public class BooleanList extends AbstractList<Boolean> {
+
+	protected int[] box;
+	
+	
+	protected int TRUE = 1;
+	protected int FALSE = 0; 
+	
+	public BooleanList() {
+		this(new int[DEFAULT_SIZE], 0);
+	}
+	
+	public BooleanList(int[] box, int size) {
+		super();
+		this.size = size;
+		this.box = box;
+	}
+	
+	public int encode(Boolean b) {
+		return (b) ? TRUE : FALSE;
+	}
+	
+	public Boolean decode(int i) {
+		return (i > 0) ? Boolean.TRUE : Boolean.FALSE;
+	}
+	
+	@Override
+	public void add(Boolean e) {
+		ensureOneMore();
+		box[size++] = encode(e);
+	}
+	
+	@Override
+	public void add(int index, Boolean e) {
+		System.arraycopy(box, index, box, index+1, size-index);
+		size++;
+		box[index] = encode(e);
+	}
+
+	@Override
+	public void remove(Boolean o) {
+		for(int i=0;i<size;i++) {
+			if (box[i] == encode(o)) {
+				remove(i--);
+			}
+		}
+	}
+
+	@Override
+	public Boolean get(int index) {
+		return decode(box[index]);
+	}
+
+	@Override
+	public void set(int index, Boolean e) {
+		if (index >= size) {
+			ensureNMore(index + 1 - size);
+			size = index + 1;
+		}
+		box[index] = encode(e);
+	}
+
+	@Override
+	public Boolean remove(int index) {
+		int e = box[index];
+		System.arraycopy(box, index+1, box, index, size-index);
+		size--;
+		return decode(e);
+	}
+	
+	
+
+	@Override
+	public PList<Boolean> subList(int fromIndex, int toIndex) {
+		int newSize = toIndex - fromIndex;
+		int[] newList = new int[Math.max(DEFAULT_SIZE,newSize)];
+		System.arraycopy(box, fromIndex, newList, 0, newSize);
+		return new BooleanList(newList, newSize);
+	}
+
+	
+	@Override
+	public Class<?> getType() {
+		return Boolean.class;
+	}
+	
+	// Data-Parallel Operations
+	
+	@Override
+	public <O> PList<O> map(Mapper<Boolean, O> mapper) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Boolean reduce(Reducer<Boolean> reducer) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	// Utilities
+	
+	protected void ensureNMore(int n) {
+		if (size >= box.length) {
+			int plus = (n > INCREMENT_SIZE) ? n : INCREMENT_SIZE; 
+			box = Arrays.copyOf(box, box.length + plus );
+		}
+	}
+	
+	protected void ensureOneMore() {
+		if (size == box.length) {
+			box = Arrays.copyOf(box, box.length + INCREMENT_SIZE );
+		}
+	}
+
+}
