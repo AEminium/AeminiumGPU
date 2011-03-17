@@ -100,6 +100,10 @@ public class CharList extends AbstractList<Character> {
 	
 	// Utilities
 	
+	public char[] getArray() {
+		return box;
+	}
+	
 	protected void ensureNMore(int n) {
 		if (size >= box.length) {
 			int plus = (n > INCREMENT_SIZE) ? n : INCREMENT_SIZE; 

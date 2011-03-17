@@ -90,6 +90,10 @@ public class IntList extends AbstractList<Integer> {
 	
 	// Utilities
 	
+	public int[] getArray() {
+		return box;
+	}
+	
 	protected void ensureNMore(int n) {
 		if (size >= box.length) {
 			int plus = (n > INCREMENT_SIZE) ? n : INCREMENT_SIZE; 

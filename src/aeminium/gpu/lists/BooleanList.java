@@ -27,7 +27,7 @@ public class BooleanList extends AbstractList<Boolean> {
 		return (b) ? TRUE : FALSE;
 	}
 	
-	public Boolean decode(int i) {
+	public static Boolean decode(int i) {
 		return (i > 0) ? Boolean.TRUE : Boolean.FALSE;
 	}
 	
@@ -106,6 +106,10 @@ public class BooleanList extends AbstractList<Boolean> {
 	}
 	
 	// Utilities
+	
+	public int[] getArray() {
+		return box;
+	}
 	
 	protected void ensureNMore(int n) {
 		if (size >= box.length) {
