@@ -1,6 +1,8 @@
 package aeminium.gpu.lists;
 
-public interface PList<T> {
+import aeminium.gpu.lists.properties.Mappable;
+
+public interface PList<T> extends Mappable<T> {
 	
 	/* Properties */
 	public int size();
@@ -24,5 +26,8 @@ public interface PList<T> {
 	
 	/* Type Methods */
 	public Class<?> getType();
+	
+	/* Lazyness */
+	public PList<T> evaluate();
 
 }

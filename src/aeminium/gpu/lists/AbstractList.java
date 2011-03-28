@@ -1,5 +1,7 @@
 package aeminium.gpu.lists;
 
+import aeminium.gpu.devices.DefaultDeviceFactory;
+import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.lists.properties.Mappable;
 import aeminium.gpu.lists.properties.Reductionable;
 
@@ -9,7 +11,12 @@ public abstract class AbstractList<T> implements PList<T>, Mappable<T>, Reductio
 	protected static final int INCREMENT_SIZE = 1000;
 	
 	protected int size;
+	protected GPUDevice device;
 	
+	public AbstractList() {
+		device = (new DefaultDeviceFactory()).getDevice();
+	}
+
 	public int size() {
 		return size;
 	}
@@ -24,5 +31,17 @@ public abstract class AbstractList<T> implements PList<T>, Mappable<T>, Reductio
 	public void add(T e) {
 		add(size, e);
 	}
+	
+	public PList<T> evaluate() {
+		return this;
+	}
 
+	public GPUDevice getDevice() {
+		return device;
+	}
+
+	public void setDevice(GPUDevice device) {
+		this.device = device;
+	}
+	
 }

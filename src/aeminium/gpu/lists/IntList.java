@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 import aeminium.gpu.lists.properties.operations.Mapper;
 import aeminium.gpu.lists.properties.operations.Reducer;
+import aeminium.gpu.operations.Map;
+import aeminium.gpu.operations.functions.LambdaMapper;
 
 public class IntList extends AbstractList<Integer> {
 
@@ -78,8 +80,9 @@ public class IntList extends AbstractList<Integer> {
 	
 	@Override
 	public <O> PList<O> map(Mapper<Integer, O> mapper) {
-		// TODO Auto-generated method stub
-		return null;
+		Map<Integer, O> mapOperation = new Map<Integer, O>((LambdaMapper<Integer, O>) mapper, (PList<Integer>) this);
+		device.execute(mapOperation);
+		return mapOperation.getOutput();
 	}
 
 	@Override

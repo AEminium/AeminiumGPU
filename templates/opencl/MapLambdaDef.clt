@@ -1,0 +1,3 @@
+{{output_type}} {{map_lambda_name}}({{input_type}} input) {
+	{{source}}
+}
