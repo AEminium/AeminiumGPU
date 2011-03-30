@@ -118,8 +118,7 @@ public class TestMap extends TestCase {
 			
 		});
 		for (int i = 0; i < TEST_SIZE; i++) {
-			System.out.println("->" + (int) output.get(i));
-			//assertTrue(output.get(i).compareTo('f') == 0);
+			assertTrue(output.get(i).compareTo('f') == 0);
 		}
 	}
 	

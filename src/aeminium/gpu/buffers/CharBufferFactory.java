@@ -1,6 +1,6 @@
 package aeminium.gpu.buffers;
 
-import java.nio.CharBuffer;
+import java.nio.ByteBuffer;
 
 import aeminium.gpu.lists.CharList;
 import aeminium.gpu.lists.PList;
@@ -13,15 +13,26 @@ import com.nativelibs4java.opencl.CLQueue;
 
 public class CharBufferFactory implements IBufferFactory {
 
+	public static byte[] encodeCharToBytes(char[] c) {
+	    byte[] b = new byte[c.length];
+	    for (int i = 0; i < c.length; i++)
+	      b[i] = (byte)(c[i] & 0x007F);
+
+	    return b;
+	}
+	
+	public static char[] decodeBytesToChar(byte[] ascii) {
+		String tmp = new String(ascii);
+		return tmp.toCharArray();
+	}
+	
+	
 	@Override
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
 		char[] ar = ((CharList) list).getArray();
-		System.out.println("Arr in:" + ar.length);
-		for (int i = 0; i < list.size(); i++) {
-			System.out.println("list[" + i + "] = " + ar[i]);
-		}
-		CharBuffer ibuffer = CharBuffer.wrap(ar, 0, list.size());
-		return context.createCharBuffer(CLMem.Usage.Input, ibuffer, true);
+		byte[] car = encodeCharToBytes(ar);
+		ByteBuffer ibuffer = ByteBuffer.wrap(car, 0, list.size());
+		return context.createByteBuffer(CLMem.Usage.Input, ibuffer, true);
 	}
 
 	@Override
@@ -38,12 +49,9 @@ public class CharBufferFactory implements IBufferFactory {
 	@Override
 	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
 			CLEvent ev, int size) {
-		char[] content = new char[size];
-		outbuffer.asCLCharBuffer().read(q, ev).get(content);
-		System.out.println("Arr in:" + content.length);
-		for (int i = 0; i < size; i++) {
-			System.out.println("out[" + i + "] = " + content[i]);
-		}
+		byte[] pcontent = new byte[size];
+		outbuffer.asCLByteBuffer().read(q, ev).get(pcontent);
+		char[] content = decodeBytesToChar(pcontent);
 		return new CharList(content, size);
 	}
 
