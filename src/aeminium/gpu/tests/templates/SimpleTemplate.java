@@ -43,7 +43,7 @@ public class SimpleTemplate extends TestCase {
 		HashMap<String, String> mapping = new HashMap<String, String>();
 		mapping.put("name", "Joaquim");
 		mapping.put("when", "today");
-		assertEquals("Hello Joaquim! How are you today? Bye Joaquim!",t.apply(mapping));
-	}
+		assertEquals("Hello Joaquim! How are you today? Bye Joaquim!\n",t.apply(mapping));
+	} 
 	
 }
