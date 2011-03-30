@@ -16,7 +16,7 @@ public class DoubleBufferFactory implements IBufferFactory{
 	@Override
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
 		double[] ar = ((DoubleList) list).getArray();
-		DoubleBuffer ibuffer = DoubleBuffer.wrap(ar);
+		DoubleBuffer ibuffer = DoubleBuffer.wrap(ar, 0, list.size());
 		return  context.createDoubleBuffer(CLMem.Usage.Input, ibuffer, true);
 	}
 	

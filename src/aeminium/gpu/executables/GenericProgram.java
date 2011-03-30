@@ -16,6 +16,8 @@ public abstract class GenericProgram implements Program {
 	protected CLKernel kernel;
 	protected CLEvent kernelCompletion;
 	
+	protected String otherSources;
+	
 	public void run() {
 		if (device != null) {
 			device = new DefaultDeviceFactory().getDevice();
@@ -47,7 +49,6 @@ public abstract class GenericProgram implements Program {
 	
 	abstract protected String getSource();
 	abstract public String getKernelName();
-	abstract public String getOtherSources();
 	
 	// Pipeline Helpers
 	
@@ -86,6 +87,14 @@ public abstract class GenericProgram implements Program {
 	
 	public GPUDevice getDevice() {
 		return device;
+	}
+	
+	public void setOtherSources(String otherSources) {
+		this.otherSources = otherSources;
+	}
+
+	public String getOtherSources() {
+		return otherSources;
 	}
 
 }

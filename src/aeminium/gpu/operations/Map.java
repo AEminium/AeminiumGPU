@@ -1,12 +1,12 @@
 package aeminium.gpu.operations;
 
 import aeminium.gpu.buffers.BufferHelper;
+import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.lists.PList;
 import aeminium.gpu.lists.lazyness.LazyEvaluator;
 import aeminium.gpu.lists.lazyness.LazyPList;
-import aeminium.gpu.lists.properties.operations.Mapper;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.generator.MapCodeGen;
 
@@ -23,20 +23,21 @@ public class Map<I,O> extends GenericProgram implements Program {
 	
 	protected CLBuffer<?> inbuffer;
 	private CLBuffer<?> outbuffer;
-	private String otherSources;
 	
-	private MapCodeGen gen = new MapCodeGen(this);
+	private MapCodeGen gen;
 	
 	// Constructors
 	
-	public Map(LambdaMapper<I, O> mapFun2, PList<I> list) {
-		this(mapFun2, list, "");
+	public Map(LambdaMapper<I, O> mapFun2, PList<I> list, GPUDevice dev) {
+		this(mapFun2, list, "", dev);
 	}
 	
-	public Map(LambdaMapper<I, O> mapFun, PList<I> list, String other) {
+	public Map(LambdaMapper<I, O> mapFun, PList<I> list, String other, GPUDevice dev) {
+		this.device = dev;
 		this.input = list;
 		this.mapFun = mapFun;
 		this.setOtherSources(other);
+		gen = new MapCodeGen(this);
 	}
 	
 	// Pipeline
@@ -105,7 +106,7 @@ public class Map<I,O> extends GenericProgram implements Program {
 			}
 
 			@Override
-			public <K> boolean canMergeWithMap(Mapper<O, K> mapFun) {
+			public <K> boolean canMergeWithMap(LambdaMapper<O, K> mapFun) {
 				return false;
 			}
 
@@ -127,13 +128,17 @@ public class Map<I,O> extends GenericProgram implements Program {
 	}
 	
 	public String getOutputType() {
+		Class<?> klass = mapFun.getClass();
 		try {
-			return mapFun.getClass().getMethod("map", input.getType()).getReturnType().getSimpleName().toString();
+			return klass.getMethod("map", input.getType()).getReturnType().getSimpleName().toString();
 		} catch (SecurityException e) {
 			e.printStackTrace();
 			return null;
 		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
+			// Java sucks
+			// TODO: Compiler can give us this information.
+			System.out.println("AeminiumGPU Runtime does not support generic types on Lambdas.");
+			System.exit(0);
 			return null;
 		}
 	}
@@ -161,14 +166,4 @@ public class Map<I,O> extends GenericProgram implements Program {
 	public String getKernelName() {
 		return gen.getMapKernelName();
 	}
-	
-	public void setOtherSources(String otherSources) {
-		this.otherSources = otherSources;
-	}
-
-	@Override
-	public String getOtherSources() {
-		return otherSources;
-	}
-
 }

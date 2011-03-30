@@ -2,11 +2,6 @@ package aeminium.gpu.lists;
 
 import java.util.Arrays;
 
-import aeminium.gpu.lists.properties.operations.Mapper;
-import aeminium.gpu.lists.properties.operations.Reducer;
-import aeminium.gpu.operations.Map;
-import aeminium.gpu.operations.functions.LambdaMapper;
-
 public class IntList extends AbstractList<Integer> {
 
 	protected int[] box;
@@ -73,22 +68,6 @@ public class IntList extends AbstractList<Integer> {
 		int[] newList = new int[Math.max(DEFAULT_SIZE,newSize)];
 		System.arraycopy(box, fromIndex, newList, 0, newSize);
 		return new IntList(newList, newSize);
-	}
-
-	
-	// Data-Parallel Operations
-	
-	@Override
-	public <O> PList<O> map(Mapper<Integer, O> mapper) {
-		Map<Integer, O> mapOperation = new Map<Integer, O>((LambdaMapper<Integer, O>) mapper, (PList<Integer>) this);
-		device.execute(mapOperation);
-		return mapOperation.getOutput();
-	}
-
-	@Override
-	public Integer reduce(Reducer<Integer> reducer) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	// Utilities

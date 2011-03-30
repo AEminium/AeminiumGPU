@@ -2,9 +2,6 @@ package aeminium.gpu.lists;
 
 import java.util.Arrays;
 
-import aeminium.gpu.lists.properties.operations.Mapper;
-import aeminium.gpu.lists.properties.operations.Reducer;
-
 public class CharList extends AbstractList<Character> {
 
 	protected char[] box;
@@ -82,20 +79,6 @@ public class CharList extends AbstractList<Character> {
 	@Override
 	public String toString() {
 		return new String(box,0,size);
-	}
-	
-	// Data-Parallel Operations
-	
-	@Override
-	public <O> PList<O> map(Mapper<Character, O> mapper) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Character reduce(Reducer<Character> reducer) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	// Utilities

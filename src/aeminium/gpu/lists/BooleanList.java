@@ -2,9 +2,6 @@ package aeminium.gpu.lists;
 
 import java.util.Arrays;
 
-import aeminium.gpu.lists.properties.operations.Mapper;
-import aeminium.gpu.lists.properties.operations.Reducer;
-
 public class BooleanList extends AbstractList<Boolean> {
 
 	protected int[] box;
@@ -89,20 +86,6 @@ public class BooleanList extends AbstractList<Boolean> {
 	@Override
 	public Class<?> getType() {
 		return Boolean.class;
-	}
-	
-	// Data-Parallel Operations
-	
-	@Override
-	public <O> PList<O> map(Mapper<Boolean, O> mapper) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Boolean reduce(Reducer<Boolean> reducer) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	// Utilities

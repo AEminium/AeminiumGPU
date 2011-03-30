@@ -2,8 +2,8 @@ package aeminium.gpu.lists.lazyness;
 
 import aeminium.gpu.lists.AbstractList;
 import aeminium.gpu.lists.PList;
-import aeminium.gpu.lists.properties.operations.Mapper;
-import aeminium.gpu.lists.properties.operations.Reducer;
+import aeminium.gpu.operations.functions.LambdaMapper;
+import aeminium.gpu.operations.functions.LambdaReducer;
 
 public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 
@@ -70,7 +70,7 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 
 
 	@Override
-	public <O> PList<O> map(Mapper<T, O> mapFun) {
+	public <O> PList<O> map(LambdaMapper<T, O> mapFun) {
 		// TODO: Merge with map
 		evaluate();
 		return actual.map(mapFun);
@@ -78,9 +78,10 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 
 
 	@Override
-	public T reduce(Reducer<T> reducer) {
-		// TODO Auto-generated method stub
-		return null;
+	public T reduce(LambdaReducer<T> reducer) {
+		// TODO Merge with Reduce
+		evaluate();
+		return actual.reduce(reducer);
 	}
 	
 	

@@ -2,9 +2,6 @@ package aeminium.gpu.lists;
 
 import java.util.Arrays;
 
-import aeminium.gpu.lists.properties.operations.Mapper;
-import aeminium.gpu.lists.properties.operations.Reducer;
-
 public class DoubleList extends AbstractList<Double> {
 
 	protected double[] box;
@@ -79,19 +76,6 @@ public class DoubleList extends AbstractList<Double> {
 		return Double.class;
 	}
 	
-	// Data-Parallel Operations
-	
-	@Override
-	public <O> PList<O> map(Mapper<Double, O> mapper) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Double reduce(Reducer<Double> reducer) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	// Utilities
 	

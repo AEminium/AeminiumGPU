@@ -1,0 +1,3 @@
+{{output_type}} {{reduce_lambda_name}}({{input_type}} reduce_input_first, {{input_type}} reduce_input_second) {
+	{{source}}
+}

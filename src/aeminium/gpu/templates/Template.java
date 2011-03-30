@@ -30,11 +30,11 @@ public class Template {
 	
 	public String apply(HashMap<String, String> mapping) {
 		String newSource = source;
-		
 		for (String key : mapping.keySet()) {
 			if (mapping.get(key) == null) {
-				System.out.println("No value for:" + key);
+				mapping.put(key,"");
 			}
+			
 			newSource = newSource.replace((CharSequence) "{{" + key + "}}", mapping.get(key));
 		}
 		

@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.operations.Map;
-import aeminium.gpu.operations.utils.UniqCounter;
 import aeminium.gpu.templates.Template;
 
 @SuppressWarnings("rawtypes")
@@ -15,7 +14,8 @@ public class MapCodeGen {
 	
 	public MapCodeGen(Map mapOp) {
 		this.mapOp = mapOp;
-		id = UniqCounter.getNewId();
+		System.out.println("Map:" + mapOp.getMapFun());
+		id = mapOp.getMapFun().getId();
 	}
 	
 	public String getMapLambdaSource() {

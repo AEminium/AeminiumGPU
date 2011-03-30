@@ -2,9 +2,6 @@ package aeminium.gpu.lists;
 
 import java.util.Arrays;
 
-import aeminium.gpu.lists.properties.operations.Mapper;
-import aeminium.gpu.lists.properties.operations.Reducer;
-
 public class FloatList extends AbstractList<Float> {
 
 	protected float[] box;
@@ -78,21 +75,7 @@ public class FloatList extends AbstractList<Float> {
 	public Class<?> getType() {
 		return Float.class;
 	}
-	
-	// Data-Parallel Operations
-	
-	@Override
-	public <O> PList<O> map(Mapper<Float, O> mapper) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public Float reduce(Reducer<Float> reducer) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 	// Utilities
 	
 	public float[] getArray() {

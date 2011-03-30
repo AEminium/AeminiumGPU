@@ -4,6 +4,10 @@ import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.lists.properties.Mappable;
 import aeminium.gpu.lists.properties.Reductionable;
+import aeminium.gpu.operations.Map;
+import aeminium.gpu.operations.Reduce;
+import aeminium.gpu.operations.functions.LambdaMapper;
+import aeminium.gpu.operations.functions.LambdaReducer;
 
 public abstract class AbstractList<T> implements PList<T>, Mappable<T>, Reductionable<T> {
 
@@ -42,6 +46,21 @@ public abstract class AbstractList<T> implements PList<T>, Mappable<T>, Reductio
 
 	public void setDevice(GPUDevice device) {
 		this.device = device;
+	}
+	
+	
+	@Override
+	public <O> PList<O> map(LambdaMapper<T, O> mapper) {
+		Map<T, O> mapOperation = new Map<T, O>(mapper, this, device);
+		device.execute(mapOperation);
+		return mapOperation.getOutput();
+	}
+	
+	@Override
+	public T reduce(LambdaReducer<T> reducer) {
+		Reduce<T> reduceOperation = new Reduce<T>(reducer, this, device);
+		device.execute(reduceOperation);
+		return reduceOperation.getOutput();
 	}
 	
 }

@@ -16,8 +16,7 @@ public class LongBufferFactory implements IBufferFactory {
 	@Override
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
 		long[] ar = ((LongList) list).getArray();
-		LongBuffer ibuffer = LongBuffer.wrap(ar);
-		ibuffer.put(ar, 0, list.size());
+		LongBuffer ibuffer = LongBuffer.wrap(ar, 0, list.size());
 		return  context.createLongBuffer(CLMem.Usage.Input, ibuffer, true);
 	}
 

@@ -2,9 +2,6 @@ package aeminium.gpu.lists;
 
 import java.util.Arrays;
 
-import aeminium.gpu.lists.properties.operations.Mapper;
-import aeminium.gpu.lists.properties.operations.Reducer;
-
 public class LongList extends AbstractList<Long> {
 
 	protected long[] box;
@@ -77,20 +74,6 @@ public class LongList extends AbstractList<Long> {
 	@Override
 	public Class<?> getType() {
 		return Long.class;
-	}
-	
-	// Data-Parallel Operations
-	
-	@Override
-	public <O> PList<O> map(Mapper<Long, O> mapper) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Long reduce(Reducer<Long> reducer) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	// Utilities

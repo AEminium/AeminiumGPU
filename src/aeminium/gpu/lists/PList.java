@@ -1,8 +1,9 @@
 package aeminium.gpu.lists;
 
 import aeminium.gpu.lists.properties.Mappable;
+import aeminium.gpu.lists.properties.Reductionable;
 
-public interface PList<T> extends Mappable<T> {
+public interface PList<T> extends Mappable<T>, Reductionable<T> {
 	
 	/* Properties */
 	public int size();

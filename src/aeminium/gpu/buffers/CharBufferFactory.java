@@ -16,8 +16,7 @@ public class CharBufferFactory implements IBufferFactory {
 	@Override
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
 		char[] ar = ((CharList) list).getArray();
-		CharBuffer ibuffer = CharBuffer.wrap(ar);
-		ibuffer.put(ar, 0, list.size());
+		CharBuffer ibuffer = CharBuffer.wrap(ar, 0, list.size());
 		return context.createCharBuffer(CLMem.Usage.Input, ibuffer, true);
 	}
 
