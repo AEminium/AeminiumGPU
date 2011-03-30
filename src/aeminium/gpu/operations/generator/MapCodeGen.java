@@ -14,7 +14,6 @@ public class MapCodeGen {
 	
 	public MapCodeGen(Map mapOp) {
 		this.mapOp = mapOp;
-		System.out.println("Map:" + mapOp.getMapFun());
 		id = mapOp.getMapFun().getId();
 	}
 	

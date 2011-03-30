@@ -3,7 +3,7 @@ package aeminium.gpu.tests.lists;
 import aeminium.gpu.lists.LongList;
 import aeminium.gpu.lists.PList;
 
-public class TestLongList extends TestAbstractList<Long> {
+public class TestLongList extends TestAbstractListTemplate<Long> {
 	
 	@Override
 	PList<Long> getEmptyList() {

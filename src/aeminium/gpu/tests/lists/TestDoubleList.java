@@ -3,7 +3,7 @@ package aeminium.gpu.tests.lists;
 import aeminium.gpu.lists.DoubleList;
 import aeminium.gpu.lists.PList;
 
-public class TestDoubleList extends TestAbstractList<Double> {
+public class TestDoubleList extends TestAbstractListTemplate<Double> {
 	
 	@Override
 	PList<Double> getEmptyList() {

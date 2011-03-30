@@ -54,12 +54,16 @@
     <target name="main" depends="clean,run"/>  
    
 	<target name="test" depends="compile">
-	    <junit failureProperty="test.failure">
+	    <junit failureProperty="test.failure" fork="true">
+	      <jvmarg value="-Xms512m" />
+		  <jvmarg value="-Xmx1536m" />
 	      <classpath refid="classpath.test" />
 
 	      <formatter type="brief" usefile="false" />
+	    	
+	      <test name="${testcase}" todir="${test.data.dir}" if="testcase"/>
 	      <batchtest>
-	        <fileset dir="${classes.dir}" includes="aeminium/gpu/tests/*.class" excludes="**/*$*.class" />
+	        <fileset dir="${classes.dir}" includes="aeminium/gpu/tests/*.class aeminium/gpu/tests/*/*.class" excludes="**/*$*.class **/*Template.class" />
 	      </batchtest>
 	    </junit>
 

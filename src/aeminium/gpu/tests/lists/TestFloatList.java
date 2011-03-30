@@ -3,7 +3,7 @@ package aeminium.gpu.tests.lists;
 import aeminium.gpu.lists.FloatList;
 import aeminium.gpu.lists.PList;
 
-public class TestFloatList extends TestAbstractList<Float> {
+public class TestFloatList extends TestAbstractListTemplate<Float> {
 	
 	@Override
 	PList<Float> getEmptyList() {

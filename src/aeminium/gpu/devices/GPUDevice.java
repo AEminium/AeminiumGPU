@@ -30,19 +30,19 @@ public class GPUDevice {
 		
 		startTime = System.nanoTime();
 		p.prepareSource(context);
-		System.out.println("Prepare Source: " + (System.nanoTime() - startTime));
+		if (System.getenv("PROFILE") != null) System.out.println("Prepare Source: " + (System.nanoTime() - startTime));
 
 		startTime = System.nanoTime();
 		p.prepareBuffers(context);
-		System.out.println("Prepare Buffers: " + (System.nanoTime() - startTime));
+		if (System.getenv("PROFILE") != null) System.out.println("Prepare Buffers: " + (System.nanoTime() - startTime));
 		
 		startTime = System.nanoTime();
 		p.execute(context, queue);
-		System.out.println("Execution: " + (System.nanoTime() - startTime));
+		if (System.getenv("PROFILE") != null) System.out.println("Execution: " + (System.nanoTime() - startTime));
 		
 		startTime = System.nanoTime();
 		p.retrieveResults(context, queue);
-		System.out.println("Results Retrieval: " + (System.nanoTime() - startTime));
+		if (System.getenv("PROFILE") != null) System.out.println("Results Retrieval: " + (System.nanoTime() - startTime));
 		
 		p.release();
 	}

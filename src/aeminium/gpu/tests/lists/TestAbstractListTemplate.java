@@ -3,7 +3,7 @@ package aeminium.gpu.tests.lists;
 import aeminium.gpu.lists.PList;
 import junit.framework.TestCase;
 
-public abstract class TestAbstractList<T> extends TestCase {
+public abstract class TestAbstractListTemplate<T> extends TestCase {
 	
 	protected int MAX_SIZE = 10000000;
 	

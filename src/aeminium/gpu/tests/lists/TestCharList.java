@@ -3,7 +3,7 @@ package aeminium.gpu.tests.lists;
 import aeminium.gpu.lists.CharList;
 import aeminium.gpu.lists.PList;
 
-public class TestCharList extends TestAbstractList<Character> {
+public class TestCharList extends TestAbstractListTemplate<Character> {
 	
 	public void testToString() {
 		String s = "Hello World!";

@@ -69,8 +69,10 @@ public abstract class GenericProgram implements Program {
 	
 	protected CLProgram getProgram(CLContext ctx) {
 		try {
-			System.out.println("Compiling Source");
-			System.out.println(getSource());
+			if (System.getenv("DEBUG") != null) {
+				System.out.println("Compiling Source");
+				System.out.println(getSource());
+			}
 			return ctx.createProgram(getSource()).build();
 		} catch (CLBuildException e) {
 			e.printStackTrace();

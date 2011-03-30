@@ -70,7 +70,6 @@ public class Reduce<O> extends GenericProgram implements Program {
 		CLBuffer<?> out_original = outbuffer;
 		boolean first = true;
 		int current_size = input.size();
-		System.out.println(input.size() + "<-- size");
 		while(current_size > 1) {
 			synchronized (kernel) {
 				inferBestValues();
@@ -98,6 +97,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 			    current_size = current_size / (threads * 2);
 			}
 		}
+		// TODO: BUG: Research this.
 		outbuffer = out_original;
 	}
 	
