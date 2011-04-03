@@ -2,8 +2,10 @@ package aeminium.gpu.devices;
 
 import aeminium.gpu.executables.Program;
 
+import com.nativelibs4java.opencl.CLBuildException;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLDevice;
+import com.nativelibs4java.opencl.CLProgram;
 import com.nativelibs4java.opencl.CLQueue;
 
 public class GPUDevice {
@@ -16,6 +18,17 @@ public class GPUDevice {
 	}
 	
 	// Execute Programs
+	
+	public void compile(String kernel) {
+		CLProgram p;
+		try {
+			p = context.createProgram(kernel).build();
+			p.release();
+		} catch (CLBuildException e) {
+			// TODO: This will hurt performance
+		}
+		
+	}
 	
 	public void execute(Program p) {
 		p.prepareSource(context);

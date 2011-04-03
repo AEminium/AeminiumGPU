@@ -30,6 +30,12 @@ public class BufferHelper {
 		clTypes.put("Character", "char");
 		clTypes.put("Long", "long");
 		clTypes.put("Boolean", "char");
+		
+		for( Object t : clTypes.keySet().toArray() ) {
+			String v = clTypes.get(t);
+			clTypes.put("java.lang." + t, v);
+		}
+		
 	}
 	
 	private static <T> IBufferFactory getFactory(PList<T> list) {
