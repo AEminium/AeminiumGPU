@@ -1,11 +1,11 @@
 package aeminium.gpu.operations.generator;
 
-import java.io.File;
 import java.util.HashMap;
 
 import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.templates.Template;
+import aeminium.gpu.templates.TemplateWrapper;
 
 @SuppressWarnings("rawtypes")
 public class MapCodeGen {	
@@ -23,7 +23,7 @@ public class MapCodeGen {
 		mapping.put("output_type", BufferHelper.getCLTypeOf(mapOp.getOutputType()));
 		mapping.put("map_lambda_name", getMapLambdaName());
 		mapping.put("source", mapOp.getMapFun().getSource());
-		Template t = new Template(new File("templates/opencl/MapLambdaDef.clt"));
+		Template t = new Template(new TemplateWrapper("opencl/MapLambdaDef.clt"));
 		return t.apply(mapping);
 	}
 
@@ -38,7 +38,7 @@ public class MapCodeGen {
 		mapping.put("map_lambda_def", getMapLambdaSource());
 		mapping.put("other_sources", mapOp.getOtherSources());
 		
-		Template t = new Template(new File("templates/opencl/MapKernel.clt"));
+		Template t = new Template(new TemplateWrapper("opencl/MapKernel.clt"));
 		return t.apply(mapping);
 	}
 

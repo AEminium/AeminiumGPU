@@ -67,7 +67,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 	public void execute(CLContext ctx, CLQueue q) {
 		CLEvent[] previous;
 		CLBuffer<?> tmp;
-		CLBuffer<?> out_original = outbuffer;
+		//CLBuffer<?> out_original = outbuffer;
 		boolean first = true;
 		int current_size = input.size();
 		while(current_size > 1) {
@@ -90,15 +90,15 @@ public class Reduce<O> extends GenericProgram implements Program {
 			    		new int[] { local_workgroup_size }, 
 			    		previous);
 			    
-			    // Swap input and output
-			    tmp = inbuffer;
-			    inbuffer = outbuffer;
-			    outbuffer= tmp;
 			    current_size = current_size / (threads * 2);
+			    if (current_size > 1) {
+				    // Swap input and output
+				    tmp = inbuffer;
+				    inbuffer = outbuffer;
+				    outbuffer= tmp;
+			    }
 			}
 		}
-		// TODO: BUG: Research this.
-		outbuffer = out_original;
 	}
 	
 	public O cpuExecution() {
@@ -121,7 +121,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 	@Override
 	public void release() {
 		this.inbuffer.release();
-		// this.outbuffer.release();
+		this.outbuffer.release();
 		super.release();
 	}
 	
