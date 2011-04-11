@@ -7,7 +7,7 @@
 {{reduce_lambda_def}}
 
 __kernel void {{reduce_kernel_name}}(
-			__global const {{input_type}}* reduce_input,
+			__global {{input_type}}* reduce_input,
 			__global {{output_type}}* reduce_output,
 			__local {{input_type}}* reduce_shared,
 			const int reduce_length) {
@@ -17,14 +17,10 @@ __kernel void {{reduce_kernel_name}}(
 	{{input_type}} accumulator = {{seed_source}};
 	while (global_index < reduce_length) {
 		{{input_type}} element = reduce_input[global_index];
-		if (global_index == get_global_id(0)) {
-			accumulator = element;
-		} else {
-			accumulator = {{reduce_lambda_name}}(accumulator, element);
-		}
+		accumulator = {{reduce_lambda_name}}(accumulator, element);
 		global_index += get_global_size(0);
 	}
-
+	
 	int local_index = get_local_id(0);
 	reduce_shared[local_index] = accumulator;
 	barrier(CLK_LOCAL_MEM_FENCE);

@@ -65,11 +65,11 @@ public class Reduce<O> extends GenericProgram implements Program {
 
 	@Override
 	public void execute(CLContext ctx, CLQueue q) {
-		CLEvent[] previous;
+		CLEvent[] previous = new CLEvent[1];
 		CLBuffer<?> tmp;
-		//CLBuffer<?> out_original = outbuffer;
 		boolean first = true;
 		int current_size = input.size();
+		
 		while(current_size > 1) {
 			synchronized (kernel) {
 				inferBestValues();
@@ -77,28 +77,29 @@ public class Reduce<O> extends GenericProgram implements Program {
 			    
 			    int global_workgroup_size = blocks * threads;
 			    int local_workgroup_size = threads;
-			    
-			    if (first) {
-			    	previous = new CLEvent[] {};
-			    	first = false;
-			    } else {
-			    	previous = new CLEvent[] { kernelCompletion };
-			    }
+			    System.out.println("g:" + global_workgroup_size + "  l:" + local_workgroup_size);
+			    System.out.println("c:" + current_size);
 			    
 			    kernelCompletion = kernel.enqueueNDRange(q, 
 			    		new int[] { global_workgroup_size }, 
 			    		new int[] { local_workgroup_size }, 
-			    		previous);
+			    		(first) ? (new CLEvent[] {}) : previous);
+			    
+			    previous[0] = kernelCompletion;
+			    first = false;
 			    
 			    current_size = current_size / (threads * 2);
-			    if (current_size > 1) {
-				    // Swap input and output
-				    tmp = inbuffer;
-				    inbuffer = outbuffer;
-				    outbuffer= tmp;
-			    }
+			    debugBuffers(ctx, q);
+			    
+				// Swap input and output
+				tmp = inbuffer;
+				inbuffer = outbuffer;
+				outbuffer= tmp;
 			}
 		}
+		
+		// final swap.
+		outbuffer = inbuffer;
 	}
 	
 	public O cpuExecution() {
@@ -110,18 +111,28 @@ public class Reduce<O> extends GenericProgram implements Program {
 	}
 
 	@SuppressWarnings("unchecked")
+	public void debugBuffers(CLContext ctx, CLQueue q) {
+		PList<O> li;
+		
+		System.out.println("o:");
+		li = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q, kernelCompletion, getOutputType(), input.size());
+		for (int i = 0; i < li.size(); i++) {
+			System.out.print(li.get(i) + ",");
+		}
+		System.out.println("___");
+	}
+	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
-		// TODO: Improve extracting one element.
-		PList<O> resultList = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q, kernelCompletion, getOutputType(), 1);
-		output = (O) BufferHelper.decode(resultList.get(0), getOutputType());
+		output = (O) BufferHelper.extractElementFromBuffer(outbuffer, q, kernelCompletion, getOutputType());
 	}
 
 	
 	@Override
 	public void release() {
 		this.inbuffer.release();
-		this.outbuffer.release();
+		//this.outbuffer.release();
 		super.release();
 	}
 	

@@ -7,11 +7,11 @@ import aeminium.gpu.operations.functions.LambdaReducer;
 
 public class MapReduceExample {
 	public static void main(String[] args) {
-		int N = 10000;
+		int N = 512;
 		
 		PList<Integer> input = new IntList();
 		for (int i = 0; i < N; i++) {
-			input.add(i);
+			input.add(3);
 		}
 		
 		input = input.map(new LambdaMapper<Integer, Integer>() {
@@ -23,7 +23,7 @@ public class MapReduceExample {
 			
 			@Override
 			public String getSource() {
-				return "return + 1;";
+				return "return input + 1;";
 			}
 			
 		});
@@ -33,6 +33,11 @@ public class MapReduceExample {
 			@Override
 			public Integer combine(Integer input, Integer other) {
 				return input + other;
+			}
+			
+			@Override
+			public String getSource() {
+				return "return reduce_input_first + reduce_input_second;";
 			}
 
 			@Override
