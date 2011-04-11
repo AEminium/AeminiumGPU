@@ -38,4 +38,12 @@ public class FloatBufferFactory implements IBufferFactory {
 		outbuffer.asCLFloatBuffer().read(q, ev).get(content);
 		return new FloatList(content, size);	
 	}
+
+	@Override
+	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
+			CLEvent ev) {
+		float[] content = new float[1];
+		outbuffer.asCLFloatBuffer().read(q, ev).get(content);
+		return content[0];
+	}
 }

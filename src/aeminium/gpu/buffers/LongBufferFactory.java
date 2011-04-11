@@ -38,4 +38,12 @@ public class LongBufferFactory implements IBufferFactory {
 		outbuffer.asCLLongBuffer().read(q, ev).get(content);
 		return new LongList(content, size);	
 	}
+
+	@Override
+	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
+			CLEvent ev) {
+		long[] content = new long[1];
+		outbuffer.asCLLongBuffer().read(q, ev).get(content);
+		return content[0];
+	}
 }

@@ -7,7 +7,7 @@ public class TemplateWrapper {
 	String fname;
 
 	public TemplateWrapper(String file) {
-		fname = "/templates/" + file;
+		fname = "templates/" + file;
 		is = TemplateWrapper.class.getResourceAsStream(fname);
 	}
 

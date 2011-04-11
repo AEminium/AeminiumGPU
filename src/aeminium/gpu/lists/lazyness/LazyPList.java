@@ -71,7 +71,6 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 
 	@Override
 	public <O> PList<O> map(LambdaMapper<T, O> mapFun) {
-		// TODO: Merge with map
 		evaluate();
 		return actual.map(mapFun);
 	}
@@ -79,7 +78,6 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 
 	@Override
 	public T reduce(LambdaReducer<T> reducer) {
-		// TODO Merge with Reduce
 		evaluate();
 		return actual.reduce(reducer);
 	}

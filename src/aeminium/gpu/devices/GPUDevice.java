@@ -25,22 +25,13 @@ public class GPUDevice {
 			p = context.createProgram(kernel).build();
 			p.release();
 		} catch (CLBuildException e) {
-			// TODO: This will hurt performance
+			// GPU not available during compilation. 
 		}
 		
 	}
 	
 	public void execute(Program p) {
-		p.prepareSource(context);
-		p.prepareBuffers(context);
-		p.execute(context, queue);
-		p.retrieveResults(context, queue);
-		p.release();
-	}
-	
-	public void executeWithDebugInfo(Program p) {
 		long startTime;
-		
 		startTime = System.nanoTime();
 		p.prepareSource(context);
 		if (System.getenv("PROFILE") != null) System.out.println("Prepare Source: " + (System.nanoTime() - startTime));

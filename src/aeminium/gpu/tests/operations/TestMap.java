@@ -29,6 +29,7 @@ public class TestMap extends TestCase {
 			}
 			
 		});
+
 		for (int i = 0; i < TEST_SIZE; i++) {
 			assertEquals(2 * i,output.get(i).intValue());
 		}

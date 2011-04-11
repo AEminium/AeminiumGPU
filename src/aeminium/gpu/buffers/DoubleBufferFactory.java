@@ -38,5 +38,12 @@ public class DoubleBufferFactory implements IBufferFactory{
 		outbuffer.asCLDoubleBuffer().read(q, ev).get(content);
 		return new DoubleList(content, size);	
 	}
+	
+	@Override
+	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev) {
+		double[] content = new double[1];
+		outbuffer.asCLDoubleBuffer().read(q, ev).get(content);
+		return content[1];
+	}
 
 }

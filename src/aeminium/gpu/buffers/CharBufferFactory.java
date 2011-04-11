@@ -54,5 +54,13 @@ public class CharBufferFactory implements IBufferFactory {
 		char[] content = decodeBytesToChar(pcontent);
 		return new CharList(content, size);
 	}
+	
+	@Override
+	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev) {
+		byte[] pcontent = new byte[1];
+		outbuffer.asCLByteBuffer().read(q, ev).get(pcontent);
+		char[] content = decodeBytesToChar(pcontent);
+		return content[0];
+	}
 
 }

@@ -39,6 +39,14 @@ public class IntBufferFactory implements IBufferFactory{
 		return new IntList(content, size);	
 	}
 
+	@Override
+	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
+			CLEvent ev) {
+		int[] content = new int[1];
+		outbuffer.asCLIntBuffer().read(q, ev).get(content);
+		return content[0];
+	}
+
 
 
 }

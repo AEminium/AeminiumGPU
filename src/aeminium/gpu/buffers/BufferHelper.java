@@ -78,6 +78,11 @@ public class BufferHelper {
 		IBufferFactory f = getFactory(type);
 		return f.extractFromBuffer(outbuffer, q, ev, size);
 	}
+	
+	public static Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev, String type) {
+		IBufferFactory f = getFactory(type);
+		return f.extractElementFromBuffer(outbuffer, q, ev);
+	}
 
 	public static String getCLTypeOf(String type) {
 		return clTypes.get(type);

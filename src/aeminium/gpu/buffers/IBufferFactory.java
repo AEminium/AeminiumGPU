@@ -16,4 +16,7 @@ public interface IBufferFactory {
 
 	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev,
 			int size);
+
+	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
+			CLEvent ev);
 }
