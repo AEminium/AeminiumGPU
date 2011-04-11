@@ -19,6 +19,13 @@ public class FloatBufferFactory implements IBufferFactory {
 		FloatBuffer ibuffer = FloatBuffer.wrap(ar, 0, list.size());
 		return  context.createFloatBuffer(CLMem.Usage.Input, ibuffer, true);
 	}
+	
+	@Override
+	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list) {
+		float[] ar = ((FloatList) list).getArray();
+		FloatBuffer ibuffer = FloatBuffer.wrap(ar, 0, list.size());
+		return  context.createFloatBuffer(CLMem.Usage.InputOutput, ibuffer, true);
+	}
 
 	@Override
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size) {

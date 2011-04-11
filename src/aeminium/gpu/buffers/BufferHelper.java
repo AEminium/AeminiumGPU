@@ -55,6 +55,11 @@ public class BufferHelper {
 		 IBufferFactory f = getFactory(list);
 		 return f.createInputBufferFor(context, list);
 	}
+	
+	public static <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list) {
+		 IBufferFactory f = getFactory(list);
+		 return f.createInputOutputBufferFor(context, list);
+	}
 
 	public static <T> CLBuffer<?> createOutputBufferFor(CLContext context, PList<T> list, int size) {
 		return createOutputBufferFor(context, list.getClass().getSimpleName(), size);

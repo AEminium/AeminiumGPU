@@ -19,6 +19,15 @@ public class IntBufferFactory implements IBufferFactory{
 		IntBuffer ibuffer = IntBuffer.wrap(ar, 0, list.size());
 		return context.createIntBuffer(CLMem.Usage.Input, ibuffer, true);
 	}
+	
+
+	@Override
+	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			PList<T> list) {
+		int[] ar = ((IntList) list).getArray();
+		IntBuffer ibuffer = IntBuffer.wrap(ar, 0, list.size());
+		return context.createIntBuffer(CLMem.Usage.InputOutput, ibuffer, true);
+	}
 
 	@Override
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size) {
@@ -46,7 +55,5 @@ public class IntBufferFactory implements IBufferFactory{
 		outbuffer.asCLIntBuffer().read(q, ev).get(content);
 		return content[0];
 	}
-
-
 
 }

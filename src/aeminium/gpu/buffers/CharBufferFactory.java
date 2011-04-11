@@ -36,6 +36,14 @@ public class CharBufferFactory implements IBufferFactory {
 	}
 
 	@Override
+	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list) {
+		char[] ar = ((CharList) list).getArray();
+		byte[] car = encodeCharToBytes(ar);
+		ByteBuffer ibuffer = ByteBuffer.wrap(car, 0, list.size());
+		return context.createByteBuffer(CLMem.Usage.InputOutput, ibuffer, true);
+	}
+	
+	@Override
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size) {
 		return context.createCharBuffer(CLMem.Usage.Output, size);
 	}

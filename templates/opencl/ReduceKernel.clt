@@ -32,9 +32,5 @@ __kernel void {{reduce_kernel_name}}(
 		}
 		barrier(CLK_LOCAL_MEM_FENCE);
 	}
-	
-	if (local_index == 0) {
-		reduce_output[get_group_id(0)] = reduce_shared[0];
-	}
-
+	reduce_output[get_group_id(0)] = reduce_shared[get_group_id(0)];
 }

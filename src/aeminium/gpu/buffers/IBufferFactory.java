@@ -8,6 +8,9 @@ import com.nativelibs4java.opencl.CLEvent;
 import com.nativelibs4java.opencl.CLQueue;
 
 public interface IBufferFactory {
+	
+	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list);
+	
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list);
 
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size);

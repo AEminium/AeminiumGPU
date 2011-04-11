@@ -58,7 +58,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 	@Override
 	public void prepareBuffers(CLContext ctx) {
 		inferBestValues();
-		inbuffer = BufferHelper.createInputBufferFor(ctx, input);
+		inbuffer = BufferHelper.createInputOutputBufferFor(ctx, input);
 		outbuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
 		sharedbuffer = new CLKernel.LocalSize(threads);
 	}
@@ -75,7 +75,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 				inferBestValues();
 			    kernel.setArgs(inbuffer, outbuffer, sharedbuffer, current_size);
 			    
-			    int global_workgroup_size = blocks * threads;
+			    int global_workgroup_size = Math.min(blocks, current_size/(threads*2)) * threads;
 			    int local_workgroup_size = threads;
 			    System.out.println("g:" + global_workgroup_size + "  l:" + local_workgroup_size);
 			    System.out.println("c:" + current_size);
@@ -94,7 +94,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 				// Swap input and output
 				tmp = inbuffer;
 				inbuffer = outbuffer;
-				outbuffer= tmp;
+				outbuffer = tmp;
 			}
 		}
 		
@@ -113,6 +113,13 @@ public class Reduce<O> extends GenericProgram implements Program {
 	@SuppressWarnings("unchecked")
 	public void debugBuffers(CLContext ctx, CLQueue q) {
 		PList<O> li;
+		
+		System.out.println("i:");
+		li = (PList<O>) BufferHelper.extractFromBuffer(inbuffer, q, kernelCompletion, getOutputType(), input.size());
+		for (int i = 0; i < li.size(); i++) {
+			System.out.print(li.get(i) + ",");
+		}
+		System.out.println("___");
 		
 		System.out.println("o:");
 		li = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q, kernelCompletion, getOutputType(), input.size());
@@ -151,14 +158,21 @@ public class Reduce<O> extends GenericProgram implements Program {
         blocks = (blocks > max_blocks) ? max_blocks : blocks;
 	}
 	
-	private int nextPow2(int x) {
-		--x;
-	    x |= x >> 1;
-	    x |= x >> 2;
-	    x |= x >> 4;
-	    x |= x >> 8;
-	    x |= x >> 16;
-	    return ++x;
+	private int nextPow2(int i) {
+        int shifted = 0;
+        boolean lost = false;
+        for (;;) {
+            int next = i >> 1;
+            if (next == 0) {
+                if (lost)
+                    return 1 << (shifted + 1);
+                else
+                    return 1 << shifted;
+            }
+            lost = lost || (next << 1 != i);
+            shifted++;
+            i = next;
+        }
 	}
 	
 	// Output
