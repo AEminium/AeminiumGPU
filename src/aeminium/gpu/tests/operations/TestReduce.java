@@ -33,7 +33,7 @@ public class TestReduce extends TestCase {
 			}
 			
 		});
-		assertEquals(10,output.intValue());
+		assertEquals(TEST_SIZE,output.intValue());
 	}
 	
 }
