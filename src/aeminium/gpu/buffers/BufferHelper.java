@@ -8,6 +8,7 @@ import aeminium.gpu.lists.PList;
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
+import com.nativelibs4java.opencl.CLKernel;
 import com.nativelibs4java.opencl.CLQueue;
 
 public class BufferHelper {
@@ -65,7 +66,7 @@ public class BufferHelper {
 		return createOutputBufferFor(context, list.getClass().getSimpleName(), size);
 	}
 	
-	public static CLBuffer<?> createSharedBufferFor(CLContext context, String outputType, int size) {
+	public static CLKernel.LocalSize createSharedBufferFor(CLContext context, String outputType, int size) {
 		IBufferFactory f = getFactory(outputType);
 		return f.createSharedBufferFor(context, outputType, size);
 	}

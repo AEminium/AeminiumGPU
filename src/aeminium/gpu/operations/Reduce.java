@@ -11,7 +11,6 @@ import aeminium.gpu.operations.generator.ReduceCodeGen;
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
-import com.nativelibs4java.opencl.CLKernel;
 import com.nativelibs4java.opencl.CLKernel.LocalSize;
 import com.nativelibs4java.opencl.CLQueue;
 
@@ -60,7 +59,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 		inferBestValues();
 		inbuffer = BufferHelper.createInputOutputBufferFor(ctx, input);
 		outbuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
-		sharedbuffer = new CLKernel.LocalSize(threads);
+		sharedbuffer = BufferHelper.createSharedBufferFor(ctx , getOutputType(), threads);
 	}
 
 	@Override

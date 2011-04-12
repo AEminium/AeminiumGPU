@@ -8,6 +8,8 @@ import aeminium.gpu.lists.PList;
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
+import com.nativelibs4java.opencl.CLKernel;
+import com.nativelibs4java.opencl.CLKernel.LocalSize;
 import com.nativelibs4java.opencl.CLMem;
 import com.nativelibs4java.opencl.CLQueue;
 
@@ -33,9 +35,9 @@ public class FloatBufferFactory implements IBufferFactory {
 	}
 	
 	@Override
-	public CLBuffer<?> createSharedBufferFor(CLContext context, String type,
+	public LocalSize createSharedBufferFor(CLContext context, String type,
 			int size) {
-		return context.createFloatBuffer(CLMem.Usage.InputOutput, size);
+		return new CLKernel.LocalSize(size * 4);
 	}
 
 	@Override
