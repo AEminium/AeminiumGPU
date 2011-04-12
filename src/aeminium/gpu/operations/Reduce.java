@@ -76,8 +76,6 @@ public class Reduce<O> extends GenericProgram implements Program {
 			    
 			    int global_workgroup_size = Math.min(blocks, current_size/(threads*2)) * threads;
 			    int local_workgroup_size = threads;
-			    System.out.println("g:" + global_workgroup_size + "  l:" + local_workgroup_size);
-			    System.out.println("c:" + current_size);
 			    
 			    kernelCompletion = kernel.enqueueNDRange(q, 
 			    		new int[] { global_workgroup_size }, 
@@ -88,7 +86,6 @@ public class Reduce<O> extends GenericProgram implements Program {
 			    first = false;
 			    
 			    current_size = current_size / (threads * 2);
-			    debugBuffers(ctx, q);
 			    
 				// Swap input and output
 				tmp = inbuffer;
