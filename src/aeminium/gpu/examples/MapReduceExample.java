@@ -11,7 +11,7 @@ public class MapReduceExample {
 		
 		PList<Integer> input = new IntList();
 		for (int i = 0; i < N; i++) {
-			input.add(3);
+			input.add(i);
 		}
 		
 		input = input.map(new LambdaMapper<Integer, Integer>() {
