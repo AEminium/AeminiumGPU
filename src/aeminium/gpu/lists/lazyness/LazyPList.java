@@ -2,6 +2,8 @@ package aeminium.gpu.lists.lazyness;
 
 import aeminium.gpu.lists.AbstractList;
 import aeminium.gpu.lists.PList;
+import aeminium.gpu.operations.Map;
+import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
 
@@ -10,7 +12,9 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 	private boolean evaluated = false;
 	private PList<T> actual;
 	private LazyEvaluator<T> evaluator;
-	
+	private int lazynessLevel = 1;
+
+
 	public LazyPList(LazyEvaluator<T> eval, int size) {
 		super();
 		this.size = size;
@@ -71,16 +75,39 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 
 	@Override
 	public <O> PList<O> map(LambdaMapper<T, O> mapFun) {
-		evaluate();
-		return actual.map(mapFun);
+		if (evaluator.canMergeWithMap(mapFun)) {
+			Map<T,O> m = new Map<T,O>(mapFun, this, this.getDevice());
+			LazyPList<O> r = (LazyPList<O>) evaluator.mergeWithMap(m);
+			r.setLazynessLevel(lazynessLevel+1);
+			return r;
+		} else {
+			evaluate();
+			return actual.map(mapFun);
+		}
 	}
 
 
 	@Override
 	public T reduce(LambdaReducer<T> reducer) {
-		evaluate();
-		return actual.reduce(reducer);
+		if (evaluator.canMergeWithReduce(reducer)) {
+			Reduce<T> m = new Reduce<T>(reducer, this, this.getDevice());
+			return evaluator.mergeWithReducer(m);
+		} else {
+			evaluate();
+			return actual.reduce(reducer);
+		}
 	}
 	
+	
+	
+	
+	public int getLazynessLevel() {
+		return lazynessLevel;
+	}
+
+
+	public void setLazynessLevel(int lazynessLevel) {
+		this.lazynessLevel = lazynessLevel;
+	}
 	
 }

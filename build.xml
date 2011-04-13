@@ -65,7 +65,7 @@
 	    	
 	      <test name="${testcase}" todir="${classes.dir}" if="${testcase}"/>
 	      <batchtest>
-	        <fileset dir="${classes.dir}" includes="aeminium/gpu/tests/*.class aeminium/gpu/tests/*/*.class" excludes="**/*$*.class **/*Template.class" />
+	        <fileset dir="${classes.dir}" includes="aeminium/gpu/tests/*.class aeminium/gpu/tests/*/*.class aeminium/gpu/tests/*/*/*.class" excludes="**/*$*.class **/*Template.class" />
 	      </batchtest>
 	    </junit>
 

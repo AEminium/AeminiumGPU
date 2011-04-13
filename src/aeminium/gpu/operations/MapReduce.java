@@ -1,12 +1,15 @@
 package aeminium.gpu.operations;
 
+import java.lang.reflect.Method;
+
 import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.lists.PList;
+import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
-import aeminium.gpu.operations.generator.ReduceCodeGen;
+import aeminium.gpu.operations.generator.MapReduceCodeGen;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -14,44 +17,32 @@ import com.nativelibs4java.opencl.CLEvent;
 import com.nativelibs4java.opencl.CLKernel.LocalSize;
 import com.nativelibs4java.opencl.CLQueue;
 
-public class Reduce<O> extends GenericProgram implements Program {
+public class MapReduce<I,O> extends GenericProgram implements Program {
 	
-	protected PList<O> input;
+	protected PList<I> input;
 	private O output;
+	protected LambdaMapper<I,O> mapFun;
 	protected LambdaReducer<O> reduceFun;
 	
 	protected CLBuffer<?> inbuffer;
 	private LocalSize sharedbuffer;
+	private CLBuffer<?> middlebuffer;
 	private CLBuffer<?> outbuffer;
 	
-	private ReduceCodeGen gen;
+	private MapReduceCodeGen gen;
 	
 	private int blocks;
 	private int threads;
 	
 	// Constructors
 	
-	public Reduce(LambdaReducer<O> reduceFun2, PList<O> list, GPUDevice dev) {
-		this(reduceFun2, list, "", dev);
-	}
-	
-	public Reduce(LambdaReducer<O> reduceFun, PList<O> list, String other, GPUDevice dev) {
+	public MapReduce(LambdaMapper<I,O> mapper, LambdaReducer<O> reducer, PList<I> list, String other, GPUDevice dev) {
 		this.device = dev;
 		this.input = list;
-		this.reduceFun = reduceFun;
+		this.mapFun = mapper;
+		this.reduceFun = reducer;
 		this.setOtherSources(other);
-		gen = new ReduceCodeGen(this);
-	}
-	
-	// only for subclasses
-	protected Reduce(LambdaReducer<O> reduceFun2, GPUDevice dev) {
-		this(reduceFun2, "", dev);
-	}
-	protected Reduce(LambdaReducer<O> reduceFun2, String other, GPUDevice dev) {
-		this.device = dev;
-		this.reduceFun = reduceFun2;
-		this.setOtherSources(other);
-		gen = new ReduceCodeGen(this);
+		gen = new MapReduceCodeGen(this);
 	}
 	
 	// Pipeline
@@ -69,6 +60,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 	public void prepareBuffers(CLContext ctx) {
 		inferBestValues();
 		inbuffer = BufferHelper.createInputOutputBufferFor(ctx, input);
+		middlebuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
 		outbuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
 		sharedbuffer = BufferHelper.createSharedBufferFor(ctx , getOutputType(), threads);
 	}
@@ -83,7 +75,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 		while(current_size > 1) {
 			synchronized (kernel) {
 				inferBestValues();
-			    kernel.setArgs(inbuffer, outbuffer, sharedbuffer, current_size);
+			    kernel.setArgs(inbuffer, middlebuffer, outbuffer, sharedbuffer, current_size, (first) ? 1 : 0);
 			    
 			    int global_workgroup_size = Math.min(blocks, current_size/(threads*2)) * threads;
 			    int local_workgroup_size = threads;
@@ -99,43 +91,24 @@ public class Reduce<O> extends GenericProgram implements Program {
 			    current_size = current_size / (threads * 2);
 			    
 				// Swap input and output
-				tmp = inbuffer;
-				inbuffer = outbuffer;
+				tmp = middlebuffer;
+				middlebuffer = outbuffer;
 				outbuffer = tmp;
 			}
 		}
 		
 		// final swap.
-		outbuffer = inbuffer;
+		outbuffer = middlebuffer;
 	}
 	
 	public O cpuExecution() {
 		O accumulator = this.getReduceFun().getSeed();
 		for (int i = 0; i < input.size(); i++) {
-			accumulator = reduceFun.combine( input.get(i), accumulator);
+			accumulator = reduceFun.combine( mapFun.map(input.get(i)), accumulator);
 		}
 		return accumulator;
 	}
 
-	@SuppressWarnings("unchecked")
-	public void debugBuffers(CLContext ctx, CLQueue q) {
-		PList<O> li;
-		
-		System.out.println("i:");
-		li = (PList<O>) BufferHelper.extractFromBuffer(inbuffer, q, kernelCompletion, getOutputType(), input.size());
-		for (int i = 0; i < li.size(); i++) {
-			System.out.print(li.get(i) + ",");
-		}
-		System.out.println("___");
-		
-		System.out.println("o:");
-		li = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q, kernelCompletion, getOutputType(), input.size());
-		for (int i = 0; i < li.size(); i++) {
-			System.out.print(li.get(i) + ",");
-		}
-		System.out.println("___");
-	}
-	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
@@ -146,6 +119,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 	@Override
 	public void release() {
 		this.inbuffer.release();
+		//this.middlebuffer.release();
 		//this.outbuffer.release();
 		super.release();
 	}
@@ -203,15 +177,16 @@ public class Reduce<O> extends GenericProgram implements Program {
 	}
 	
 	public String getOutputType() {
-		try {
-			return reduceFun.getClass().getMethod("combine", input.getType(), input.getType()).getReturnType().getSimpleName().toString();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-			return null;
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			return null;
+		Class<?> klass = reduceFun.getClass();
+		for (Method m: klass.getMethods()) {
+			if (m.getName().equals("combine")) {
+				return m.getReturnType().getSimpleName().toString();
+			}
 		}
+		
+		System.out.println("AeminiumGPU doesn't support Generic Lambdas.");
+		System.exit(0);
+		return null;
 	}
 	
 	public int getOutputSize() {
@@ -237,6 +212,14 @@ public class Reduce<O> extends GenericProgram implements Program {
 		this.reduceFun = reduceFun;
 	}
 	
+	public LambdaMapper<I, O> getMapFun() {
+		return mapFun;
+	}
+
+	public void setMapFun(LambdaMapper<I, O> mapFun) {
+		this.mapFun = mapFun;
+	}
+
 	@Override
 	public String getKernelName() {
 		return gen.getReduceKernelName();

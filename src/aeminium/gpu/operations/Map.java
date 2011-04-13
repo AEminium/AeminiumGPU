@@ -8,7 +8,10 @@ import aeminium.gpu.lists.PList;
 import aeminium.gpu.lists.lazyness.LazyEvaluator;
 import aeminium.gpu.lists.lazyness.LazyPList;
 import aeminium.gpu.operations.functions.LambdaMapper;
+import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.MapCodeGen;
+import aeminium.gpu.operations.mergers.MapToMapMerger;
+import aeminium.gpu.operations.mergers.MapToReduceMerger;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -51,6 +54,10 @@ public class Map<I,O> extends GenericProgram implements Program {
 		return gen.getMapLambdaSource();
 	}
 	
+	public String getMapOpenCLName() {
+		return gen.getMapLambdaName();
+	}
+	
 	@Override
 	public void prepareBuffers(CLContext ctx) {
 		inbuffer = BufferHelper.createInputBufferFor(ctx, input);
@@ -86,9 +93,6 @@ public class Map<I,O> extends GenericProgram implements Program {
 	// Output
 	
 	public PList<O> getOutput() {
-		// Reference to Map operation
-		if (output != null) return output;
-		
 		final Map<I,O> innerMap = this;
 		
 		// Lazy return
@@ -107,13 +111,24 @@ public class Map<I,O> extends GenericProgram implements Program {
 
 			@Override
 			public <K> boolean canMergeWithMap(LambdaMapper<O, K> mapFun) {
-				return false;
+				return true;
 			}
 
 			@Override
 			public <K> PList<K> mergeWithMap(Map<O, K> mapOp) {
-				// TODO: Merge
-				return null;
+				MapToMapMerger<I,O,K> merger = new MapToMapMerger<I,O,K>(innerMap, mapOp, input);
+				return merger.getOutput();
+			}
+
+			@Override
+			public boolean canMergeWithReduce(LambdaReducer<O> reduceFun) {
+				return true;
+			}
+
+			@Override
+			public O mergeWithReducer(Reduce<O> reduceOp) {
+				MapToReduceMerger<I,O> merger = new MapToReduceMerger<I,O>(innerMap, reduceOp, input);
+				return merger.getOutput();
 			}
 			
 		};
