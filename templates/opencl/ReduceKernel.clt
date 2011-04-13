@@ -6,6 +6,10 @@
 // Specific Reduce Lambda Function
 {{reduce_lambda_def}}
 
+inline {{input_type}} get_accumulator() {
+	{{seed_source}}
+}
+
 __kernel void {{reduce_kernel_name}}(
 			__global {{input_type}}* reduce_input,
 			__global {{output_type}}* reduce_output,
@@ -14,7 +18,7 @@ __kernel void {{reduce_kernel_name}}(
 			
 	int global_index = get_global_id(0);
 	
-	{{input_type}} accumulator = {{seed_source}};
+	{{input_type}} accumulator = get_accumulator();
 	while (global_index < reduce_length) {
 		{{input_type}} element = reduce_input[global_index];
 		accumulator = {{reduce_lambda_name}}(accumulator, element);

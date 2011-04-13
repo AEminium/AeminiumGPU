@@ -1,3 +1,3 @@
-{{output_type}} {{reduce_lambda_name}}({{input_type}} {{reduce_lambda_par1}}, {{input_type}} {{reduce_lambda_par2}}) {
+inline {{output_type}} {{reduce_lambda_name}}({{input_type}} {{reduce_lambda_par1}}, {{input_type}} {{reduce_lambda_par2}}) {
 	{{source}}
 }
