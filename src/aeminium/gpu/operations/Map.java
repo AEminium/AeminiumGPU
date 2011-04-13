@@ -71,7 +71,6 @@ public class Map<I,O> extends GenericProgram implements Program {
 		    kernel.setArgs(inbuffer, outbuffer);
 
 		    // Ask for 1-dimensional execution of length dataSize, with auto choice of local workgroup size :
-		    // TODO: WorkGroup Size
 		    kernelCompletion = kernel.enqueueNDRange(q, new int[] { input.size() }, new CLEvent[] {});
 		}
 	}

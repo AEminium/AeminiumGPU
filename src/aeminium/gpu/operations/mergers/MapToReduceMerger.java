@@ -45,8 +45,6 @@ public class MapToReduceMerger<I,O> {
 
 			@Override
 			public <O2> PList<O2> mergeWithMap(Map<O, O2> mapOp) {
-				// mapOp.getMapFun().map(evaluate());
-				// TODO: PListFactory
 				return null;
 			}
 
