@@ -8,7 +8,9 @@ public class TemplateWrapper {
 
 	public TemplateWrapper(String file) {
 		fname = "templates/" + file;
-		is = TemplateWrapper.class.getResourceAsStream(fname);
+		
+		// Inside the jar, the path is absolute
+		is = TemplateWrapper.class.getResourceAsStream("/" + fname);
 	}
 
 	public InputStream getInputStream() {

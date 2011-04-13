@@ -13,19 +13,23 @@ public class Template {
 	private String source;
 	
 	public Template(TemplateWrapper t) {
+		
+		// First try inside the Jar
 		InputStream is = t.getInputStream();
 		if (is != null) {
 			readStream(t.toString(), new BufferedReader(new InputStreamReader(is)));
-		} else {
-			// Fallback to file
-			File f = new File(t.getFileName());
-			if (f.exists()) {
-				readStream(f);
-			} else {
-				System.out.println("Could not load file: " + t.getFileName());
-				System.exit(1);
-			}
+			return;
+		} 
+		
+		// Fallback to local file.
+		File f = new File(t.getFileName());
+		if (f.exists()) {
+			readStream(f);
+			return;
 		}
+		
+		System.out.println("Could not load file: " + t.getFileName());
+		System.exit(1);
 	}
 	
 	public Template(File f) {
