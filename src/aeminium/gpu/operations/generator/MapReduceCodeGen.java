@@ -12,10 +12,12 @@ import aeminium.gpu.templates.TemplateWrapper;
 public class MapReduceCodeGen {
 	private MapReduce op;
 	private String id;
+	private String[] map_parameters;
 
 	public MapReduceCodeGen(MapReduce op) {
 		this.op = op;
 		id = op.getMapFun().getId() + "_" + op.getReduceFun().getId();
+		map_parameters = op.getMapFun().getParameters();
 	}
 	
 	public String getMapLambdaSource() {
@@ -23,6 +25,7 @@ public class MapReduceCodeGen {
 		mapping.put("input_type", BufferHelper.getCLTypeOf(op.getInputType()));
 		mapping.put("output_type", BufferHelper.getCLTypeOf(op.getOutputType()));
 		mapping.put("map_lambda_name", getMapLambdaName());
+		mapping.put("map_lambda_par", map_parameters[0]);
 		mapping.put("source", op.getMapFun().getSource());
 		Template t = new Template(new TemplateWrapper("opencl/MapLambdaDef.clt"));
 		return t.apply(mapping);

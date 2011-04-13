@@ -15,26 +15,29 @@ public class MapCodeGen {
 	private String clSource;
 	private String otherSources = "";
 	private String id;
+	private String[] parameters;
 	
 	public MapCodeGen(Map mapOp) {
 		inputType = BufferHelper.getCLTypeOf(mapOp.getInputType());
 		outputType = BufferHelper.getCLTypeOf(mapOp.getOutputType());
 		clSource = mapOp.getMapFun().getSource();
 		otherSources = mapOp.getOtherSources();
+		parameters = mapOp.getMapFun().getParameters();
 		id = mapOp.getMapFun().getId();
 	}
 	
 	public MapCodeGen(String inputType, String outputType, 
-			String clSource, String id) {
-		this(inputType, outputType, clSource, id, "");
+			String clSource, String[] pars, String id) {
+		this(inputType, outputType, clSource, pars, id, "");
 	}
 	
 	public MapCodeGen(String inputType, String outputType, 
-			String clSource, String id, String otherSources) {
+			String clSource, String[] pars, String id, String otherSources) {
 		this.inputType = BufferHelper.getCLTypeOf(inputType);
 		this.outputType = BufferHelper.getCLTypeOf(outputType);
 		this.clSource =  clSource;
 		this.otherSources = otherSources;
+		this.parameters = pars;
 		this.id = id;
 	}
 	
@@ -43,6 +46,7 @@ public class MapCodeGen {
 		mapping.put("input_type", inputType);
 		mapping.put("output_type", outputType);
 		mapping.put("map_lambda_name", getMapLambdaName());
+		mapping.put("map_lambda_par", parameters[0]);
 		mapping.put("source", clSource);
 		Template t = new Template(new TemplateWrapper("opencl/MapLambdaDef.clt"));
 		return t.apply(mapping);
