@@ -1,6 +1,5 @@
 package aeminium.gpu.operations.generator;
 
-import java.io.File;
 import java.util.HashMap;
 
 import aeminium.gpu.buffers.BufferHelper;
@@ -41,8 +40,7 @@ public class MapReduceCodeGen {
 		mapping.put("reduce_lambda_par1", op.getReduceFun().getParameters()[0]);
 		mapping.put("reduce_lambda_par2", op.getReduceFun().getParameters()[1]);
 		mapping.put("source", op.getReduceFun().getSource());
-		Template t = new Template(new File(
-				"templates/opencl/ReduceLambdaDef.clt"));
+		Template t = new Template(new TemplateWrapper("opencl/ReduceLambdaDef.clt"));
 		return t.apply(mapping);
 	}
 
@@ -65,7 +63,7 @@ public class MapReduceCodeGen {
 
 		mapping.put("seed_source", op.getOpenCLSeed());
 
-		Template t = new Template(new File("templates/opencl/MapReduceKernel.clt"));
+		Template t = new Template(new TemplateWrapper("opencl/MapReduceKernel.clt"));
 		return t.apply(mapping);
 	}
 	

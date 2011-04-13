@@ -1,7 +1,5 @@
 package aeminium.gpu.operations;
 
-import java.lang.reflect.Method;
-
 import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
@@ -10,6 +8,7 @@ import aeminium.gpu.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.MapReduceCodeGen;
+import aeminium.gpu.operations.utils.ExtractTypes;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -177,16 +176,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	}
 	
 	public String getOutputType() {
-		Class<?> klass = reduceFun.getClass();
-		for (Method m: klass.getMethods()) {
-			if (m.getName().equals("combine")) {
-				return m.getReturnType().getSimpleName().toString();
-			}
-		}
-		
-		System.out.println("AeminiumGPU doesn't support Generic Lambdas.");
-		System.exit(0);
-		return null;
+		return ExtractTypes.extractReturnTypeOutOf(reduceFun, "combine");
 	}
 	
 	public int getOutputSize() {

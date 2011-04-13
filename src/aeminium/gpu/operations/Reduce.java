@@ -7,6 +7,7 @@ import aeminium.gpu.executables.Program;
 import aeminium.gpu.lists.PList;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.ReduceCodeGen;
+import aeminium.gpu.operations.utils.ExtractTypes;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -203,15 +204,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 	}
 	
 	public String getOutputType() {
-		try {
-			return reduceFun.getClass().getMethod("combine", input.getType(), input.getType()).getReturnType().getSimpleName().toString();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-			return null;
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return ExtractTypes.extractReturnTypeOutOf(reduceFun, "combine");
 	}
 	
 	public int getOutputSize() {
