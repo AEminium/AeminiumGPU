@@ -10,11 +10,12 @@ import aeminium.gpu.operations.functions.LambdaMapper;
 
 public class TestMap extends TestCase {
 	
-	private static int TEST_SIZE = 10;
+	private static int TEST_SIZE = 10000;
+	private static int SMALL_TEST_SIZE = 10;
 	
-	public void testMapIntToInt() { 
+	public void performTestMapIntToInt(int size) { 
 		PList<Integer> example = new IntList();
-		for (int i = 0; i < TEST_SIZE; i++) {
+		for (int i = 0; i < size; i++) {
 			example.add(i);
 		}
 		PList<Integer> output = example.map(new LambdaMapper<Integer, Integer>() {
@@ -30,9 +31,16 @@ public class TestMap extends TestCase {
 			
 		});
 
-		for (int i = 0; i < TEST_SIZE; i++) {
+		for (int i = 0; i < size; i++) {
 			assertEquals(2 * i,output.get(i).intValue());
 		}
+	}
+	public void testMapIntToInt() {
+		performTestMapIntToInt(TEST_SIZE);
+	}
+	
+	public void testSmappMapIntToInt() {
+		performTestMapIntToInt(SMALL_TEST_SIZE);
 	}
 	
 	public void testMapIntToFloat() { 

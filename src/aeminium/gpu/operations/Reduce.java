@@ -55,6 +55,14 @@ public class Reduce<O> extends GenericProgram implements Program {
 		gen = new ReduceCodeGen(this);
 	}
 	
+	public void execute() {
+		if (input.size() < 1000) {
+			cpuExecution();
+		} else {
+			run();
+		}
+	}
+	
 	// Pipeline
 	
 	@Override
@@ -110,12 +118,11 @@ public class Reduce<O> extends GenericProgram implements Program {
 		outbuffer = inbuffer;
 	}
 	
-	public O cpuExecution() {
-		O accumulator = this.getReduceFun().getSeed();
+	public void cpuExecution() {
+		output = this.getReduceFun().getSeed();
 		for (int i = 0; i < input.size(); i++) {
-			accumulator = reduceFun.combine( input.get(i), accumulator);
+			output = reduceFun.combine( input.get(i), output);
 		}
-		return accumulator;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -187,7 +194,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 	
 	public O getOutput() {
 		// No need for lazyness in reduces.
-		run();
+		execute();
 		return output;
 	}
 	

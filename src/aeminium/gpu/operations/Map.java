@@ -5,6 +5,7 @@ import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.lists.PList;
+import aeminium.gpu.lists.factories.ListFactory;
 import aeminium.gpu.lists.lazyness.LazyEvaluator;
 import aeminium.gpu.lists.lazyness.LazyPList;
 import aeminium.gpu.operations.functions.LambdaMapper;
@@ -44,6 +45,23 @@ public class Map<I,O> extends GenericProgram implements Program {
 	}
 	
 	// Pipeline
+	
+	public void execute() {
+		if (input.size() < 1000) {
+			cpuExecution();
+		} else {
+			run();
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void cpuExecution() {
+		output = (PList<O>) ListFactory.fromType(getOutputType());
+		for (int i=0; i< input.size(); i++ ) {
+			output.add(mapFun.map(input.get(i)));
+		}
+	}
+	
 	
 	@Override
 	protected String getSource() {
@@ -99,7 +117,7 @@ public class Map<I,O> extends GenericProgram implements Program {
 
 			@Override
 			public PList<O> evaluate() {
-				innerMap.run();
+				innerMap.execute();
 				return output;
 			}
 
