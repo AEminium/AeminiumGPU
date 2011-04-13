@@ -18,6 +18,11 @@ public abstract class LambdaReducer<I> implements Reducer<I>, GPUFunction {
 	}
 	
 	/*  This method should be overridden by the Aeminium GPU Compiler */
+	public String[] getParameters() {
+		return new String[] { "reduce_input_first", "reduce_input_second" };
+	}
+	
+	/*  This method should be overridden by the Aeminium GPU Compiler */
 	public String getId() {
 		if (id == null)
 			id = UniqCounter.getNewId(); 

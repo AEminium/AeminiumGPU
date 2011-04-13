@@ -38,6 +38,8 @@ public class MapReduceCodeGen {
 		mapping.put("output_type",
 				BufferHelper.getCLTypeOf(op.getOutputType()));
 		mapping.put("reduce_lambda_name", getReduceLambdaName());
+		mapping.put("reduce_lambda_par1", op.getReduceFun().getParameters()[0]);
+		mapping.put("reduce_lambda_par2", op.getReduceFun().getParameters()[1]);
 		mapping.put("source", op.getReduceFun().getSource());
 		Template t = new Template(new File(
 				"templates/opencl/ReduceLambdaDef.clt"));
