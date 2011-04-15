@@ -2,6 +2,7 @@ package aeminium.gpu.lists.lazyness;
 
 import aeminium.gpu.lists.AbstractList;
 import aeminium.gpu.lists.PList;
+import aeminium.gpu.lists.factories.ListFactory;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
@@ -32,6 +33,15 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 	}
 	
 	@Override
+	public int size() {
+		if (evaluated) {
+			return actual.size();
+		} else {
+			return size;
+		}
+	}
+	
+	@Override
 	public void add(int index, T e) {
 		evaluate();
 		actual.add(index, e);
@@ -59,6 +69,14 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 	public T remove(int index) {
 		evaluate();
 		return actual.remove(index);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void clear() {
+		size = 0;
+		evaluated = true;
+		actual = (PList<T>) ListFactory.fromType(getType().getSimpleName().toString());
 	}
 	
 	@Override
@@ -97,8 +115,6 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 			return actual.reduce(reducer);
 		}
 	}
-	
-	
 	
 	
 	public int getLazynessLevel() {

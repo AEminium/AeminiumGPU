@@ -123,7 +123,7 @@ public class Map<I,O> extends GenericProgram implements Program {
 
 			@Override
 			public Class<?> getType() {
-				return input.getType();
+				return output.getType();
 			}
 
 			@Override

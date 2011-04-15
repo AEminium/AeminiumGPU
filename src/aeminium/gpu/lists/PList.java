@@ -21,6 +21,7 @@ public interface PList<T> extends Mappable<T>, Reductionable<T> {
 	public T get(int index);
 	public void set(int index, T e);
 	
+	public void clear();
 	
 	/* Extraction Methods */
 	public PList<T> subList(int fromIndex, int toIndex);

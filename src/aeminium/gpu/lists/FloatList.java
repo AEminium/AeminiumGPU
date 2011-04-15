@@ -60,7 +60,11 @@ public class FloatList extends AbstractList<Float> {
 		return e;
 	}
 	
-	
+	@Override
+	public void clear() {
+		size = 0;
+		box = new float[DEFAULT_SIZE];
+	}
 
 	@Override
 	public PList<Float> subList(int fromIndex, int toIndex) {

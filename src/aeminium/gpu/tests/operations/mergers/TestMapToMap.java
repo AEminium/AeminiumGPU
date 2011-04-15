@@ -42,4 +42,30 @@ public class TestMapToMap extends TestCase {
 		}
 	}
 	
+	
+	public void testClearAfterMap() {
+		PList<Integer> example = new IntList();
+		for (int i = 0; i < TEST_SIZE; i++) {
+			example.add(1);
+		}
+		
+		PList<Float> output = example.map(new LambdaMapper<Integer,Float>() {
+
+			@Override
+			public Float map(Integer input) {
+				fail();
+				return 2.0f * input;
+			}
+			
+			@Override
+			public String getSource() {
+				return "return 2.0 * input;";
+			}
+			
+		});
+		output.clear();
+		output.add(1f);
+		assertEquals(1, output.size());
+		
+	}
 }

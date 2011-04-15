@@ -60,6 +60,12 @@ public class DoubleList extends AbstractList<Double> {
 		return e;
 	}
 	
+	@Override
+	public void clear() {
+		size = 0;
+		box = new double[DEFAULT_SIZE];
+	}
+	
 	
 
 	@Override

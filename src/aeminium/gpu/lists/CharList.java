@@ -60,6 +60,11 @@ public class CharList extends AbstractList<Character> {
 		return e;
 	}
 	
+	@Override
+	public void clear() {
+		size = 0;
+		box = new char[DEFAULT_SIZE];
+	}
 	
 
 	@Override

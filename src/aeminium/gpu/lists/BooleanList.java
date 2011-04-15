@@ -49,6 +49,12 @@ public class BooleanList extends AbstractList<Boolean> {
 			}
 		}
 	}
+	
+	@Override
+	public void clear() {
+		size = 0;
+		box = new int[DEFAULT_SIZE];
+	}
 
 	@Override
 	public Boolean get(int index) {

@@ -37,6 +37,12 @@ public class LongList extends AbstractList<Long> {
 			}
 		}
 	}
+	
+	@Override
+	public void clear() {
+		size = 0;
+		box = new long[DEFAULT_SIZE];
+	}
 
 	@Override
 	public Long get(int index) {
@@ -59,8 +65,6 @@ public class LongList extends AbstractList<Long> {
 		size--;
 		return e;
 	}
-	
-	
 
 	@Override
 	public PList<Long> subList(int fromIndex, int toIndex) {

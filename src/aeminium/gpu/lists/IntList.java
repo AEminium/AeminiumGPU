@@ -61,6 +61,11 @@ public class IntList extends AbstractList<Integer> {
 	}
 	
 	
+	@Override
+	public void clear() {
+		size = 0;
+		box = new int[DEFAULT_SIZE];
+	}
 
 	@Override
 	public PList<Integer> subList(int fromIndex, int toIndex) {
