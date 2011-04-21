@@ -45,9 +45,10 @@ public class Benchmarker {
 	
 	
 	public void executeExprMultipleTimes(String name, String expr, PList<Float> input) {
+		System.out.println("Op:" + name + ", Size:" + input.size());
 		for (int i = 0; i < times; i++) {
-			System.out.println("Op:" + name + ", Size:" + input.size());
 			executeExpr(name, expr, input);
+			System.gc();
 		}
 	}
 	
