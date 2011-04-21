@@ -63,6 +63,8 @@ public class GPUDevice {
 		p.retrieveResults(context, queue);
 		logger.saveTime("buffer.from", System.nanoTime() - startTime);
 		
+		p.release();
+		
 	}
 	
 
