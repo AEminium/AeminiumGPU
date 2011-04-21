@@ -1,6 +1,7 @@
 package aeminium.gpu.devices;
 
 import aeminium.gpu.executables.Program;
+import aeminium.gpu.executables.ProgramLogger;
 
 import com.nativelibs4java.opencl.CLBuildException;
 import com.nativelibs4java.opencl.CLContext;
@@ -31,26 +32,40 @@ public class GPUDevice {
 	}
 	
 	public void execute(Program p) {
-		long startTime;
-		startTime = System.nanoTime();
+		if (p.getLogger() !=  null) {
+			executeWithLogger(p);
+			return;
+		}
 		p.prepareSource(context);
-		if (System.getenv("PROFILE") != null) System.out.println("Prepare Source: " + (System.nanoTime() - startTime));
-
-		startTime = System.nanoTime();
 		p.prepareBuffers(context);
-		if (System.getenv("PROFILE") != null) System.out.println("Prepare Buffers: " + (System.nanoTime() - startTime));
-		
-		startTime = System.nanoTime();
 		p.execute(context, queue);
-		if (System.getenv("PROFILE") != null) System.out.println("Execution: " + (System.nanoTime() - startTime));
-		
-		startTime = System.nanoTime();
 		p.retrieveResults(context, queue);
-		if (System.getenv("PROFILE") != null) System.out.println("Results Retrieval: " + (System.nanoTime() - startTime));
-		
 		p.release();
 	}
 	
+	private void executeWithLogger(Program p) {
+		ProgramLogger logger = p.getLogger();		
+		long startTime;
+		
+		startTime = System.nanoTime();
+		p.prepareSource(context);
+		logger.saveTime("kernel.compilation", System.nanoTime() - startTime);
+		
+		startTime = System.nanoTime();
+		p.prepareBuffers(context);
+		logger.saveTime("buffer.to", System.nanoTime() - startTime);
+		
+		startTime = System.nanoTime();
+		p.execute(context, queue);
+		logger.saveTime("kernel.execution", System.nanoTime() - startTime);
+		
+		startTime = System.nanoTime();
+		p.retrieveResults(context, queue);
+		logger.saveTime("buffer.from", System.nanoTime() - startTime);
+		
+	}
+	
+
 	public void release() {
 		if (queue != null) {
 			queue.finish();

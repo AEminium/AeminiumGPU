@@ -11,4 +11,7 @@ public interface Program {
 	public void execute(CLContext ctx, CLQueue q);
 	public void retrieveResults(CLContext ctx, CLQueue q);
 	public void release();
+	
+	public void setLogger(ProgramLogger logger);
+	public ProgramLogger getLogger();
 }

@@ -15,8 +15,10 @@ public abstract class GenericProgram implements Program {
 	protected CLProgram program;
 	protected CLKernel kernel;
 	protected CLEvent kernelCompletion;
-	
+	protected ProgramLogger logger = null;
+
 	protected String otherSources;
+	protected long startTime;
 	
 	public void run() {
 		if (device != null) {
@@ -81,6 +83,7 @@ public abstract class GenericProgram implements Program {
 		}
 	}
 	
+	
 	// Getters/Setters
 	
 	public void setDevice(GPUDevice dev) {
@@ -97,6 +100,14 @@ public abstract class GenericProgram implements Program {
 
 	public String getOtherSources() {
 		return otherSources;
+	}
+	
+	public ProgramLogger getLogger() {
+		return logger;
+	}
+
+	public void setLogger(ProgramLogger logger) {
+		this.logger = logger;
 	}
 
 }
