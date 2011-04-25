@@ -23,7 +23,6 @@ public class LoggerTimer implements ProgramLogger {
 	}
 
 	public void makeAverages() {
-		
 		for (String name : map.keySet()) {
 			long average = 0;
 			for (Long t : map.get(name)) {
@@ -31,6 +30,16 @@ public class LoggerTimer implements ProgramLogger {
 			}
 			average /= map.get(name).size();
 			Configuration.set(prf + name, average + "");
+		}
+	}
+	
+	public void makeMaximum() {
+		for (String name : map.keySet()) {
+			long max = 0;
+			for (Long t : map.get(name)) {
+				if (t > max) max = t; 
+			}
+			Configuration.set(prf + name, max + "");
 		}
 	}
 
