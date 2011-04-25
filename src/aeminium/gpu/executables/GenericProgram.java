@@ -39,6 +39,7 @@ public abstract class GenericProgram implements Program {
 	@Override
 	public void waitExecution(CLContext context, CLQueue queue) {
 		kernelCompletion.waitFor();
+		kernelCompletion = null;
 	}
 	
 	public void release() {
