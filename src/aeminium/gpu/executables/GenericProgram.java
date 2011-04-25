@@ -35,6 +35,12 @@ public abstract class GenericProgram implements Program {
 	abstract public void prepareBuffers(CLContext ctx);
 	abstract public void execute(CLContext ctx, CLQueue q);
 	abstract public void retrieveResults(CLContext ctx, CLQueue q);
+	
+	@Override
+	public void waitExecution(CLContext context, CLQueue queue) {
+		kernelCompletion.waitFor();
+	}
+	
 	public void release() {
 		if (program != null) {
 			program.release();

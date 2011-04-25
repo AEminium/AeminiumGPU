@@ -57,6 +57,7 @@ public class GPUDevice {
 		
 		startTime = System.nanoTime();
 		p.execute(context, queue);
+		p.waitExecution(context, queue);
 		logger.saveTime("kernel.execution", System.nanoTime() - startTime);
 		
 		startTime = System.nanoTime();

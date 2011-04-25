@@ -9,6 +9,7 @@ public interface Program {
 	public void prepareSource(CLContext ctx);
 	public void prepareBuffers(CLContext ctx);
 	public void execute(CLContext ctx, CLQueue q);
+	public void waitExecution(CLContext context, CLQueue queue);
 	public void retrieveResults(CLContext ctx, CLQueue q);
 	public void release();
 	
