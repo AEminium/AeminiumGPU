@@ -1,46 +1,24 @@
 package aeminium.gpu.benchmarker;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import aeminium.gpu.executables.ProgramLogger;
 
 public class LoggerTimer implements ProgramLogger {
-
-	HashMap<String, ArrayList<Long>> map = new HashMap<String, ArrayList<Long>>();
+	RecordTracker tracker;
 	String prf;
+	String size_prf;
 	
-	public LoggerTimer(int buffer, int size, String exprname) {
-		prf = exprname + "." + size + ".";
+	public LoggerTimer(int buffer, int size, String exprname, RecordTracker tracker) {
+		size_prf = size + ".";
+		prf = exprname + "." + size_prf;
+		this.tracker = tracker;
 	}
 		
 	@Override
 	public void saveTime(String name, long time) {
-		if (!map.containsKey(name)) {
-			map.put(name, new ArrayList<Long>());
-		}
-		map.get(name).add(time);
-	}
-
-	public void makeAverages() {
-		for (String name : map.keySet()) {
-			long average = 0;
-			for (Long t : map.get(name)) {
-				average += t;
-			}
-			average /= map.get(name).size();
-			Configuration.set(prf + name, average + "");
+		if (name.contains("buffer")) {
+			tracker.store(size_prf + name, time);
+		} else {
+			tracker.store(prf + name, time);
 		}
 	}
-	
-	public void makeMaximum() {
-		for (String name : map.keySet()) {
-			long max = 0;
-			for (Long t : map.get(name)) {
-				if (t > max) max = t; 
-			}
-			Configuration.set(prf + name, max + "");
-		}
-	}
-
 }

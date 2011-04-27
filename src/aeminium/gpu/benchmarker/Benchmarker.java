@@ -15,7 +15,8 @@ public class Benchmarker {
 	};
 	
 	GPUDevice dev = new DefaultDeviceFactory().getDevice();
-		
+	RecordTracker tracker = new RecordTracker();
+	
 	public static void main(String[] args) {
 		Benchmarker b = new Benchmarker();
 		b.run();
@@ -30,8 +31,14 @@ public class Benchmarker {
 		executeExprMultipleSizes("pow", "pow(input, 2)");
 		executeExprMultipleSizes("log", "log(input)");
 		executeExprMultipleSizes("floor", "floor(input)");
+		
+		finish();
 	}
 	
+	private void finish() {
+		tracker.makeAverages();
+	}
+
 	public void executeExprMultipleSizes(String name, String expr) {
 		PList<Float> input;
 		for (int size : sizes) {
@@ -46,12 +53,11 @@ public class Benchmarker {
 	
 	public void executeExprMultipleTimes(String name, String expr, PList<Float> input) {
 		System.out.println("Op:" + name + ", Size:" + input.size());
-		LoggerTimer logger = new LoggerTimer(times, input.size(), name);
+		LoggerTimer logger = new LoggerTimer(times, input.size(), name, tracker);
 		for (int i = 0; i < times; i++) {
 			executeExpr(name, expr, input, logger);
 			System.gc();
 		}
-		logger.makeAverages();
 	}
 	
 	public void executeExpr(String name, String expr, PList<Float> input, LoggerTimer logger) {
