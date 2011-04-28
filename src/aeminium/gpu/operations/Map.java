@@ -1,5 +1,6 @@
 package aeminium.gpu.operations;
 
+import aeminium.gpu.benchmarker.Configuration;
 import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
@@ -47,13 +48,26 @@ public class Map<I,O> extends GenericProgram implements Program {
 	// Pipeline
 	
 	public void execute() {
-		if (input.size() < 1000) {
-			cpuExecution();
-		} else {
+		if (willRunOnGPU()) {
 			run();
+		} else {
+			cpuExecution();
 		}
 	}
 	
+	private boolean willRunOnGPU() {
+		int s = 1 * (int)Math.pow(10, ("" + input.size()).length());
+		long pTimeGPU;
+		try {
+			pTimeGPU = Long.parseLong(Configuration.get(s + ".buffer.to"));
+			pTimeGPU += Long.parseLong(Configuration.get(s + ".buffer.from"));
+			System.out.println("TIME: " + pTimeGPU);
+		} catch(Exception e) {
+			return false;
+		}
+		return true;
+	}
+
 	@SuppressWarnings("unchecked")
 	public void cpuExecution() {
 		output = (PList<O>) ListFactory.fromType(getOutputType());

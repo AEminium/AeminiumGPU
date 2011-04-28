@@ -23,6 +23,7 @@ public class Benchmarker {
 	}
 	
 	public void run() {
+		executeExprMultipleSizes("unit", "input");
 		executeExprMultipleSizes("sum", "input + input");
 		executeExprMultipleSizes("mul", "input * input");
 		executeExprMultipleSizes("eq", "(input == input) ? 1.0 : 2.0");
