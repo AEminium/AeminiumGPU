@@ -11,7 +11,7 @@ public class Benchmarker {
 	
 	int times = 30;
 	public int[] sizes = new int[] {
-			10, 100, 1000, 10000, 100000, 1000000
+			10, 100, 1000, 10000, 100000, 1000000, 10000000
 	};
 	
 	GPUDevice dev = new DefaultDeviceFactory().getDevice();
@@ -23,6 +23,7 @@ public class Benchmarker {
 	}
 	
 	public void run() {
+		System.setProperty("ForceGPU", "yes");
 		executeExprMultipleSizes("unit", "input");
 		executeExprMultipleSizes("sum", "input + input");
 		executeExprMultipleSizes("mul", "input * input");
@@ -32,8 +33,9 @@ public class Benchmarker {
 		executeExprMultipleSizes("pow", "pow(input, 2)");
 		executeExprMultipleSizes("log", "log(input)");
 		executeExprMultipleSizes("floor", "floor(input)");
-		
+
 		finish();
+		System.clearProperty("ForceGPU");
 	}
 	
 	private void finish() {

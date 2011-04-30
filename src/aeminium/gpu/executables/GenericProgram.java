@@ -52,6 +52,7 @@ public abstract class GenericProgram implements Program {
 		if (kernel != null) {
 			kernel.release();
 		}
+		System.gc();
 	}
 	
 	// CL Definitions

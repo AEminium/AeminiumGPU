@@ -1,6 +1,5 @@
 package aeminium.gpu.operations;
 
-import aeminium.gpu.benchmarker.Configuration;
 import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
@@ -9,6 +8,7 @@ import aeminium.gpu.lists.PList;
 import aeminium.gpu.lists.factories.ListFactory;
 import aeminium.gpu.lists.lazyness.LazyEvaluator;
 import aeminium.gpu.lists.lazyness.LazyPList;
+import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.MapCodeGen;
@@ -48,6 +48,29 @@ public class Map<I,O> extends GenericProgram implements Program {
 	// Pipeline
 	
 	public void execute() {
+		if (System.getenv("BENCH") != null) {
+			boolean isGpu = willRunOnGPU();
+			long startT = System.nanoTime();
+			run();
+			long gpuT = System.nanoTime() - startT;
+			
+			startT = System.nanoTime();
+			cpuExecution();
+			long cpuT = System.nanoTime() - startT;
+			System.out.println("GPUreal: " + gpuT);
+			System.out.println("CPUreal: " + cpuT);
+			
+			if ( isGpu == (gpuT < cpuT) ) {
+				System.out.println("GPUvsCPU: right");
+			} else {
+				System.out.println("GPUvsCPU: wrong");
+			}
+			
+			
+			
+			return;
+		}
+		// TODO: Consider size: 0
 		if (willRunOnGPU()) {
 			run();
 		} else {
@@ -56,16 +79,12 @@ public class Map<I,O> extends GenericProgram implements Program {
 	}
 	
 	private boolean willRunOnGPU() {
-		int s = 1 * (int)Math.pow(10, ("" + input.size()).length());
-		long pTimeGPU;
-		try {
-			pTimeGPU = Long.parseLong(Configuration.get(s + ".buffer.to"));
-			pTimeGPU += Long.parseLong(Configuration.get(s + ".buffer.from"));
-			System.out.println("TIME: " + pTimeGPU);
-		} catch(Exception e) {
-			return false;
-		}
-		return true;
+		return OpenCLDecider.useGPU(input.size(), mapFun.getSource(), new Runnable() {
+			@Override
+			public void run() {
+				mapFun.map(input.get(0));
+			}
+		});
 	}
 
 	@SuppressWarnings("unchecked")
