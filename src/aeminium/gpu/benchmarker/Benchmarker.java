@@ -25,14 +25,21 @@ public class Benchmarker {
 	public void run() {
 		System.setProperty("ForceGPU", "yes");
 		executeExprMultipleSizes("unit", "input");
-		executeExprMultipleSizes("sum", "input + input");
+		executeExprMultipleSizes("plus", "input + input");
+		executeExprMultipleSizes("minus", "input - input");
 		executeExprMultipleSizes("mul", "input * input");
+		executeExprMultipleSizes("div", "input / input");
 		executeExprMultipleSizes("eq", "(input == input) ? 1.0 : 2.0");
 		executeExprMultipleSizes("sin", "sin(input)");
+		executeExprMultipleSizes("asin", "asin(input)");
 		executeExprMultipleSizes("cos", "cos(input)");
+		executeExprMultipleSizes("acos", "acos(input)");
+		executeExprMultipleSizes("tan", "cos(input)");
+		executeExprMultipleSizes("atan", "atan(input)");
 		executeExprMultipleSizes("pow", "pow(input, 2)");
 		executeExprMultipleSizes("log", "log(input)");
 		executeExprMultipleSizes("floor", "floor(input)");
+		executeExprMultipleSizes("ceil", "ceil(input)");
 
 		finish();
 		System.clearProperty("ForceGPU");

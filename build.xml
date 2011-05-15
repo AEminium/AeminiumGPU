@@ -53,7 +53,7 @@
         </java>  
     </target>  
    
-	<target name="benchmarker" depends="jar">  
+	<target name="record" depends="jar">  
         <java fork="true" classname="${bench-class}">
             <classpath>  
                 <path refid="classpath"/>  

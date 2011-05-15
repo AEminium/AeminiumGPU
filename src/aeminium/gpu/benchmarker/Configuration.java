@@ -15,7 +15,7 @@ public class Configuration {
 	static {
 		filename = System.getenv("AEMINIUMGPU_CONFIG");
 		if ( filename == null ) {
-			filename = "aeminiumgpu.config";
+			filename = System.getProperty("user.home") + ".aeminiumgpurc";
 		}
 		File file = new File(filename);
 		properties = new Properties();

@@ -79,7 +79,7 @@ public class Map<I,O> extends GenericProgram implements Program {
 	}
 	
 	private boolean willRunOnGPU() {
-		return OpenCLDecider.useGPU(input.size(), mapFun.getSource(), new Runnable() {
+		return OpenCLDecider.useGPU(input.size(), mapFun.getSource(), mapFun.getSourceComplexity(), new Runnable() {
 			@Override
 			public void run() {
 				mapFun.map(input.get(0));
