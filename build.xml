@@ -10,7 +10,7 @@
 	<property name="verbose" value="false" />
    
     <property name="main-class"  value="aeminium.gpu.examples.CompareSumSin"/>
-	<property name="bench-class"  value="aeminium.gpu.benchmarker.Benchmarker"/>
+	<property name="bench-class"  value="aeminium.gpu.recorder.Recorder"/>
      <property name="lib.dir"     value="lib"/>
    
     <path id="classpath">  

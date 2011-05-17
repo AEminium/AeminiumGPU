@@ -1,4 +1,4 @@
-package aeminium.gpu.benchmarker;
+package aeminium.gpu.recorder;
 
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
@@ -7,7 +7,7 @@ import aeminium.gpu.lists.PList;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.functions.LambdaMapper;
 
-public class Benchmarker {
+public class Recorder {
 	
 	int times = 30;
 	public int[] sizes = new int[] {
@@ -18,28 +18,21 @@ public class Benchmarker {
 	RecordTracker tracker = new RecordTracker();
 	
 	public static void main(String[] args) {
-		Benchmarker b = new Benchmarker();
+		Recorder b = new Recorder();
 		b.run();
 	}
 	
 	public void run() {
 		System.setProperty("ForceGPU", "yes");
 		executeExprMultipleSizes("unit", "input");
-		executeExprMultipleSizes("plus", "input + input");
-		executeExprMultipleSizes("minus", "input - input");
+		executeExprMultipleSizes("sum", "input + input");
 		executeExprMultipleSizes("mul", "input * input");
-		executeExprMultipleSizes("div", "input / input");
 		executeExprMultipleSizes("eq", "(input == input) ? 1.0 : 2.0");
 		executeExprMultipleSizes("sin", "sin(input)");
-		executeExprMultipleSizes("asin", "asin(input)");
 		executeExprMultipleSizes("cos", "cos(input)");
-		executeExprMultipleSizes("acos", "acos(input)");
-		executeExprMultipleSizes("tan", "cos(input)");
-		executeExprMultipleSizes("atan", "atan(input)");
 		executeExprMultipleSizes("pow", "pow(input, 2)");
 		executeExprMultipleSizes("log", "log(input)");
 		executeExprMultipleSizes("floor", "floor(input)");
-		executeExprMultipleSizes("ceil", "ceil(input)");
 
 		finish();
 		System.clearProperty("ForceGPU");

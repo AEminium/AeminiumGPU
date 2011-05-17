@@ -1,4 +1,4 @@
-package aeminium.gpu.benchmarker;
+package aeminium.gpu.recorder;
 
 import java.io.File;
 import java.io.FileNotFoundException;

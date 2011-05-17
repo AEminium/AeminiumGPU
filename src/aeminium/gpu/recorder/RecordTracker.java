@@ -1,4 +1,4 @@
-package aeminium.gpu.benchmarker;
+package aeminium.gpu.recorder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
