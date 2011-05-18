@@ -24,16 +24,17 @@ public class Recorder {
 	
 	public void run() {
 		System.setProperty("ForceGPU", "yes");
-		executeExprMultipleSizes("unit", "input");
-		executeExprMultipleSizes("sum", "input + input");
-		executeExprMultipleSizes("mul", "input * input");
+		//executeExprMultipleSizes("unit", "input");
+		executeExprMultipleSizes("plus", "input + input");
+		executeExprMultipleSizes("minus", "input - input");
+		/*executeExprMultipleSizes("mul", "input * input");
 		executeExprMultipleSizes("eq", "(input == input) ? 1.0 : 2.0");
 		executeExprMultipleSizes("sin", "sin(input)");
 		executeExprMultipleSizes("cos", "cos(input)");
 		executeExprMultipleSizes("pow", "pow(input, 2)");
 		executeExprMultipleSizes("log", "log(input)");
 		executeExprMultipleSizes("floor", "floor(input)");
-
+	*/
 		finish();
 		System.clearProperty("ForceGPU");
 	}

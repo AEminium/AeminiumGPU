@@ -15,7 +15,7 @@ public class Configuration {
 	static {
 		filename = System.getenv("AEMINIUMGPU_CONFIG");
 		if ( filename == null ) {
-			filename = System.getProperty("user.home") + ".aeminiumgpurc";
+			filename = System.getProperty("user.home") + System.getProperty("file.separator") + ".aeminiumgpurc";
 		}
 		File file = new File(filename);
 		properties = new Properties();
@@ -27,7 +27,7 @@ public class Configuration {
 				freader.close();
 			}  catch (IOException e) {
 			} 
-		} 
+		}
 	}
 	
 
@@ -56,7 +56,11 @@ public class Configuration {
 		try {
 			properties.store(new FileOutputStream(file), "");
 		} catch (FileNotFoundException e) {
+			System.out.println("Failed to write on " + file);
+			e.printStackTrace();
 		} catch (IOException e) {
+			System.out.println("Failed to write on " + file);
+			e.printStackTrace();
 		}
 	}
 

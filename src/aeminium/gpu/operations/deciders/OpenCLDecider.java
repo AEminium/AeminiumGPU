@@ -57,31 +57,49 @@ public class OpenCLDecider {
 		}
 	}
 	
-	private static long getGPUEstimation(int size, String code, String complexity) {
+	private static long getInterpolatedValue(String prefix, int size, String sufix) {
+		int sb = 1 * (int)Math.pow(10, ("" + size).length());
+		int st = 1 * (int)Math.pow(10, ("" + size).length() + 1);
 		
-		int s = 1 * (int)Math.pow(10, ("" + size).length());
+		long bottom = 0;
+		long top = 0;
+		try {
+			bottom = getOrFail(prefix + sb + sufix );
+		} catch (Exception e) {
+			return 0;
+		}
+		try {
+			top = getOrFail(prefix + st + sufix );
+			if (top == 0) throw new Exception();
+		} catch (Exception e) {
+			return bottom;
+		}
+		return top + bottom/2;
+	}
+	
+	private static long getGPUEstimation(int size, String code, String complexity) {
 		long pTimeGPU;
 		// Buffer times
-		pTimeGPU = getOrFail(s + ".buffer.to");
-		pTimeGPU += getOrFail(s + ".buffer.from");
+		pTimeGPU = getInterpolatedValue("gpu.buffer.to.", size, "");
+		pTimeGPU += getInterpolatedValue("gpu.buffer.to.", size, "");
 		
 		// Compilation and execution times
-		long unitComp = getOrFail("unit." + s + ".kernel.compilation");
-		long unitExec = getOrFail("unit." + s + ".kernel.execution");
+		long unitComp = getInterpolatedValue("gpu.kernel.compilation.", size, ".unit");
+		long unitExec = getInterpolatedValue("gpu.kernel.execution.", size, ".unit");
 		
 		if (complexity == null || complexity.length() == 0) {
-			System.out.println("Simple!");
+			System.out.println("D: Lack of Complexity!");
 			return pTimeGPU;
 		} else {
-			String[] parts = complexity.split("+");
+			String[] parts = complexity.split("\\+");
 			for (String part: parts) {
-				String[] kv = part.split("*");
+				String[] kv = part.split("\\*");
 				try {
 					int times = Integer.parseInt(kv[0]);
 					String v = kv[1];
-					pTimeGPU += (getOrFail( v + "." + s + ".kernel.compilation") - unitComp);
-					pTimeGPU += times * (getOrFail( v + "." + s + ".kernel.execution") - unitExec);
-					System.out.println("v:" + v);
+					pTimeGPU += (getInterpolatedValue("gpu.kernel.compilation.", size, "." + v) - unitComp);
+					pTimeGPU += times * (getInterpolatedValue("gpu.kernel.execution.", size, "." + v) - unitExec);
+					System.out.println("Operation:" + v);
 				} catch (Exception e) {
 					System.out.println("Failed to get " + part);
 				}
@@ -91,4 +109,6 @@ public class OpenCLDecider {
 			return pTimeGPU;
 		}
 	}
+
+
 }
