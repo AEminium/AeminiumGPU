@@ -23,27 +23,104 @@ public class Recorder {
 	}
 	
 	public void run() {
-		System.setProperty("ForceGPU", "yes");
-		//executeExprMultipleSizes("unit", "input");
-		executeExprMultipleSizes("plus", "input + input");
-		executeExprMultipleSizes("minus", "input - input");
-		/*executeExprMultipleSizes("mul", "input * input");
-		executeExprMultipleSizes("eq", "(input == input) ? 1.0 : 2.0");
-		executeExprMultipleSizes("sin", "sin(input)");
-		executeExprMultipleSizes("cos", "cos(input)");
-		executeExprMultipleSizes("pow", "pow(input, 2)");
-		executeExprMultipleSizes("log", "log(input)");
-		executeExprMultipleSizes("floor", "floor(input)");
-	*/
+		executeExprMultipleSizes("unit", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return input;
+			}
+			public String getSource() {
+				return "return input;";
+			}
+		});
+		executeExprMultipleSizes("plus", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return input-input;
+			}
+			public String getSource() {
+				return "return input+input;";
+			}
+		});
+		executeExprMultipleSizes("minus", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return input+input;
+			}
+			public String getSource() {
+				return "return input-input;";
+			}
+		});
+		executeExprMultipleSizes("mul", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return input*input;
+			}
+			public String getSource() {
+				return "return input*input;";
+			}
+		});
+		executeExprMultipleSizes("eq", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return (input==1f) ? 1f : 2f;
+			}
+			public String getSource() {
+				return "return (input==1.0) ? 1.0 : 2.0;";
+			}
+		});
+		executeExprMultipleSizes("sin", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return (float) Math.sin(input);
+			}
+			public String getSource() {
+				return "return sin(input);";
+			}
+		});
+		executeExprMultipleSizes("cos", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return (float) Math.cos(input);
+			}
+			public String getSource() {
+				return "return cos(input);";
+			}
+		});
+		executeExprMultipleSizes("pow", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return (float) Math.pow(input,4);
+			}
+			public String getSource() {
+				return "return pow(input,4);";
+			}
+		});
+		executeExprMultipleSizes("log", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return (float) Math.log(input);
+			}
+			public String getSource() {
+				return "return log(input);";
+			}
+		});
+		executeExprMultipleSizes("floor", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return (float) Math.floor(input);
+			}
+			public String getSource() {
+				return "return floor(input);";
+			}
+		});
 		finish();
-		System.clearProperty("ForceGPU");
 	}
 	
 	private void finish() {
 		tracker.makeAverages();
 	}
 
-	public void executeExprMultipleSizes(String name, String expr) {
+	public void executeExprMultipleSizes(String name, LambdaMapper<Float,Float> expr) {
 		PList<Float> input;
 		for (int size : sizes) {
 			input = new FloatList();
@@ -55,34 +132,26 @@ public class Recorder {
 	}
 	
 	
-	public void executeExprMultipleTimes(String name, String expr, PList<Float> input) {
+	public void executeExprMultipleTimes(String name, LambdaMapper<Float,Float> expr, PList<Float> input) {
 		System.out.println("Op:" + name + ", Size:" + input.size());
-		LoggerTimer logger = new LoggerTimer(times, input.size(), name, tracker);
+		LoggerTimer loggerGPU = new LoggerTimer("gpu",times, input.size(), name, tracker);
+		LoggerTimer loggerCPU = new LoggerTimer("cpu",times, input.size(), name, tracker);
 		for (int i = 0; i < times; i++) {
-			executeExpr(name, expr, input, logger);
+			executeExpr(name, expr, input, loggerGPU, loggerCPU);
 			System.gc();
 		}
 	}
 	
-	public void executeExpr(String name, String expr, PList<Float> input, LoggerTimer logger) {
-		Map<Float, Float> op = new Map<Float, Float>(getLambda(expr), input, dev);
-		op.setLogger(logger);
-		dev.execute(op);		
-	}
-	
-	public LambdaMapper<Float, Float> getLambda(final String expr) {
-		return new LambdaMapper<Float, Float>() {
-
-			@Override
-			public Float map(Float input) {
-				return input;
-			}
-			
-			@Override
-			public String getSource() {
-				return "return (" + expr + ");";
-			} 
-
-		};
+	public void executeExpr(String name, LambdaMapper<Float,Float> expr, PList<Float> input, LoggerTimer loggerGPU, LoggerTimer loggerCPU) {
+		// Record GPU Times
+		Map<Float, Float> op = new Map<Float, Float>(expr, input, dev);
+		op.setLogger(loggerGPU);
+		dev.execute(op);
+		
+		// Record CPU Times
+		op = new Map<Float, Float>(expr, input, dev);
+		long t = System.nanoTime();
+		op.cpuExecution();
+		loggerCPU.saveTime("execution", System.nanoTime() - t);	
 	}
 }

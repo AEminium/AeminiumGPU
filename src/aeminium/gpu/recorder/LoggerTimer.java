@@ -6,19 +6,21 @@ public class LoggerTimer implements ProgramLogger {
 	RecordTracker tracker;
 	int size;
 	String exprname;
+	String pref;
 	
-	public LoggerTimer(int bufferSize, int arraySize, String exprname, RecordTracker tracker) {
+	public LoggerTimer(String pref, int bufferSize, int arraySize, String exprname, RecordTracker tracker) {
 		this.tracker = tracker;
 		this.size = arraySize;
 		this.exprname = exprname;
+		this.pref = pref + "."; /* CPU or GPU */
 	}
 		
 	@Override
 	public void saveTime(String name, long time) {
 		if (name.contains("buffer")) {
-			tracker.store("gpu." + name + "." + size, time);
+			tracker.store(pref + name + "." + size, time);
 		} else {
-			tracker.store("gpu." + name + "." + size + "." + exprname, time);
+			tracker.store(pref + name + "." + size + "." + exprname, time);
 		}
 	}
 }

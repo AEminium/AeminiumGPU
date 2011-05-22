@@ -61,6 +61,7 @@ public class OpenCLDecider {
 		int sb = 1 * (int)Math.pow(10, ("" + size).length());
 		int st = 1 * (int)Math.pow(10, ("" + size).length() + 1);
 		
+		int cutPoint = Integer.parseInt((""  + size).substring(0, 1));
 		long bottom = 0;
 		long top = 0;
 		try {
@@ -74,7 +75,7 @@ public class OpenCLDecider {
 		} catch (Exception e) {
 			return bottom;
 		}
-		return top + bottom/2;
+		return (bottom * cutPoint + top * (10 - cutPoint))/10;
 	}
 	
 	private static long getGPUEstimation(int size, String code, String complexity) {
@@ -88,7 +89,6 @@ public class OpenCLDecider {
 		long unitExec = getInterpolatedValue("gpu.kernel.execution.", size, ".unit");
 		
 		if (complexity == null || complexity.length() == 0) {
-			System.out.println("D: Lack of Complexity!");
 			return pTimeGPU;
 		} else {
 			String[] parts = complexity.split("\\+");
@@ -99,7 +99,6 @@ public class OpenCLDecider {
 					String v = kv[1];
 					pTimeGPU += (getInterpolatedValue("gpu.kernel.compilation.", size, "." + v) - unitComp);
 					pTimeGPU += times * (getInterpolatedValue("gpu.kernel.execution.", size, "." + v) - unitExec);
-					System.out.println("Operation:" + v);
 				} catch (Exception e) {
 					System.out.println("Failed to get " + part);
 				}

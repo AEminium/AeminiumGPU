@@ -65,9 +65,6 @@ public class Map<I,O> extends GenericProgram implements Program {
 			} else {
 				System.out.println("GPUvsCPU: wrong");
 			}
-			
-			
-			
 			return;
 		}
 		// TODO: Consider size: 0
