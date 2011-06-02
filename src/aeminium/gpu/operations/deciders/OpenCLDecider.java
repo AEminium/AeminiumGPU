@@ -85,8 +85,8 @@ public class OpenCLDecider {
 		pTimeGPU += getInterpolatedValue("gpu.buffer.to.", size, "");
 		
 		// Compilation and execution times
-		long unitComp = getInterpolatedValue("gpu.kernel.compilation.", size, ".unit");
-		long unitExec = getInterpolatedValue("gpu.kernel.execution.", size, ".unit");
+		//long unitComp = getInterpolatedValue("gpu.kernel.compilation.", size, ".unit");
+		//long unitExec = getInterpolatedValue("gpu.kernel.execution.", size, ".unit");
 		
 		if (complexity == null || complexity.length() == 0) {
 			return pTimeGPU;
@@ -97,8 +97,8 @@ public class OpenCLDecider {
 				try {
 					int times = Integer.parseInt(kv[0]);
 					String v = kv[1];
-					pTimeGPU += (getInterpolatedValue("gpu.kernel.compilation.", size, "." + v) - unitComp);
-					pTimeGPU += times * (getInterpolatedValue("gpu.kernel.execution.", size, "." + v) - unitExec);
+					pTimeGPU += (getInterpolatedValue("gpu.kernel.compilation.", size, "." + v));
+					pTimeGPU += times * (getInterpolatedValue("gpu.kernel.execution.", size, "." + v));
 				} catch (Exception e) {
 					System.out.println("Failed to get " + part);
 				}
