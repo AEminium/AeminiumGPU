@@ -16,8 +16,14 @@ public class RecordTracker {
 	
 	public void makeAverages() {
 		for (String name : store.keySet()) {
+			if (System.getenv("MEA") != null) {
+				System.out.print(name + " --> ");
+			}
 			long average = 0;
 			for (Long t : store.get(name)) {
+				if (System.getenv("MEA") != null) {
+					System.out.print(t + ",");
+				}
 				average += t;
 			}
 			average /= store.get(name).size();
