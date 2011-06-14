@@ -3,6 +3,8 @@ package aeminium.gpu.recorder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import aeminium.gpu.utils.Statistics;
+
 public class RecordTracker {
 
 	HashMap<String, ArrayList<Long>> store = new HashMap<String, ArrayList<Long>>();
@@ -16,6 +18,8 @@ public class RecordTracker {
 	
 	public void makeAverages() {
 		for (String name : store.keySet()) {
+			long[] data = new long[store.get(name).size()];
+			int i = 0;
 			if (System.getenv("MEA") != null) {
 				System.out.print(name + " --> ");
 			}
@@ -25,9 +29,13 @@ public class RecordTracker {
 					System.out.print(t + ",");
 				}
 				average += t;
+				data[i++] = t;
 			}
 			average /= store.get(name).size();
 			Configuration.set(name, average + "");
+			
+			long stddev = (long) Statistics.standard_deviation(data);
+			Configuration.set(name + ".stddev", stddev + "");
 		}
 	}
 	
