@@ -6,12 +6,14 @@ import aeminium.gpu.lists.FloatList;
 import aeminium.gpu.lists.PList;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.functions.LambdaMapper;
+import aeminium.gpu.utils.TimeoutController;
+import aeminium.gpu.utils.TimeoutController.TimeoutException;
 
 public class Recorder {
 	
 	int times = 30;
 	public int[] sizes = new int[] {
-			10, 100, 1000, 10000, 100000, 1000000, 10000000
+			10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000
 	};
 	
 	GPUDevice dev = new DefaultDeviceFactory().getDevice();
@@ -142,16 +144,31 @@ public class Recorder {
 		}
 	}
 	
-	public void executeExpr(String name, LambdaMapper<Float,Float> expr, PList<Float> input, LoggerTimer loggerGPU, LoggerTimer loggerCPU) {
+	public void executeExpr(String name, final LambdaMapper<Float,Float> expr, final PList<Float> input, LoggerTimer loggerGPU, final LoggerTimer loggerCPU) {
 		// Record GPU Times
+		long t = System.nanoTime();
 		Map<Float, Float> op = new Map<Float, Float>(expr, input, dev);
 		op.setLogger(loggerGPU);
 		dev.execute(op);
+		final long gpuTime = System.nanoTime() - t;
 		
 		// Record CPU Times
-		op = new Map<Float, Float>(expr, input, dev);
-		long t = System.nanoTime();
-		op.cpuExecution();
-		loggerCPU.saveTime("execution", System.nanoTime() - t);	
+		
+		
+		Runnable cpu = new Runnable() {
+			@Override
+			public void run() {
+				Map<Float, Float> op = new Map<Float, Float>(expr, input, dev);
+				long t = System.nanoTime();
+				op.cpuExecution();
+				loggerCPU.saveTime("execution", System.nanoTime() - t);
+			}
+		};
+		try {
+			TimeoutController.execute(cpu, 2 * gpuTime);
+		} catch (TimeoutException e) {
+			loggerCPU.saveTime("execution", 2 * gpuTime);
+		}
+			
 	}
 }
