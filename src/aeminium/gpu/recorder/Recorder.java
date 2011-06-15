@@ -13,7 +13,7 @@ public class Recorder {
 	
 	int times = 30;
 	public int[] sizes = new int[] {
-			10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000
+			10, 100, 1000, 10000, 100000, 1000000, 10000000
 	};
 	
 	GPUDevice dev = new DefaultDeviceFactory().getDevice();
