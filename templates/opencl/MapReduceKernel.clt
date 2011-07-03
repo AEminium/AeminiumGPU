@@ -27,7 +27,7 @@ __kernel void {{reduce_kernel_name}}(
 	while (global_index < reduce_length) {
 		{{output_type}} element;
 		if (first)
-			element = {{map_lambda_name}}(map_input[global_index]);
+			element = {{map_lambda_name}}({{get_input}});
 		else
 			element = reduce_input[global_index];
 		accumulator = {{reduce_lambda_name}}(accumulator, element);

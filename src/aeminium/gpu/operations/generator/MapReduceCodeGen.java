@@ -12,6 +12,7 @@ public class MapReduceCodeGen {
 	private MapReduce op;
 	private String id;
 	private String[] map_parameters;
+	private boolean isRange = false;
 
 	public MapReduceCodeGen(MapReduce op) {
 		this.op = op;
@@ -61,6 +62,13 @@ public class MapReduceCodeGen {
 		mapping.put("reduce_kernel_name", getReduceKernelName());
 		mapping.put("other_sources", op.getOtherSources());
 
+		if (isRange) {
+			mapping.put("get_input", "global_index");
+		} else {
+			mapping.put("get_input", "map_input[global_index]");
+		}
+		
+		
 		mapping.put("seed_source", op.getOpenCLSeed());
 
 		Template t = new Template(new TemplateWrapper("opencl/MapReduceKernel.clt"));
@@ -79,4 +87,13 @@ public class MapReduceCodeGen {
 		return "reduce_kernel_" + id;
 	}
 
+	public boolean isRange() {
+		return isRange;
+	}
+
+	public void setRange(boolean isRange) {
+		this.isRange = isRange;
+	}
+
+	
 }

@@ -16,7 +16,8 @@ public class MapCodeGen {
 	private String otherSources = "";
 	private String id;
 	private String[] parameters;
-	
+	private boolean isRange = false;
+
 	public MapCodeGen(Map mapOp) {
 		inputType = BufferHelper.getCLTypeOf(mapOp.getInputType());
 		outputType = BufferHelper.getCLTypeOf(mapOp.getOutputType());
@@ -56,12 +57,21 @@ public class MapCodeGen {
 		HashMap<String,String> mapping = new HashMap<String,String>();
 		
 		mapping.put("input_type", inputType);
-		mapping.put("output_type", outputType);
+		mapping.put("output_type", outputType);		
 		mapping.put("map_lambda_name", getMapLambdaName());
 		mapping.put("map_kernel_name", getMapKernelName());
 		
 		mapping.put("map_lambda_def", getMapLambdaSource());
 		mapping.put("other_sources", otherSources);
+		
+		
+		if (isRange) {
+			mapping.put("get_input", "map_global_id");
+		}
+		else {
+			mapping.put("get_input", "map_input[map_global_id]");
+		}
+		
 		
 		Template t = new Template(new TemplateWrapper("opencl/MapKernel.clt"));
 		return t.apply(mapping);
@@ -73,6 +83,14 @@ public class MapCodeGen {
 	
 	public String getMapKernelName() {
 		return "map_kernel_" + id;
+	}
+	
+	public boolean isRange() {
+		return isRange;
+	}
+
+	public void setRange(boolean isRange) {
+		this.isRange = isRange;
 	}
 
 }

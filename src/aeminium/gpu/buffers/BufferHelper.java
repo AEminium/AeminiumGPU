@@ -16,6 +16,7 @@ public class BufferHelper {
 	private static HashMap<String, IBufferFactory> factories = new HashMap<String, IBufferFactory>();
 
 	private static HashMap<String, String> clTypes = new HashMap<String, String>();
+	private static HashMap<String, Class<?>> clClasses = new HashMap<String, Class<?>>();
 	
 	static {
 		factories.put("Integer", new IntBufferFactory());
@@ -31,6 +32,13 @@ public class BufferHelper {
 		clTypes.put("Character", "char");
 		clTypes.put("Long", "long");
 		clTypes.put("Boolean", "char");
+		
+		clClasses.put("Integer", new Integer(1).getClass());
+		clClasses.put("Float", new Float(1).getClass());
+		clClasses.put("Double", new Double(1).getClass());
+		clClasses.put("Character", new Character('a').getClass());
+		clClasses.put("Long", new Long(1).getClass());
+		clClasses.put("Boolean", new Boolean(true).getClass());
 		
 		for( Object t : clTypes.keySet().toArray() ) {
 			String v = clTypes.get(t);
@@ -92,6 +100,10 @@ public class BufferHelper {
 
 	public static String getCLTypeOf(String type) {
 		return clTypes.get(type);
+	}
+
+	public static Class<?> getClassOf(String type) {
+		return clClasses.get(type);
 	}
 	
 	public static Object decode(Object in, String outputType) {

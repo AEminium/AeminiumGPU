@@ -1,5 +1,8 @@
 package aeminium.gpu.operations;
 
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+
 import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
@@ -8,6 +11,7 @@ import aeminium.gpu.lists.PList;
 import aeminium.gpu.lists.factories.ListFactory;
 import aeminium.gpu.lists.lazyness.LazyEvaluator;
 import aeminium.gpu.lists.lazyness.LazyPList;
+import aeminium.gpu.lists.lazyness.Range;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
@@ -18,6 +22,7 @@ import aeminium.gpu.operations.mergers.MapToReduceMerger;
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
+import com.nativelibs4java.opencl.CLMem;
 import com.nativelibs4java.opencl.CLQueue;
 
 public class Map<I,O> extends GenericProgram implements Program {
@@ -43,6 +48,9 @@ public class Map<I,O> extends GenericProgram implements Program {
 		this.mapFun = mapFun;
 		this.setOtherSources(other);
 		gen = new MapCodeGen(this);
+		if (list instanceof Range) {
+			gen.setRange(true);
+		}
 	}
 	
 	// Pipeline
@@ -108,7 +116,13 @@ public class Map<I,O> extends GenericProgram implements Program {
 	
 	@Override
 	public void prepareBuffers(CLContext ctx) {
-		inbuffer = BufferHelper.createInputBufferFor(ctx, input);
+		if (input instanceof Range) {
+			// Fake 1 byte data.
+			FloatBuffer ptr = ByteBuffer.allocateDirect(1 * 4).asFloatBuffer();
+			inbuffer = ctx.createBuffer(CLMem.Usage.InputOutput, ptr, false);
+		} else {
+			inbuffer = BufferHelper.createInputBufferFor(ctx, input);
+		}
 		outbuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
 	}
 
@@ -116,8 +130,8 @@ public class Map<I,O> extends GenericProgram implements Program {
 	public void execute(CLContext ctx, CLQueue q) {
 		synchronized (kernel) {
 		    // setArgs will throw an exception at runtime if the types / sizes of the arguments are incorrect
-		    kernel.setArgs(inbuffer, outbuffer);
-
+			kernel.setArgs(inbuffer, outbuffer);
+		    
 		    // Ask for 1-dimensional execution of length dataSize, with auto choice of local workgroup size :
 		    kernelCompletion = kernel.enqueueNDRange(q, new int[] { input.size() }, new CLEvent[] {});
 		}
@@ -153,7 +167,7 @@ public class Map<I,O> extends GenericProgram implements Program {
 
 			@Override
 			public Class<?> getType() {
-				return output.getType();
+				return BufferHelper.getClassOf(getOutputType());
 			}
 
 			@Override

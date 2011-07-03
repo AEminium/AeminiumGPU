@@ -1,10 +1,14 @@
 package aeminium.gpu.operations;
 
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+
 import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.lists.PList;
+import aeminium.gpu.lists.lazyness.Range;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.MapReduceCodeGen;
@@ -13,6 +17,7 @@ import aeminium.gpu.operations.utils.ExtractTypes;
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
+import com.nativelibs4java.opencl.CLMem;
 import com.nativelibs4java.opencl.CLKernel.LocalSize;
 import com.nativelibs4java.opencl.CLQueue;
 
@@ -42,6 +47,9 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		this.reduceFun = reducer;
 		this.setOtherSources(other);
 		gen = new MapReduceCodeGen(this);
+		if (list instanceof Range) {
+			gen.setRange(true);
+		}
 	}
 	
 	// Pipeline
@@ -58,7 +66,13 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	@Override
 	public void prepareBuffers(CLContext ctx) {
 		inferBestValues();
-		inbuffer = BufferHelper.createInputOutputBufferFor(ctx, input);
+		if (input instanceof Range) {
+			// Fake 1 byte data.
+			FloatBuffer ptr = ByteBuffer.allocateDirect(1 * 4).asFloatBuffer();
+			inbuffer = ctx.createBuffer(CLMem.Usage.InputOutput, ptr, false);
+		} else {
+			inbuffer = BufferHelper.createInputBufferFor(ctx, input);
+		}
 		middlebuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
 		outbuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
 		sharedbuffer = BufferHelper.createSharedBufferFor(ctx , getOutputType(), threads);

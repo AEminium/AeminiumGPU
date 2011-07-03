@@ -8,5 +8,5 @@
 
 __kernel void {{map_kernel_name}}(__global const {{input_type}}* map_input, __global {{output_type}}* map_output) {
 	int map_global_id = get_global_id(0);
-	map_output[map_global_id] = {{map_lambda_name}}(map_input[map_global_id]);
+	map_output[map_global_id] = {{map_lambda_name}}({{get_input}});
 }
