@@ -46,13 +46,11 @@ public class Range implements PList<Integer> {
 
 	@Override
 	public int size() {
-		// TODO Auto-generated method stub
 		return max;
 	}
 
 	@Override
 	public int length() {
-		// TODO Auto-generated method stub
 		return max;
 	}
 
