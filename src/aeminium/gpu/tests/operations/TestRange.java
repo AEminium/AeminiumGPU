@@ -60,11 +60,11 @@ public class TestRange extends TestCase {
 
 			@Override
 			public Integer map(Integer input) {
-				return 2 * input;
+				return input;
 			}
 			
 			public String getSource() {
-				return "return 2 * input;";
+				return "return input;";
 			}
 			
 		});
@@ -73,7 +73,7 @@ public class TestRange extends TestCase {
 
 			@Override
 			public Integer combine(Integer input, Integer other) {
-				return input + other;
+				return other;
 			}
 
 			@Override
@@ -83,7 +83,7 @@ public class TestRange extends TestCase {
 			
 			@Override
 			public String getSource() {
-				return "return reduce_input_first + reduce_input_second;";
+				return "return get_global_id(0);";
 			}
 			
 		});

@@ -126,8 +126,15 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
+		//TODO: remove prints
 		System.out.println("o:" + outbuffer.getElementCount() + "," + outbuffer.getElementSize());
 		System.out.println("m:" + middlebuffer.getElementCount() + "," + middlebuffer.getElementSize());
+		
+		PList<O> tmp = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q, kernelCompletion, getOutputType(), input.size());
+		for (int i=0;i<input.size();i++) {
+			 System.out.println(tmp.get(i) + "<-" + i);
+		}
+		
 		output = (O) BufferHelper.extractElementFromBuffer(outbuffer, q, kernelCompletion, getOutputType());
 	}
 

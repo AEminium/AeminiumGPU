@@ -63,7 +63,7 @@ public class MapReduceCodeGen {
 		mapping.put("other_sources", op.getOtherSources());
 
 		if (isRange) {
-			mapping.put("get_input", "get_global_id(0)");
+			mapping.put("get_input", "global_index");
 		} else {
 			mapping.put("get_input", "map_input[global_index]");
 		}

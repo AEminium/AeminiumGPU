@@ -22,6 +22,7 @@ __kernel void {{reduce_kernel_name}}(
 			const int first) {
 			
 	int global_index = get_global_id(0);
+	if (global_index >= reduce_length) return;
 	
 	{{output_type}} accumulator = get_accumulator();
 	while (global_index < reduce_length) {
