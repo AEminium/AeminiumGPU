@@ -9,7 +9,7 @@
 // Specific Reduce Lambda Function
 {{reduce_lambda_def}}
 
-inline {{input_type}} get_accumulator() {
+inline {{output_type}} get_accumulator() {
 	{{seed_source}}
 }
 
