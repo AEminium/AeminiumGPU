@@ -17,8 +17,8 @@ import aeminium.gpu.operations.utils.ExtractTypes;
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
-import com.nativelibs4java.opencl.CLMem;
 import com.nativelibs4java.opencl.CLKernel.LocalSize;
+import com.nativelibs4java.opencl.CLMem;
 import com.nativelibs4java.opencl.CLQueue;
 
 public class MapReduce<I,O> extends GenericProgram implements Program {
@@ -41,6 +41,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	// Constructors
 	
 	public MapReduce(LambdaMapper<I,O> mapper, LambdaReducer<O> reducer, PList<I> list, String other, GPUDevice dev) {
+		System.out.println("T:" + list.getClass());
 		this.device = dev;
 		this.input = list;
 		this.mapFun = mapper;
@@ -69,13 +70,14 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		if (input instanceof Range) {
 			// Fake 1 byte data.
 			FloatBuffer ptr = ByteBuffer.allocateDirect(1 * 4).asFloatBuffer();
-			inbuffer = ctx.createBuffer(CLMem.Usage.InputOutput, ptr, false);
+			inbuffer = ctx.createBuffer(CLMem.Usage.Input, ptr, false);
 		} else {
 			inbuffer = BufferHelper.createInputBufferFor(ctx, input);
 		}
 		middlebuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
 		outbuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
 		sharedbuffer = BufferHelper.createSharedBufferFor(ctx , getOutputType(), threads);
+		System.out.println("t:" + getOutputType() + ", s:" + threads);
 	}
 
 	@Override
@@ -84,7 +86,6 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		CLBuffer<?> tmp;
 		boolean first = true;
 		int current_size = input.size();
-		
 		while(current_size > 1) {
 			synchronized (kernel) {
 				inferBestValues();
@@ -102,6 +103,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 			    first = false;
 			    
 			    current_size = current_size / (threads * 2);
+			    
 			    
 				// Swap input and output
 				tmp = middlebuffer;

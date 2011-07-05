@@ -56,7 +56,7 @@ public class TestRange extends TestCase {
 	
 	public void testMapReduceRange() { 
 		PList<Integer> example = new Range(10);
-		Integer output = example.map(new LambdaMapper<Integer, Integer>() {
+		example = example.map(new LambdaMapper<Integer, Integer>() {
 
 			@Override
 			public Integer map(Integer input) {
@@ -67,7 +67,9 @@ public class TestRange extends TestCase {
 				return "return 2 * input;";
 			}
 			
-		}).reduce(new LambdaReducer<Integer>() {
+		});
+		
+		Integer output = example.reduce(new LambdaReducer<Integer>() {
 
 			@Override
 			public Integer combine(Integer input, Integer other) {

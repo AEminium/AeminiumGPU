@@ -93,7 +93,7 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 
 	@Override
 	public <O> PList<O> map(LambdaMapper<T, O> mapFun) {
-		if (evaluator.canMergeWithMap(mapFun)) {
+		if (!evaluated && evaluator.canMergeWithMap(mapFun)) {
 			Map<T,O> m = new Map<T,O>(mapFun, this, this.getDevice());
 			LazyPList<O> r = (LazyPList<O>) evaluator.mergeWithMap(m);
 			r.setLazynessLevel(lazynessLevel+1);
@@ -107,7 +107,7 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 
 	@Override
 	public T reduce(LambdaReducer<T> reducer) {
-		if (evaluator.canMergeWithReduce(reducer)) {
+		if (!evaluated && evaluator.canMergeWithReduce(reducer)) {
 			Reduce<T> m = new Reduce<T>(reducer, this, this.getDevice());
 			return evaluator.mergeWithReducer(m);
 		} else {
