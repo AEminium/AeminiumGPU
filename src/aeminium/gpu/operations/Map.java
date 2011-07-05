@@ -9,10 +9,15 @@ import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.lists.PList;
 import aeminium.gpu.lists.factories.ListFactory;
+import aeminium.gpu.lists.lazyness.LazyEvaluator;
+import aeminium.gpu.lists.lazyness.LazyPList;
 import aeminium.gpu.lists.lazyness.Range;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaMapper;
+import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.MapCodeGen;
+import aeminium.gpu.operations.mergers.MapToMapMerger;
+import aeminium.gpu.operations.mergers.MapToReduceMerger;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -149,8 +154,6 @@ public class Map<I,O> extends GenericProgram implements Program {
 	// Output
 	
 	public PList<O> getOutput() {
-		
-		/*
 		final Map<I,O> innerMap = this;
 		
 		// Lazy return
@@ -191,9 +194,6 @@ public class Map<I,O> extends GenericProgram implements Program {
 			
 		};
 		return new LazyPList<O>(operation, input.size());
-		*/
-		execute();
-		return output;
 	}
 	
 	

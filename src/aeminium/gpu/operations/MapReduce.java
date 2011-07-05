@@ -41,7 +41,6 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	// Constructors
 	
 	public MapReduce(LambdaMapper<I,O> mapper, LambdaReducer<O> reducer, PList<I> list, String other, GPUDevice dev) {
-		System.out.println("T:" + list.getClass());
 		this.device = dev;
 		this.input = list;
 		this.mapFun = mapper;
@@ -127,6 +126,8 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
+		System.out.println("o:" + outbuffer.getElementCount() + "," + outbuffer.getElementSize());
+		System.out.println("m:" + middlebuffer.getElementCount() + "," + middlebuffer.getElementSize());
 		output = (O) BufferHelper.extractElementFromBuffer(outbuffer, q, kernelCompletion, getOutputType());
 	}
 
