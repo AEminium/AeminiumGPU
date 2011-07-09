@@ -83,7 +83,7 @@ public class TestRange extends TestCase {
 			
 			@Override
 			public String getSource() {
-				return "return get_global_id(0);";
+				return "return get_global_id(0)';";
 			}
 			
 		});
