@@ -21,15 +21,15 @@ public class TestReduce extends TestCase {
 			public Integer combine(Integer input, Integer other) {
 				return input + other;
 			}
-
-			@Override
-			public Integer getSeed() {
-				return 0;
-			}
 			
 			@Override
 			public String getSource() {
 				return "return reduce_input_first + reduce_input_second;";
+			}
+
+			@Override
+			public Integer getSeed() {
+				return 0;
 			}
 			
 		});
