@@ -1,6 +1,6 @@
 package aeminium.gpu.buffers;
 
-import java.nio.DoubleBuffer;
+import org.bridj.Pointer;
 
 import aeminium.gpu.lists.DoubleList;
 import aeminium.gpu.lists.PList;
@@ -17,22 +17,18 @@ public class DoubleBufferFactory implements IBufferFactory{
 
 	@Override
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
-		double[] ar = ((DoubleList) list).getArray();
-		DoubleBuffer ibuffer = DoubleBuffer.wrap(ar, 0, list.size());
-		return  context.createDoubleBuffer(CLMem.Usage.Input, ibuffer, true);
+		return context.createDoubleBuffer(CLMem.Usage.Input, Pointer.pointerToDoubles(((DoubleList) list).getArray()), true);
 	}
 	
 	@Override
 	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list) {
-		double[] ar = ((DoubleList) list).getArray();
-		DoubleBuffer ibuffer = DoubleBuffer.wrap(ar, 0, list.size());
-		return  context.createDoubleBuffer(CLMem.Usage.InputOutput, ibuffer, true);
+		return context.createDoubleBuffer(CLMem.Usage.InputOutput, Pointer.pointerToDoubles(((DoubleList) list).getArray()), true);
 	}
 	
 	@Override
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size) {
-		return context.createDoubleBuffer(CLMem.Usage.Output, size);
-	}
+		Pointer<Double> ptr = Pointer.allocateDoubles(size).order(context.getByteOrder());
+		return context.createBuffer(CLMem.Usage.Output, ptr, true);	}
 	
 	@Override
 	public LocalSize createSharedBufferFor(CLContext context, String type,
@@ -43,16 +39,12 @@ public class DoubleBufferFactory implements IBufferFactory{
 	@Override
 	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev,
 			int size) {
-		double[] content = new double[size];
-		outbuffer.asCLDoubleBuffer().read(q, ev).get(content);
-		return new DoubleList(content, size);	
+		return new DoubleList(outbuffer.read(q, ev).getDoubles(), size);	
 	}
 	
 	@Override
 	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev) {
-		double[] content = new double[1];
-		outbuffer.asCLDoubleBuffer().read(q, ev).get(content);
-		return content[1];
+		return outbuffer.read(q, ev).getDoubles(1)[0];
 	}
 
 }

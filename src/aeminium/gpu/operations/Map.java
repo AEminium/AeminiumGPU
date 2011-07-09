@@ -1,7 +1,6 @@
 package aeminium.gpu.operations;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
+import org.bridj.Pointer;
 
 import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.devices.GPUDevice;
@@ -117,8 +116,7 @@ public class Map<I,O> extends GenericProgram implements Program {
 	@Override
 	public void prepareBuffers(CLContext ctx) {
 		if (input instanceof Range) {
-			// Fake 1 byte data.
-			FloatBuffer ptr = ByteBuffer.allocateDirect(1 * 4).asFloatBuffer();
+			Pointer<Integer> ptr = Pointer.allocateInts(1).order(ctx.getByteOrder());
 			inbuffer = ctx.createBuffer(CLMem.Usage.Input, ptr, false);
 		} else {
 			inbuffer = BufferHelper.createInputBufferFor(ctx, input);

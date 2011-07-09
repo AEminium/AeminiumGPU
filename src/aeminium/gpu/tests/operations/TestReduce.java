@@ -7,7 +7,7 @@ import aeminium.gpu.operations.functions.LambdaReducer;
 
 public class TestReduce extends TestCase {
 	
-	private static int TEST_SIZE = 32;
+	private static int TEST_SIZE = 1025;
 	
 	public void testSumReduce() { 
 		PList<Integer> example = new IntList();

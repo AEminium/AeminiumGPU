@@ -1,6 +1,6 @@
 package aeminium.gpu.buffers;
 
-import java.nio.IntBuffer;
+import org.bridj.Pointer;
 
 import aeminium.gpu.lists.IntList;
 import aeminium.gpu.lists.PList;
@@ -17,23 +17,20 @@ public class IntBufferFactory implements IBufferFactory{
 
 	@Override
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
-		int[] ar = ((IntList) list).getArray();
-		IntBuffer ibuffer = IntBuffer.wrap(ar, 0, list.size());
-		return context.createIntBuffer(CLMem.Usage.Input, ibuffer, true);
+		return context.createIntBuffer(CLMem.Usage.Input, Pointer.pointerToInts(((IntList) list).getArray()), true);
 	}
 	
 
 	@Override
 	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
 			PList<T> list) {
-		int[] ar = ((IntList) list).getArray();
-		IntBuffer ibuffer = IntBuffer.wrap(ar, 0, list.size());
-		return context.createIntBuffer(CLMem.Usage.InputOutput, ibuffer, true);
+		return context.createIntBuffer(CLMem.Usage.InputOutput, Pointer.pointerToInts(((IntList) list).getArray()), true);
 	}
 
 	@Override
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size) {
-		return context.createIntBuffer(CLMem.Usage.Output, size);
+		Pointer<Integer> ptr = Pointer.allocateInts(size).order(context.getByteOrder());
+		return context.createBuffer(CLMem.Usage.Output, ptr, true);
 	}
 	
 	@Override
@@ -45,17 +42,13 @@ public class IntBufferFactory implements IBufferFactory{
 	@Override
 	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev,
 			int size) {
-		int[] content = new int[size];
-		outbuffer.asCLIntBuffer().read(q, ev).get(content);
-		return new IntList(content, size);	
+		return new IntList(outbuffer.read(q, ev).getInts(), size);
 	}
 
 	@Override
 	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
 			CLEvent ev) {
-		int[] content = new int[1];
-		outbuffer.asCLIntBuffer().read(q, ev).get(content);
-		return content[0];
+		return outbuffer.read(q, ev).getInts(1)[0];
 	}
 
 }

@@ -39,7 +39,7 @@ public class TestMap extends TestCase {
 		performTestMapIntToInt(TEST_SIZE);
 	}
 	
-	public void testSmappMapIntToInt() {
+	public void testSmallMapIntToInt() {
 		performTestMapIntToInt(SMALL_TEST_SIZE);
 	}
 	

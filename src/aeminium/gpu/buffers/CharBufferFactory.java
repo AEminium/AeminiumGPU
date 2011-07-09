@@ -1,6 +1,6 @@
 package aeminium.gpu.buffers;
 
-import java.nio.ByteBuffer;
+import org.bridj.Pointer;
 
 import aeminium.gpu.lists.CharList;
 import aeminium.gpu.lists.PList;
@@ -33,21 +33,23 @@ public class CharBufferFactory implements IBufferFactory {
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
 		char[] ar = ((CharList) list).getArray();
 		byte[] car = encodeCharToBytes(ar);
-		ByteBuffer ibuffer = ByteBuffer.wrap(car, 0, list.size());
-		return context.createByteBuffer(CLMem.Usage.Input, ibuffer, true);
+		return context.createByteBuffer(CLMem.Usage.Input, Pointer.pointerToBytes(car), true);
 	}
 
 	@Override
 	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list) {
 		char[] ar = ((CharList) list).getArray();
 		byte[] car = encodeCharToBytes(ar);
-		ByteBuffer ibuffer = ByteBuffer.wrap(car, 0, list.size());
-		return context.createByteBuffer(CLMem.Usage.InputOutput, ibuffer, true);
+		
+		Pointer<Byte> ptr = Pointer.allocateBytes(list.size()).order(context.getByteOrder());
+		ptr.setBytes(car);
+		return context.createBuffer(CLMem.Usage.InputOutput, ptr, true);
 	}
 	
 	@Override
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size) {
-		return context.createCharBuffer(CLMem.Usage.Output, size);
+		Pointer<Byte> ptr = Pointer.allocateBytes(size).order(context.getByteOrder());
+		return context.createBuffer(CLMem.Usage.Output, ptr, true);
 	}
 
 	@Override
@@ -59,17 +61,14 @@ public class CharBufferFactory implements IBufferFactory {
 	@Override
 	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
 			CLEvent ev, int size) {
-		byte[] pcontent = new byte[size];
-		outbuffer.asCLByteBuffer().read(q, ev).get(pcontent);
+		byte[] pcontent = outbuffer.read(q, ev).getBytes();
 		char[] content = decodeBytesToChar(pcontent);
 		return new CharList(content, size);
 	}
 	
 	@Override
 	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev) {
-		byte[] pcontent = new byte[1];
-		outbuffer.asCLByteBuffer().read(q, ev).get(pcontent);
-		char[] content = decodeBytesToChar(pcontent);
+		char[] content = decodeBytesToChar(outbuffer.read(q, ev).getBytes(1));
 		return content[0];
 	}
 

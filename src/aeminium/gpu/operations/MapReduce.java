@@ -1,7 +1,6 @@
 package aeminium.gpu.operations;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
+import org.bridj.Pointer;
 
 import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.devices.GPUDevice;
@@ -68,7 +67,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		inferBestValues();
 		if (input instanceof Range) {
 			// Fake 1 byte data.
-			FloatBuffer ptr = ByteBuffer.allocateDirect(1 * 4).asFloatBuffer();
+			Pointer<Integer> ptr = Pointer.allocateInts(1).order(ctx.getByteOrder());
 			inbuffer = ctx.createBuffer(CLMem.Usage.Input, ptr, false);
 		} else {
 			inbuffer = BufferHelper.createInputBufferFor(ctx, input);
@@ -76,7 +75,6 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		middlebuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
 		outbuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
 		sharedbuffer = BufferHelper.createSharedBufferFor(ctx , getOutputType(), threads);
-		System.out.println("t:" + getOutputType() + ", s:" + threads);
 	}
 
 	@Override
@@ -127,14 +125,6 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
 		//TODO: remove prints
-		System.out.println("o:" + outbuffer.getElementCount() + "," + outbuffer.getElementSize());
-		System.out.println("m:" + middlebuffer.getElementCount() + "," + middlebuffer.getElementSize());
-		
-		PList<O> tmp = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q, kernelCompletion, getOutputType(), input.size());
-		for (int i=0;i<input.size();i++) {
-			 System.out.println(tmp.get(i) + "<-" + i);
-		}
-		
 		output = (O) BufferHelper.extractElementFromBuffer(outbuffer, q, kernelCompletion, getOutputType());
 	}
 

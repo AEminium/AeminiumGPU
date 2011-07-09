@@ -1,6 +1,6 @@
 package aeminium.gpu.buffers;
 
-import java.nio.FloatBuffer;
+import org.bridj.Pointer;
 
 import aeminium.gpu.lists.FloatList;
 import aeminium.gpu.lists.PList;
@@ -17,21 +17,19 @@ public class FloatBufferFactory implements IBufferFactory {
 
 	@Override
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
-		float[] ar = ((FloatList) list).getArray();
-		FloatBuffer ibuffer = FloatBuffer.wrap(ar, 0, list.size());
-		return  context.createFloatBuffer(CLMem.Usage.Input, ibuffer, true);
+		return context.createFloatBuffer(CLMem.Usage.Input, Pointer.pointerToFloats(((FloatList) list).getArray()), true);
+
 	}
 	
 	@Override
 	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list) {
-		float[] ar = ((FloatList) list).getArray();
-		FloatBuffer ibuffer = FloatBuffer.wrap(ar, 0, list.size());
-		return  context.createFloatBuffer(CLMem.Usage.InputOutput, ibuffer, true);
+		return context.createFloatBuffer(CLMem.Usage.InputOutput, Pointer.pointerToFloats(((FloatList) list).getArray()), true);
 	}
 
 	@Override
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size) {
-		return context.createFloatBuffer(CLMem.Usage.Output, size);
+		Pointer<Float> ptr = Pointer.allocateFloats(size).order(context.getByteOrder());
+		return context.createBuffer(CLMem.Usage.Output, ptr, true);
 	}
 	
 	@Override
@@ -43,16 +41,12 @@ public class FloatBufferFactory implements IBufferFactory {
 	@Override
 	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev,
 			int size) {
-		float[] content = new float[size];
-		outbuffer.asCLFloatBuffer().read(q, ev).get(content);
-		return new FloatList(content, size);	
+		return new FloatList(outbuffer.read(q, ev).getFloats(), size);
 	}
 
 	@Override
 	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
 			CLEvent ev) {
-		float[] content = new float[1];
-		outbuffer.asCLFloatBuffer().read(q, ev).get(content);
-		return content[0];
+		return outbuffer.read(q, ev).getFloats(1)[0];
 	}
 }
