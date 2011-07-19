@@ -60,11 +60,11 @@ public class TestRange extends TestCase {
 
 			@Override
 			public Integer map(Integer input) {
-				return input;
+				return 3 * input;
 			}
 			
 			public String getSource() {
-				return "return input;";
+				return "return 3 * input;";
 			}
 			
 		});
@@ -73,7 +73,12 @@ public class TestRange extends TestCase {
 
 			@Override
 			public Integer combine(Integer input, Integer other) {
-				return other;
+				return input + other;
+			}
+			
+			@Override
+			public String getSource() {
+				return "return reduce_input_first + reduce_input_second;";
 			}
 
 			@Override
@@ -81,14 +86,9 @@ public class TestRange extends TestCase {
 				return 0;
 			}
 			
-			@Override
-			public String getSource() {
-				return "return get_global_id(0)';";
-			}
-			
 		});
 
-		assertEquals(new Integer(90),output);
+		assertEquals(new Integer(3 * 45),output);
 	}
 		
 	

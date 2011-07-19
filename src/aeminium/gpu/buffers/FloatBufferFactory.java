@@ -49,4 +49,10 @@ public class FloatBufferFactory implements IBufferFactory {
 			CLEvent ev) {
 		return outbuffer.read(q, ev).getFloats(1)[0];
 	}
+
+	@Override
+	public CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			String outputType, int size) {
+		return context.createFloatBuffer(CLMem.Usage.InputOutput, size);
+	}
 }

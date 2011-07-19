@@ -23,4 +23,7 @@ public interface IBufferFactory {
 
 	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
 			CLEvent ev);
+
+	public CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			String outputType, int size);
 }

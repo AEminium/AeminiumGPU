@@ -1,8 +1,6 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 
 #define MERGE(acc,other) acc = {{reduce_lambda_name}}(acc,other)
-#define blockSize 128
-
 
 // Other Sources Required
 {{other_sources}}
@@ -14,40 +12,23 @@ inline {{output_type}} get_accumulator() {
 	{{seed_source}}
 }
 
-__kernel void {{reduce_kernel_name}}(
-			__global {{input_type}}* reduce_input,
-			__global {{output_type}}* reduce_output,
-			__local volatile {{input_type}}* reduce_shared,
-			const int reduce_length) {
-			
-	unsigned int tid = get_local_id(0);
-    unsigned int i = get_group_id(0)*(get_local_size(0)*2) + get_local_id(0);
-    unsigned int gridSize = blockSize*2*get_num_groups(0);
-    reduce_shared[tid] = get_accumulator();
-			
-	while (i < reduce_length) {
-		MERGE(reduce_shared[tid], reduce_input[i]);
-        if (i + blockSize < reduce_length) {
-        	MERGE(reduce_shared[tid], reduce_input[i+blockSize]);
-        }
-        i += gridSize;
-    } 
-    barrier(CLK_LOCAL_MEM_FENCE);
-    
-    
-    if (blockSize >= 512) { if (tid < 256) { MERGE(reduce_shared[tid], reduce_input[tid + 256]); } barrier(CLK_LOCAL_MEM_FENCE); }
-    if (blockSize >= 256) { if (tid < 128) { MERGE(reduce_shared[tid], reduce_input[tid + 128]); } barrier(CLK_LOCAL_MEM_FENCE); }
-    if (blockSize >= 128) { if (tid <  64) { MERGE(reduce_shared[tid], reduce_input[tid + 64]); } barrier(CLK_LOCAL_MEM_FENCE); }
-    
-    if (tid < 32) {
-        if (blockSize >=  64) { MERGE(reduce_shared[tid], reduce_input[tid + 32]); }
-        if (blockSize >=  32) { MERGE(reduce_shared[tid], reduce_input[tid + 16]); }
-        if (blockSize >=  16) { MERGE(reduce_shared[tid], reduce_input[tid + 8]); }
-        if (blockSize >=   8) { MERGE(reduce_shared[tid], reduce_input[tid + 4]); }
-        if (blockSize >=   4) { MERGE(reduce_shared[tid], reduce_input[tid + 2]); }
-        if (blockSize >=   2) { MERGE(reduce_shared[tid], reduce_input[tid + 1]); }
-    }
-    
-    if (tid == 0) reduce_output[get_group_id(0)] = reduce_shared[0];
-    
+
+__kernel void {{reduce_kernel_name}}(                  
+   __global const {{input_type}}* reduce_input,
+   __global {{output_type}}* reduce_output,
+   long dataLength, 
+   long blocks,
+   long blockLength)  {
+        long block = get_global_id(0);
+        if (block >= blocks)
+                return;
+        
+        long inputStart = block * blockLength;
+        long inputEnd = min(inputStart + blockLength, dataLength);
+        
+        {{output_type}} total = ({{output_type}}) get_accumulator();
+        for (int inputOffset = inputStart; inputOffset < inputEnd; inputOffset++)
+                MERGE(total, reduce_input[inputOffset]);
+        
+        reduce_output[block] = total;
 }

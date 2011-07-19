@@ -35,6 +35,8 @@ public class DoubleBufferFactory implements IBufferFactory{
 			int size) {
 		return new CLKernel.LocalSize(size * 8);
 	}
+	
+	
 
 	@Override
 	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev,
@@ -45,6 +47,12 @@ public class DoubleBufferFactory implements IBufferFactory{
 	@Override
 	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev) {
 		return outbuffer.read(q, ev).getDoubles(1)[0];
+	}
+
+	@Override
+	public CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			String outputType, int size) {
+		return context.createDoubleBuffer(CLMem.Usage.InputOutput, size);
 	}
 
 }

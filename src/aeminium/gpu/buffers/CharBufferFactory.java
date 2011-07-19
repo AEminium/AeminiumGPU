@@ -72,4 +72,10 @@ public class CharBufferFactory implements IBufferFactory {
 		return content[0];
 	}
 
+	@Override
+	public CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			String outputType, int size) {
+		return context.createByteBuffer(CLMem.Usage.InputOutput, size);
+	}
+
 }

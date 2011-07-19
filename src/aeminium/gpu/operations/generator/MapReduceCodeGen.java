@@ -63,9 +63,9 @@ public class MapReduceCodeGen {
 		mapping.put("other_sources", op.getOtherSources());
 
 		if (isRange) {
-			mapping.put("get_input", "global_index");
+			mapping.put("get_input", "inputOffset");
 		} else {
-			mapping.put("get_input", "map_input[global_index]");
+			mapping.put("get_input", "map_input[inputOffset]");
 		}
 		
 		

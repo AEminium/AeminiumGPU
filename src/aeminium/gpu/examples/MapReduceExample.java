@@ -1,19 +1,15 @@
 package aeminium.gpu.examples;
 
-import aeminium.gpu.lists.IntList;
 import aeminium.gpu.lists.PList;
+import aeminium.gpu.lists.lazyness.Range;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
 
 public class MapReduceExample {
 	public static void main(String[] args) {
-		int N = 512;
+		int N = 1034;
 		
-		PList<Integer> input = new IntList();
-		for (int i = 0; i < N; i++) {
-			input.add(i);
-		}
-		
+		PList<Integer> input = new Range(N);
 		input = input.map(new LambdaMapper<Integer, Integer>() {
 
 			@Override
@@ -27,7 +23,6 @@ public class MapReduceExample {
 			}
 			
 		});
-		input.get(0);
 		int sum = input.reduce(new LambdaReducer<Integer>(){
 
 			@Override

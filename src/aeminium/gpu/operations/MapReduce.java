@@ -16,11 +16,13 @@ import aeminium.gpu.operations.utils.ExtractTypes;
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
-import com.nativelibs4java.opencl.CLKernel.LocalSize;
 import com.nativelibs4java.opencl.CLMem;
 import com.nativelibs4java.opencl.CLQueue;
 
 public class MapReduce<I,O> extends GenericProgram implements Program {
+	
+	static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
+
 	
 	protected PList<I> input;
 	private O output;
@@ -28,14 +30,13 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	protected LambdaReducer<O> reduceFun;
 	
 	protected CLBuffer<?> inbuffer;
-	private LocalSize sharedbuffer;
-	private CLBuffer<?> middlebuffer;
-	private CLBuffer<?> outbuffer;
+	private CLBuffer<O> outbuffer;
 	
 	private MapReduceCodeGen gen;
 	
 	private int blocks;
 	private int threads;
+	private int current_size;
 	
 	// Constructors
 	
@@ -72,45 +73,47 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		} else {
 			inbuffer = BufferHelper.createInputBufferFor(ctx, input);
 		}
-		middlebuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
-		outbuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(), input.size());
-		sharedbuffer = BufferHelper.createSharedBufferFor(ctx , getOutputType(), threads);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(CLContext ctx, CLQueue q) {
-		CLEvent[] previous = new CLEvent[1];
-		CLBuffer<?> tmp;
-		boolean first = true;
-		int current_size = input.size();
-		while(current_size > 1) {
-			synchronized (kernel) {
-				inferBestValues();
-			    kernel.setArgs(inbuffer, middlebuffer, outbuffer, sharedbuffer, current_size, (first) ? 1 : 0);
-			    
-			    int global_workgroup_size = Math.min(blocks, current_size/(threads*2)) * threads;
-			    int local_workgroup_size = threads;
-			    
-			    kernelCompletion = kernel.enqueueNDRange(q, 
-			    		new int[] { global_workgroup_size }, 
-			    		new int[] { local_workgroup_size }, 
-			    		(first) ? (new CLEvent[] {}) : previous);
-			    
-			    previous[0] = kernelCompletion;
-			    first = false;
-			    
-			    current_size = current_size / (threads * 2);
-			    
-			    
-				// Swap input and output
-				tmp = middlebuffer;
-				middlebuffer = outbuffer;
-				outbuffer = tmp;
+		CLBuffer<?>[] tempBuffers = new CLBuffer<?>[2];
+		int depth = 0;
+		CLEvent[] eventsArr = new CLEvent[1];
+		int[] blockCountArr = new int[1];
+		current_size = input.length();
+
+		while (current_size > 1) {
+			int blocksInCurrentDepth = current_size
+					/ DEFAULT_MAX_REDUCTION_SIZE;
+			if (current_size > blocksInCurrentDepth
+					* DEFAULT_MAX_REDUCTION_SIZE) {
+				blocksInCurrentDepth++;
 			}
+			int iOutput = depth & 1;
+			CLBuffer<?> currentInput = (depth == 0) ? inbuffer : tempBuffers[iOutput ^ 1];
+			outbuffer = (CLBuffer<O>) tempBuffers[iOutput];
+			if (outbuffer == null) {
+				tempBuffers[iOutput] = BufferHelper.createInputOutputBufferFor(ctx, getOutputType(), blocksInCurrentDepth);
+				outbuffer = (CLBuffer<O>) tempBuffers[iOutput];
+			}
+			synchronized (kernel) {
+				kernel.setArgs(inbuffer, currentInput, outbuffer, (long) current_size,
+						(long) blocksInCurrentDepth,
+						(long) DEFAULT_MAX_REDUCTION_SIZE, (depth == 0) ? 1 : 0);
+				int workgroupSize = blocksInCurrentDepth;
+				if (workgroupSize == 1)
+					workgroupSize = 2;
+				blockCountArr[0] = workgroupSize;
+				eventsArr[0] = kernel.enqueueNDRange(q, blockCountArr, null,
+						eventsArr);
+			}
+			current_size = blocksInCurrentDepth;
+			depth++;
 		}
-		
-		// final swap.
-		outbuffer = middlebuffer;
+
+		kernelCompletion = eventsArr[eventsArr.length - 1];
 	}
 	
 	public O cpuExecution() {

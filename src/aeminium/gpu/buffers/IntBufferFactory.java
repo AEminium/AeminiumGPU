@@ -51,4 +51,11 @@ public class IntBufferFactory implements IBufferFactory{
 		return outbuffer.read(q, ev).getInts(1)[0];
 	}
 
+
+	@Override
+	public CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			String outputType, int size) {
+		return context.createIntBuffer(CLMem.Usage.InputOutput, size);
+	}
+
 }

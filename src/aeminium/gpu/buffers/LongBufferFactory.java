@@ -49,4 +49,10 @@ public class LongBufferFactory implements IBufferFactory {
 			CLEvent ev) {
 		return outbuffer.read(q, ev).getLongs(1)[0];
 	}
+
+	@Override
+	public CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			String outputType, int size) {
+		return context.createLongBuffer(CLMem.Usage.InputOutput, size);
+	}
 }
