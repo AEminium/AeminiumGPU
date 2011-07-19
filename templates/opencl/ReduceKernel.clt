@@ -25,7 +25,7 @@ __kernel void {{reduce_kernel_name}}(
     unsigned int gridSize = blockSize*2*get_num_groups(0);
     reduce_shared[tid] = get_accumulator();
 			
-	while (i < recude_length) {
+	while (i < reduce_length) {
 		MERGE(reduce_shared[tid], reduce_input[i]);
         if (i + blockSize < reduce_length) {
         	MERGE(reduce_shared[tid], reduce_input[i+blockSize]);
