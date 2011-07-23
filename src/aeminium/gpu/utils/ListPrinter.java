@@ -1,6 +1,6 @@
 package aeminium.gpu.utils;
 
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.PList;
 
 public class ListPrinter {
 	public static <O> void printInline(PList<O> list) {

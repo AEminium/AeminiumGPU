@@ -1,4 +1,4 @@
-package aeminium.gpu.lists.properties;
+package aeminium.gpu.collections.properties;
 
 import aeminium.gpu.operations.functions.LambdaReducer;
 

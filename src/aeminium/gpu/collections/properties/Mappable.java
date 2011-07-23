@@ -1,6 +1,6 @@
-package aeminium.gpu.lists.properties;
+package aeminium.gpu.collections.properties;
 
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
 
 public interface Mappable<I> {

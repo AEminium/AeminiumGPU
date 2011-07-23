@@ -1,6 +1,6 @@
 package aeminium.gpu.operations.functions;
 
-import aeminium.gpu.lists.properties.operations.Mapper;
+import aeminium.gpu.collections.properties.operations.Mapper;
 import aeminium.gpu.operations.utils.UniqCounter;
 
 public abstract class LambdaMapper<I,O> implements Mapper<I,O>, GPUFunction {

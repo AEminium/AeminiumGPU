@@ -1,11 +1,11 @@
 package aeminium.gpu.tests.operations;
 
 import junit.framework.TestCase;
-import aeminium.gpu.lists.CharList;
-import aeminium.gpu.lists.DoubleList;
-import aeminium.gpu.lists.FloatList;
-import aeminium.gpu.lists.IntList;
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.CharList;
+import aeminium.gpu.collections.lists.DoubleList;
+import aeminium.gpu.collections.lists.FloatList;
+import aeminium.gpu.collections.lists.IntList;
+import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
 
 public class TestMap extends TestCase {

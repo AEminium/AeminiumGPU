@@ -1,9 +1,9 @@
-package aeminium.gpu.lists;
+package aeminium.gpu.collections.lists;
 
+import aeminium.gpu.collections.properties.Mappable;
+import aeminium.gpu.collections.properties.Reductionable;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
-import aeminium.gpu.lists.properties.Mappable;
-import aeminium.gpu.lists.properties.Reductionable;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;

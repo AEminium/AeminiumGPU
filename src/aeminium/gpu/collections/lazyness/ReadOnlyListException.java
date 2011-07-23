@@ -1,4 +1,4 @@
-package aeminium.gpu.lists.lazyness;
+package aeminium.gpu.collections.lazyness;
 
 public class ReadOnlyListException extends RuntimeException {
 

@@ -1,7 +1,7 @@
 package aeminium.gpu.examples;
 
-import aeminium.gpu.lists.FloatList;
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.FloatList;
+import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
 
 public class CompareSumSin {

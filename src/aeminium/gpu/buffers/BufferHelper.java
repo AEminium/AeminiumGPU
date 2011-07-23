@@ -2,8 +2,8 @@ package aeminium.gpu.buffers;
 
 import java.util.HashMap;
 
-import aeminium.gpu.lists.BooleanList;
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.BooleanList;
+import aeminium.gpu.collections.lists.PList;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;

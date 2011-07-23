@@ -1,7 +1,7 @@
 package aeminium.gpu.tests.lists;
 
-import aeminium.gpu.lists.CharList;
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.CharList;
+import aeminium.gpu.collections.lists.PList;
 
 public class TestCharList extends TestAbstractListTemplate<Character> {
 	

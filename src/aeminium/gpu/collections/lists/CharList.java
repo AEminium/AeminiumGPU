@@ -1,50 +1,50 @@
-package aeminium.gpu.lists;
+package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
-public class FloatList extends AbstractList<Float> {
+public class CharList extends AbstractList<Character> {
 
-	protected float[] box;
+	protected char[] box;
 	
-	public FloatList() {
-		this(new float[DEFAULT_SIZE], 0);
+	public CharList() {
+		this(new char[DEFAULT_SIZE], 0);
 	}
 	
-	public FloatList(float[] box, int size) {
+	public CharList(char[] box, int size) {
 		super();
 		this.size = size;
 		this.box = box;
 	}
 	
 	@Override
-	public void add(Float e) {
+	public void add(Character e) {
 		ensureOneMore();
-		box[size++] = e.floatValue();
+		box[size++] = e.charValue();
 	}
 	
 	@Override
-	public void add(int index, Float e) {
+	public void add(int index, Character e) {
 		System.arraycopy(box, index, box, index+1, size-index);
 		size++;
-		box[index] = e.floatValue();
+		box[index] = e.charValue();
 	}
 
 	@Override
-	public void remove(Float o) {
+	public void remove(Character o) {
 		for(int i=0;i<size;i++) {
-			if (box[i] == o.floatValue()) {
+			if (box[i] == o.charValue()) {
 				remove(i--);
 			}
 		}
 	}
 
 	@Override
-	public Float get(int index) {
+	public Character get(int index) {
 		return box[index];
 	}
 
 	@Override
-	public void set(int index, Float e) {
+	public void set(int index, Character e) {
 		if (index >= size) {
 			ensureNMore(index + 1 - size);
 			size = index + 1;
@@ -53,8 +53,8 @@ public class FloatList extends AbstractList<Float> {
 	}
 
 	@Override
-	public Float remove(int index) {
-		float e = box[index];
+	public Character remove(int index) {
+		char e = box[index];
 		System.arraycopy(box, index+1, box, index, size-index);
 		size--;
 		return e;
@@ -63,26 +63,32 @@ public class FloatList extends AbstractList<Float> {
 	@Override
 	public void clear() {
 		size = 0;
-		box = new float[DEFAULT_SIZE];
+		box = new char[DEFAULT_SIZE];
 	}
+	
 
 	@Override
-	public PList<Float> subList(int fromIndex, int toIndex) {
+	public PList<Character> subList(int fromIndex, int toIndex) {
 		int newSize = toIndex - fromIndex;
-		float[] newList = new float[Math.max(DEFAULT_SIZE,newSize)];
+		char[] newList = new char[Math.max(DEFAULT_SIZE,newSize)];
 		System.arraycopy(box, fromIndex, newList, 0, newSize);
-		return new FloatList(newList, newSize);
+		return new CharList(newList, newSize);
 	}
 
 	
 	@Override
 	public Class<?> getType() {
-		return Float.class;
+		return Character.class;
 	}
-
+	
+	@Override
+	public String toString() {
+		return new String(box,0,size);
+	}
+	
 	// Utilities
 	
-	public float[] getArray() {
+	public char[] getArray() {
 		return box;
 	}
 	

@@ -1,50 +1,50 @@
-package aeminium.gpu.lists;
+package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
-public class DoubleList extends AbstractList<Double> {
+public class FloatList extends AbstractList<Float> {
 
-	protected double[] box;
+	protected float[] box;
 	
-	public DoubleList() {
-		this(new double[DEFAULT_SIZE], 0);
+	public FloatList() {
+		this(new float[DEFAULT_SIZE], 0);
 	}
 	
-	public DoubleList(double[] box, int size) {
+	public FloatList(float[] box, int size) {
 		super();
 		this.size = size;
 		this.box = box;
 	}
 	
 	@Override
-	public void add(Double e) {
+	public void add(Float e) {
 		ensureOneMore();
-		box[size++] = e.doubleValue();
+		box[size++] = e.floatValue();
 	}
 	
 	@Override
-	public void add(int index, Double e) {
+	public void add(int index, Float e) {
 		System.arraycopy(box, index, box, index+1, size-index);
 		size++;
-		box[index] = e.doubleValue();
+		box[index] = e.floatValue();
 	}
 
 	@Override
-	public void remove(Double o) {
+	public void remove(Float o) {
 		for(int i=0;i<size;i++) {
-			if (box[i] == o.doubleValue()) {
+			if (box[i] == o.floatValue()) {
 				remove(i--);
 			}
 		}
 	}
 
 	@Override
-	public Double get(int index) {
+	public Float get(int index) {
 		return box[index];
 	}
 
 	@Override
-	public void set(int index, Double e) {
+	public void set(int index, Float e) {
 		if (index >= size) {
 			ensureNMore(index + 1 - size);
 			size = index + 1;
@@ -53,8 +53,8 @@ public class DoubleList extends AbstractList<Double> {
 	}
 
 	@Override
-	public Double remove(int index) {
-		double e = box[index];
+	public Float remove(int index) {
+		float e = box[index];
 		System.arraycopy(box, index+1, box, index, size-index);
 		size--;
 		return e;
@@ -63,29 +63,26 @@ public class DoubleList extends AbstractList<Double> {
 	@Override
 	public void clear() {
 		size = 0;
-		box = new double[DEFAULT_SIZE];
+		box = new float[DEFAULT_SIZE];
 	}
-	
-	
 
 	@Override
-	public PList<Double> subList(int fromIndex, int toIndex) {
+	public PList<Float> subList(int fromIndex, int toIndex) {
 		int newSize = toIndex - fromIndex;
-		double[] newList = new double[Math.max(DEFAULT_SIZE,newSize)];
+		float[] newList = new float[Math.max(DEFAULT_SIZE,newSize)];
 		System.arraycopy(box, fromIndex, newList, 0, newSize);
-		return new DoubleList(newList, newSize);
+		return new FloatList(newList, newSize);
 	}
 
 	
 	@Override
 	public Class<?> getType() {
-		return Double.class;
+		return Float.class;
 	}
-	
-	
+
 	// Utilities
 	
-	public double[] getArray() {
+	public float[] getArray() {
 		return box;
 	}
 	

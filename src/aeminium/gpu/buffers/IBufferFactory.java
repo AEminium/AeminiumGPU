@@ -1,6 +1,6 @@
 package aeminium.gpu.buffers;
 
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.PList;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;

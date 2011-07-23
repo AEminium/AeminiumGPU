@@ -1,7 +1,7 @@
 package aeminium.gpu.tests.lists;
 
-import aeminium.gpu.lists.LongList;
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.LongList;
+import aeminium.gpu.collections.lists.PList;
 
 public class TestLongList extends TestAbstractListTemplate<Long> {
 	

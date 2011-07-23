@@ -3,11 +3,11 @@ package aeminium.gpu.operations;
 import org.bridj.Pointer;
 
 import aeminium.gpu.buffers.BufferHelper;
+import aeminium.gpu.collections.lazyness.Range;
+import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
-import aeminium.gpu.lists.PList;
-import aeminium.gpu.lists.lazyness.Range;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.MapReduceCodeGen;

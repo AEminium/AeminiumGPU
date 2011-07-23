@@ -1,12 +1,12 @@
-package aeminium.gpu.lists;
+package aeminium.gpu.collections.lists;
 
-import aeminium.gpu.lists.properties.Mappable;
-import aeminium.gpu.lists.properties.Reductionable;
+import aeminium.gpu.collections.PCollection;
+import aeminium.gpu.collections.properties.Mappable;
+import aeminium.gpu.collections.properties.Reductionable;
 
-public interface PList<T> extends Mappable<T>, Reductionable<T> {
+public interface PList<T> extends PCollection<T>, Mappable<T>, Reductionable<T> {
 	
 	/* Properties */
-	public int size();
 	public int length();
 	
 	public boolean isEmpty();
@@ -25,9 +25,6 @@ public interface PList<T> extends Mappable<T>, Reductionable<T> {
 	
 	/* Extraction Methods */
 	public PList<T> subList(int fromIndex, int toIndex);
-	
-	/* Type Methods */
-	public Class<?> getType();
 	
 	/* Lazyness */
 	public PList<T> evaluate();

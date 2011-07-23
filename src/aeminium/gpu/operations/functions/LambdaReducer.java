@@ -1,6 +1,7 @@
 package aeminium.gpu.operations.functions;
 
-import aeminium.gpu.lists.properties.operations.Reducer;
+
+import aeminium.gpu.collections.properties.operations.Reducer;
 import aeminium.gpu.operations.utils.UniqCounter;
 
 public abstract class LambdaReducer<I> implements Reducer<I>, GPUFunction {

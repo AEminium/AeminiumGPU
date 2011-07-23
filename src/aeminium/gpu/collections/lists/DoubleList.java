@@ -1,50 +1,50 @@
-package aeminium.gpu.lists;
+package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
-public class CharList extends AbstractList<Character> {
+public class DoubleList extends AbstractList<Double> {
 
-	protected char[] box;
+	protected double[] box;
 	
-	public CharList() {
-		this(new char[DEFAULT_SIZE], 0);
+	public DoubleList() {
+		this(new double[DEFAULT_SIZE], 0);
 	}
 	
-	public CharList(char[] box, int size) {
+	public DoubleList(double[] box, int size) {
 		super();
 		this.size = size;
 		this.box = box;
 	}
 	
 	@Override
-	public void add(Character e) {
+	public void add(Double e) {
 		ensureOneMore();
-		box[size++] = e.charValue();
+		box[size++] = e.doubleValue();
 	}
 	
 	@Override
-	public void add(int index, Character e) {
+	public void add(int index, Double e) {
 		System.arraycopy(box, index, box, index+1, size-index);
 		size++;
-		box[index] = e.charValue();
+		box[index] = e.doubleValue();
 	}
 
 	@Override
-	public void remove(Character o) {
+	public void remove(Double o) {
 		for(int i=0;i<size;i++) {
-			if (box[i] == o.charValue()) {
+			if (box[i] == o.doubleValue()) {
 				remove(i--);
 			}
 		}
 	}
 
 	@Override
-	public Character get(int index) {
+	public Double get(int index) {
 		return box[index];
 	}
 
 	@Override
-	public void set(int index, Character e) {
+	public void set(int index, Double e) {
 		if (index >= size) {
 			ensureNMore(index + 1 - size);
 			size = index + 1;
@@ -53,8 +53,8 @@ public class CharList extends AbstractList<Character> {
 	}
 
 	@Override
-	public Character remove(int index) {
-		char e = box[index];
+	public Double remove(int index) {
+		double e = box[index];
 		System.arraycopy(box, index+1, box, index, size-index);
 		size--;
 		return e;
@@ -63,32 +63,29 @@ public class CharList extends AbstractList<Character> {
 	@Override
 	public void clear() {
 		size = 0;
-		box = new char[DEFAULT_SIZE];
+		box = new double[DEFAULT_SIZE];
 	}
+	
 	
 
 	@Override
-	public PList<Character> subList(int fromIndex, int toIndex) {
+	public PList<Double> subList(int fromIndex, int toIndex) {
 		int newSize = toIndex - fromIndex;
-		char[] newList = new char[Math.max(DEFAULT_SIZE,newSize)];
+		double[] newList = new double[Math.max(DEFAULT_SIZE,newSize)];
 		System.arraycopy(box, fromIndex, newList, 0, newSize);
-		return new CharList(newList, newSize);
+		return new DoubleList(newList, newSize);
 	}
 
 	
 	@Override
 	public Class<?> getType() {
-		return Character.class;
+		return Double.class;
 	}
 	
-	@Override
-	public String toString() {
-		return new String(box,0,size);
-	}
 	
 	// Utilities
 	
-	public char[] getArray() {
+	public double[] getArray() {
 		return box;
 	}
 	

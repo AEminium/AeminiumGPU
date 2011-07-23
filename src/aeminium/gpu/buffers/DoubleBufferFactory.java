@@ -2,8 +2,8 @@ package aeminium.gpu.buffers;
 
 import org.bridj.Pointer;
 
-import aeminium.gpu.lists.DoubleList;
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.DoubleList;
+import aeminium.gpu.collections.lists.PList;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;

@@ -1,8 +1,8 @@
 package aeminium.gpu.operations.mergers;
 
-import aeminium.gpu.lists.PList;
-import aeminium.gpu.lists.lazyness.LazyEvaluator;
-import aeminium.gpu.lists.lazyness.LazyPList;
+import aeminium.gpu.collections.lazyness.LazyEvaluator;
+import aeminium.gpu.collections.lazyness.LazyPList;
+import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;

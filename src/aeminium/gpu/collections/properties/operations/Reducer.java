@@ -1,4 +1,4 @@
-package aeminium.gpu.lists.properties.operations;
+package aeminium.gpu.collections.properties.operations;
 
 public interface Reducer<I> {
 	public I combine(I input, I other);

@@ -1,8 +1,8 @@
-package aeminium.gpu.lists.lazyness;
+package aeminium.gpu.collections.lazyness;
 
+import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
-import aeminium.gpu.lists.PList;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;

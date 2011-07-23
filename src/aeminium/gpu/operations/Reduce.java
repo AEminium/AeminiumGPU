@@ -1,10 +1,10 @@
 package aeminium.gpu.operations;
 
 import aeminium.gpu.buffers.BufferHelper;
+import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
-import aeminium.gpu.lists.PList;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.ReduceCodeGen;
 import aeminium.gpu.operations.utils.ExtractTypes;

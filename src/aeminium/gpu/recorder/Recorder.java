@@ -1,9 +1,9 @@
 package aeminium.gpu.recorder;
 
+import aeminium.gpu.collections.lists.FloatList;
+import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
-import aeminium.gpu.lists.FloatList;
-import aeminium.gpu.lists.PList;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.utils.TimeoutController;

@@ -1,7 +1,7 @@
 package aeminium.gpu.tests.lists;
 
-import aeminium.gpu.lists.FloatList;
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.FloatList;
+import aeminium.gpu.collections.lists.PList;
 
 public class TestFloatList extends TestAbstractListTemplate<Float> {
 	

@@ -1,7 +1,7 @@
 package aeminium.gpu.tests.lists;
 
-import aeminium.gpu.lists.DoubleList;
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.DoubleList;
+import aeminium.gpu.collections.lists.PList;
 
 public class TestDoubleList extends TestAbstractListTemplate<Double> {
 	

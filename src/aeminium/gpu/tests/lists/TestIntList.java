@@ -1,7 +1,7 @@
 package aeminium.gpu.tests.lists;
 
-import aeminium.gpu.lists.IntList;
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.IntList;
+import aeminium.gpu.collections.lists.PList;
 
 public class TestIntList extends TestAbstractListTemplate<Integer> {
 	

@@ -1,6 +1,6 @@
 package aeminium.gpu.tests.lists;
 
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.PList;
 import junit.framework.TestCase;
 
 public abstract class TestAbstractListTemplate<T> extends TestCase {

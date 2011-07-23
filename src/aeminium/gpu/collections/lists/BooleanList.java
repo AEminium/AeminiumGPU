@@ -1,4 +1,4 @@
-package aeminium.gpu.lists;
+package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 

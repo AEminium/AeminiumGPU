@@ -1,50 +1,56 @@
-package aeminium.gpu.lists;
+package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
-public class IntList extends AbstractList<Integer> {
+public class LongList extends AbstractList<Long> {
 
-	protected int[] box;
+	protected long[] box;
 	
-	public IntList() {
-		this(new int[DEFAULT_SIZE], 0);
+	public LongList() {
+		this(new long[DEFAULT_SIZE], 0);
 	}
 	
-	public IntList(int[] box, int size) {
+	public LongList(long[] box, int size) {
 		super();
 		this.size = size;
 		this.box = box;
 	}
 	
 	@Override
-	public void add(Integer e) {
+	public void add(Long e) {
 		ensureOneMore();
-		box[size++] = e.intValue();
+		box[size++] = e.longValue();
 	}
 	
 	@Override
-	public void add(int index, Integer e) {
+	public void add(int index, Long e) {
 		System.arraycopy(box, index, box, index+1, size-index);
 		size++;
-		box[index] = e.intValue();
+		box[index] = e.longValue();
 	}
 
 	@Override
-	public void remove(Integer o) {
+	public void remove(Long o) {
 		for(int i=0;i<size;i++) {
-			if (box[i] == o.intValue()) {
+			if (box[i] == o.longValue()) {
 				remove(i--);
 			}
 		}
 	}
+	
+	@Override
+	public void clear() {
+		size = 0;
+		box = new long[DEFAULT_SIZE];
+	}
 
 	@Override
-	public Integer get(int index) {
+	public Long get(int index) {
 		return box[index];
 	}
 
 	@Override
-	public void set(int index, Integer e) {
+	public void set(int index, Long e) {
 		if (index >= size) {
 			ensureNMore(index + 1 - size);
 			size = index + 1;
@@ -53,31 +59,30 @@ public class IntList extends AbstractList<Integer> {
 	}
 
 	@Override
-	public Integer remove(int index) {
-		int e = box[index];
+	public Long remove(int index) {
+		long e = box[index];
 		System.arraycopy(box, index+1, box, index, size-index);
 		size--;
 		return e;
 	}
-	
-	
-	@Override
-	public void clear() {
-		size = 0;
-		box = new int[DEFAULT_SIZE];
-	}
 
 	@Override
-	public PList<Integer> subList(int fromIndex, int toIndex) {
+	public PList<Long> subList(int fromIndex, int toIndex) {
 		int newSize = toIndex - fromIndex;
-		int[] newList = new int[Math.max(DEFAULT_SIZE,newSize)];
+		long[] newList = new long[Math.max(DEFAULT_SIZE,newSize)];
 		System.arraycopy(box, fromIndex, newList, 0, newSize);
-		return new IntList(newList, newSize);
+		return new LongList(newList, newSize);
+	}
+
+	
+	@Override
+	public Class<?> getType() {
+		return Long.class;
 	}
 	
 	// Utilities
 	
-	public int[] getArray() {
+	public long[] getArray() {
 		return box;
 	}
 	
@@ -92,10 +97,6 @@ public class IntList extends AbstractList<Integer> {
 		if (size == box.length) {
 			box = Arrays.copyOf(box, box.length + INCREMENT_SIZE );
 		}
-	}
-	
-	public Class<?> getType() {
-		return Integer.class;
 	}
 
 }

@@ -1,8 +1,8 @@
 package aeminium.gpu.tests.operations;
 
 import junit.framework.TestCase;
-import aeminium.gpu.lists.IntList;
-import aeminium.gpu.lists.PList;
+import aeminium.gpu.collections.lists.IntList;
+import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaReducer;
 
 public class TestReduce extends TestCase {
