@@ -1,6 +1,6 @@
 package aeminium.gpu.collections.lazyness;
 
-import aeminium.gpu.collections.factories.ListFactory;
+import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.AbstractList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.Map;
@@ -76,7 +76,7 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 	public void clear() {
 		size = 0;
 		evaluated = true;
-		actual = (PList<T>) ListFactory.fromType(getType().getSimpleName().toString());
+		actual = (PList<T>) CollectionFactory.listFromType(getType().getSimpleName().toString());
 	}
 	
 	@Override

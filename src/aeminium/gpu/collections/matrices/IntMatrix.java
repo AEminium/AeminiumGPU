@@ -36,7 +36,7 @@ public class IntMatrix extends AbstractMatrix<Integer> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <O> PMatrix<O> map(LambdaMapper<Integer, O> mapper) {
-		IntList output = (IntList) elements().map(mapper);
+		IntList output = (IntList) elements().map(mapper).evaluate();
 		return (PMatrix<O>) new IntMatrix(output.getArray(), rows, cols);
 	}
 

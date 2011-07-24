@@ -7,9 +7,11 @@ import aeminium.gpu.collections.lists.FloatList;
 import aeminium.gpu.collections.lists.IntList;
 import aeminium.gpu.collections.lists.LongList;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.collections.matrices.IntMatrix;
+import aeminium.gpu.collections.matrices.PMatrix;
 
-public class ListFactory {
-	public static PList<?> fromType(String outputType) {
+public class CollectionFactory {
+	public static PList<?> listFromType(String outputType) {
 		if (outputType.equals("Integer")) {
 			return new IntList();
 		}
@@ -27,6 +29,13 @@ public class ListFactory {
 		}
 		if (outputType.equals("Boolean")) {
 			return new BooleanList();
+		}
+		return null;
+	}
+	
+	public static PMatrix<?> matrixFromType(String outputType, int m, int n) {
+		if (outputType.equals("Integer")) {
+			return new IntMatrix(m, n);
 		}
 		return null;
 	}

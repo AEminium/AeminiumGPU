@@ -3,7 +3,7 @@ package aeminium.gpu.operations;
 import org.bridj.Pointer;
 
 import aeminium.gpu.buffers.BufferHelper;
-import aeminium.gpu.collections.factories.ListFactory;
+import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lazyness.LazyEvaluator;
 import aeminium.gpu.collections.lazyness.LazyPList;
 import aeminium.gpu.collections.lazyness.Range;
@@ -93,7 +93,7 @@ public class Map<I,O> extends GenericProgram implements Program {
 
 	@SuppressWarnings("unchecked")
 	public void cpuExecution() {
-		output = (PList<O>) ListFactory.fromType(getOutputType());
+		output = (PList<O>) CollectionFactory.listFromType(getOutputType());
 		for (int i=0; i< input.size(); i++ ) {
 			output.add(mapFun.map(input.get(i)));
 		}
