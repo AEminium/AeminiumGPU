@@ -5,6 +5,7 @@ import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
+import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.ReduceCodeGen;
 import aeminium.gpu.operations.utils.ExtractTypes;
@@ -57,12 +58,16 @@ public class Reduce<O> extends GenericProgram implements Program {
 		this.setOtherSources(other);
 		gen = new ReduceCodeGen(this);
 	}
+	
+	private boolean willRunOnGPU() {
+		return OpenCLDecider.useGPU(input.size(), reduceFun.getSource(), reduceFun.getSourceComplexity());
+	}
 
 	public void execute() {
-		if (input.size() < 1000) {
-			cpuExecution();
-		} else {
+		if (willRunOnGPU()) {
 			run();
+		} else {
+			cpuExecution();
 		}
 	}
 
