@@ -1,6 +1,7 @@
 package aeminium.gpu.operations;
 
 import aeminium.gpu.buffers.BufferHelper;
+import aeminium.gpu.collections.PCollection;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
@@ -19,7 +20,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 
 	static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
 
-	protected PList<O> input;
+	protected PCollection<O> input;
 	private O output;
 	protected LambdaReducer<O> reduceFun;
 
@@ -96,7 +97,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 		int depth = 0;
 		CLEvent[] eventsArr = new CLEvent[1];
 		int[] blockCountArr = new int[1];
-		current_size = input.length();
+		current_size = input.size();
 
 		while (current_size > 1) {
 			int blocksInCurrentDepth = current_size

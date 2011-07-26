@@ -44,5 +44,10 @@ public class IntMatrix extends AbstractMatrix<Integer> {
 	public PList<Integer> elements() {
 		return new IntList(box,size);
 	}
+
+	@Override
+	public Integer get(int index) {
+		return box[index];
+	}
 		
 }

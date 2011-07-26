@@ -3,6 +3,7 @@ package aeminium.gpu.operations;
 import org.bridj.Pointer;
 
 import aeminium.gpu.buffers.BufferHelper;
+import aeminium.gpu.collections.PCollection;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lazyness.LazyEvaluator;
 import aeminium.gpu.collections.lazyness.LazyPList;
@@ -26,7 +27,7 @@ import com.nativelibs4java.opencl.CLQueue;
 
 public class Map<I,O> extends GenericProgram implements Program {
 	
-	protected PList<I> input;
+	protected PCollection<I> input;
 	private PList<O> output;
 	protected LambdaMapper<I,O> mapFun;
 	

@@ -3,6 +3,7 @@ package aeminium.gpu.operations;
 import org.bridj.Pointer;
 
 import aeminium.gpu.buffers.BufferHelper;
+import aeminium.gpu.collections.PCollection;
 import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
@@ -25,7 +26,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
 
 	
-	protected PList<I> input;
+	protected PCollection<I> input;
 	private O output;
 	protected LambdaMapper<I,O> mapFun;
 	protected LambdaReducer<O> reduceFun;
@@ -41,7 +42,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	
 	// Constructors
 	
-	public MapReduce(LambdaMapper<I,O> mapper, LambdaReducer<O> reducer, PList<I> list, String other, GPUDevice dev) {
+	public MapReduce(LambdaMapper<I,O> mapper, LambdaReducer<O> reducer, PCollection<I> list, String other, GPUDevice dev) {
 		this.device = dev;
 		this.input = list;
 		this.mapFun = mapper;
@@ -101,7 +102,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		int depth = 0;
 		CLEvent[] eventsArr = new CLEvent[1];
 		int[] blockCountArr = new int[1];
-		current_size = input.length();
+		current_size = input.size();
 
 		while (current_size > 1) {
 			int blocksInCurrentDepth = current_size

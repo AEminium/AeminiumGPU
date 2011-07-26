@@ -1,5 +1,6 @@
 package aeminium.gpu.operations.mergers;
 
+import aeminium.gpu.collections.PCollection;
 import aeminium.gpu.collections.lazyness.LazyEvaluator;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.Map;
@@ -12,7 +13,7 @@ public class MapToReduceMerger<I,O> {
 	
 	private Map<I,O> first;
 	private Reduce<O> second;
-	private PList<I> current;
+	private PCollection<I> current;
 	
 	public MapToReduceMerger(Map<I,O> f, Reduce<O> s, PList<I> c) {
 		first = f;

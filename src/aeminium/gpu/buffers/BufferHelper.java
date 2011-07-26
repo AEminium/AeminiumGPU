@@ -2,6 +2,7 @@ package aeminium.gpu.buffers;
 
 import java.util.HashMap;
 
+import aeminium.gpu.collections.PCollection;
 import aeminium.gpu.collections.lists.BooleanList;
 import aeminium.gpu.collections.lists.PList;
 
@@ -47,7 +48,7 @@ public class BufferHelper {
 		
 	}
 	
-	private static <T> IBufferFactory getFactory(PList<T> list) {
+	private static <T> IBufferFactory getFactory(PCollection<T> list) {
 		return getFactory(list.getType().getSimpleName());
 	}
 	
@@ -60,12 +61,12 @@ public class BufferHelper {
 		return f;
 	}
 	
-	public static <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
+	public static <T> CLBuffer<?> createInputBufferFor(CLContext context, PCollection<T> list) {
 		 IBufferFactory f = getFactory(list);
 		 return f.createInputBufferFor(context, list);
 	}
 	
-	public static <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list) {
+	public static <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PCollection<T> list) {
 		 IBufferFactory f = getFactory(list);
 		 return f.createInputOutputBufferFor(context, list);
 	}
@@ -75,7 +76,7 @@ public class BufferHelper {
 		 return f.createInputOutputBufferFor(context, outputType, size);
 	}
 
-	public static <T> CLBuffer<?> createOutputBufferFor(CLContext context, PList<T> list, int size) {
+	public static <T> CLBuffer<?> createOutputBufferFor(CLContext context, PCollection<T> list, int size) {
 		return createOutputBufferFor(context, list.getClass().getSimpleName(), size);
 	}
 	
