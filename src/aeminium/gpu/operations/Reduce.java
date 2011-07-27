@@ -59,23 +59,15 @@ public class Reduce<O> extends GenericProgram implements Program {
 		gen = new ReduceCodeGen(this);
 	}
 
-	private boolean willRunOnGPU() {
+	protected boolean willRunOnGPU() {
 		return OpenCLDecider.useGPU(input.size(), reduceFun.getSource(),
 				reduceFun.getSourceComplexity());
 	}
-
-	public void execute() {
-		if (device == null) {
-			if (System.getenv("DEBUG") != null) {
-				System.out.println("No GPU device available.");
-			}
-			cpuExecution();
-		} else {
-			if (willRunOnGPU()) {
-				run();
-			} else {
-				cpuExecution();
-			}
+	
+	public void cpuExecution() {
+		output = this.getReduceFun().getSeed();
+		for (int i = 0; i < input.size(); i++) {
+			output = reduceFun.combine(input.get(i), output);
 		}
 	}
 
@@ -139,13 +131,6 @@ public class Reduce<O> extends GenericProgram implements Program {
 
 		kernelCompletion = eventsArr[eventsArr.length - 1];
 
-	}
-
-	public void cpuExecution() {
-		output = this.getReduceFun().getSeed();
-		for (int i = 0; i < input.size(); i++) {
-			output = reduceFun.combine(input.get(i), output);
-		}
 	}
 
 	@SuppressWarnings("unchecked")

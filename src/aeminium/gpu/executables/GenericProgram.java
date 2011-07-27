@@ -1,6 +1,5 @@
 package aeminium.gpu.executables;
 
-import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
 
 import com.nativelibs4java.opencl.CLBuildException;
@@ -20,12 +19,53 @@ public abstract class GenericProgram implements Program {
 	protected String otherSources;
 	protected long startTime;
 	
-	public void run() {
-		if (device != null) {
-			device = new DefaultDeviceFactory().getDevice();
-		}
+	
+	protected abstract boolean willRunOnGPU();
+	public abstract void cpuExecution();
+	public void gpuExecution() {
 		device.execute(this);
 	}
+	
+	
+	public void execute() {
+		/* Do we have a GPU available?*/
+		if (device == null) {
+			if (System.getenv("DEBUG") != null) {
+				System.out.println("No GPU device available.");
+			}
+			cpuExecution();
+			return;
+		}
+		
+		if (System.getenv("BENCH") != null) {
+			boolean isGpu = willRunOnGPU();
+			long startT = System.nanoTime();
+			gpuExecution();
+			long gpuT = System.nanoTime() - startT;
+			
+			startT = System.nanoTime();
+			cpuExecution();
+			long cpuT = System.nanoTime() - startT;
+			System.out.println("GPUreal: " + gpuT);
+			System.out.println("CPUreal: " + cpuT);
+			
+			if ( isGpu == (gpuT < cpuT) ) {
+				System.out.println("GPUvsCPU: right");
+			} else {
+				System.out.println("GPUvsCPU: wrong");
+			}
+			return;
+		}
+		
+		/* Regular decision */
+		if (willRunOnGPU()) {
+			gpuExecution();
+		} else {
+			cpuExecution();
+		}
+	}
+	
+	
 	
 	// Pipeline
 	

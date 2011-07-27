@@ -53,32 +53,26 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		}
 	}
 	
-	// Pipeline
-	
 	private String mergeComplexities(String one, String two) {
 		if (one == null || one.length() == 0) return two;
 		if (two == null || two.length() == 0) return one;
 		return one + "+" + two;
 	}
 	
-	private boolean willRunOnGPU() {
+	protected boolean willRunOnGPU() {
 		return OpenCLDecider.useGPU(input.size(), mapFun.getSource() + reduceFun.getSource(),  mergeComplexities(mapFun.getSourceComplexity(), reduceFun.getSourceComplexity()));
 	}
-
-	public void execute() {
-		if (device == null) {
-			if (System.getenv("DEBUG") != null) {
-				System.out.println("No GPU device available.");
-			}
-			cpuExecution();
-		} else {
-			if (willRunOnGPU()) {
-				run();
-			} else {
-				cpuExecution();
-			}
+	
+	
+	public void cpuExecution() {
+		O accumulator = this.getReduceFun().getSeed();
+		for (int i = 0; i < input.size(); i++) {
+			accumulator = reduceFun.combine( mapFun.map(input.get(i)), accumulator);
 		}
+		output = accumulator;
 	}
+	
+	// Pipeline
 	
 	@Override
 	protected String getSource() {
@@ -140,15 +134,6 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		}
 
 		kernelCompletion = eventsArr[eventsArr.length - 1];
-	}
-	
-	public O cpuExecution() {
-		O accumulator = this.getReduceFun().getSeed();
-		for (int i = 0; i < input.size(); i++) {
-			accumulator = reduceFun.combine( mapFun.map(input.get(i)), accumulator);
-		}
-		output = accumulator;
-		return accumulator;
 	}
 
 	@SuppressWarnings("unchecked")
