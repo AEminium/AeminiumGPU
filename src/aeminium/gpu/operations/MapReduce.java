@@ -66,10 +66,17 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	}
 
 	public void execute() {
-		if (willRunOnGPU()) {
-			run();
-		} else {
+		if (device == null) {
+			if (System.getenv("DEBUG") != null) {
+				System.out.println("No GPU device available.");
+			}
 			cpuExecution();
+		} else {
+			if (willRunOnGPU()) {
+				run();
+			} else {
+				cpuExecution();
+			}
 		}
 	}
 	

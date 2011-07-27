@@ -55,30 +55,37 @@ public class Map<I,O> extends GenericProgram implements Program {
 	// Pipeline
 	
 	public void execute() {
-		if (System.getenv("BENCH") != null) {
-			boolean isGpu = willRunOnGPU();
-			long startT = System.nanoTime();
-			run();
-			long gpuT = System.nanoTime() - startT;
-			
-			startT = System.nanoTime();
-			cpuExecution();
-			long cpuT = System.nanoTime() - startT;
-			System.out.println("GPUreal: " + gpuT);
-			System.out.println("CPUreal: " + cpuT);
-			
-			if ( isGpu == (gpuT < cpuT) ) {
-				System.out.println("GPUvsCPU: right");
-			} else {
-				System.out.println("GPUvsCPU: wrong");
+		if (device == null) {
+			if (System.getenv("DEBUG") != null) {
+				System.out.println("No GPU device available.");
 			}
-			return;
-		}
-		// TODO: Consider size: 0
-		if (willRunOnGPU()) {
-			run();
-		} else {
 			cpuExecution();
+		} else {
+			if (System.getenv("BENCH") != null) {
+				boolean isGpu = willRunOnGPU();
+				long startT = System.nanoTime();
+				run();
+				long gpuT = System.nanoTime() - startT;
+				
+				startT = System.nanoTime();
+				cpuExecution();
+				long cpuT = System.nanoTime() - startT;
+				System.out.println("GPUreal: " + gpuT);
+				System.out.println("CPUreal: " + cpuT);
+				
+				if ( isGpu == (gpuT < cpuT) ) {
+					System.out.println("GPUvsCPU: right");
+				} else {
+					System.out.println("GPUvsCPU: wrong");
+				}
+				return;
+			}
+			// TODO: Consider size: 0
+			if (willRunOnGPU()) {
+				run();
+			} else {
+				cpuExecution();
+			}
 		}
 	}
 	
