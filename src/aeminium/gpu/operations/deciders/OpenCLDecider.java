@@ -6,17 +6,21 @@ public class OpenCLDecider {
 
 	public static boolean useGPU(int size, String code, String complexity) {		
 		boolean b = decide(size, code, complexity);
-		if (System.getenv("DEBUG") != null) {
+		if (System.getenv("BENCH") != null) {
 			if (b) {
-				System.out.println("GPUchoice");
+				System.out.println("> GPUchoice");
 			} else {
-				System.out.println("CPUchoice");
+				System.out.println("> CPUchoice");
 			}
 		}
 		return b;
 	}
 
 	public static boolean decide(int size, String code, String complexity) {
+		return OpenCLDecider.decide(size, code, complexity, false);
+	}
+	
+	public static boolean decide(int size, String code, String complexity, boolean isRange) {
 		if (System.getProperties().containsKey("ForceGPU"))
 			return true;
 		if (System.getProperties().containsKey("ForceCPU"))
@@ -28,12 +32,12 @@ public class OpenCLDecider {
 		}
 
 		try {
-			long gpuTime = getGPUEstimation(size, code, complexity);
-			long cpuTime = getCPUEstimation(size, code, complexity);
+			long gpuTime = getGPUEstimation(size, code, complexity, isRange);
+			long cpuTime = getCPUEstimation(size, code, complexity, isRange);
 
-			if (System.getenv("DEBUG") != null) {
-				System.out.println("GPUexp: " + gpuTime);
-				System.out.println("CPUexp: " + cpuTime);
+			if (System.getenv("BENCH") != null) {
+				System.out.println("> GPUexp: " + gpuTime);
+				System.out.println("> CPUexp: " + cpuTime);
 			}
 			return gpuTime < cpuTime;
 
@@ -47,7 +51,7 @@ public class OpenCLDecider {
 	}
 
 	private static long getCPUEstimation(int size, String code,
-			String complexity) {
+			String complexity, boolean isRange) {
 		long pTimeCPU = 0;
 		String[] parts = complexity.split("\\+");
 		for (String part : parts) {
@@ -67,11 +71,13 @@ public class OpenCLDecider {
 	}
 
 	private static long getGPUEstimation(int size, String code,
-			String complexity) {
-		long pTimeGPU;
+			String complexity, boolean isRange) {
+		long pTimeGPU = 0;
 		// Buffer times
-		pTimeGPU = getInterpolatedValue("gpu.buffer.to.", size, "");
-		pTimeGPU += getInterpolatedValue("gpu.buffer.to.", size, "");
+		if (!isRange) {
+			pTimeGPU += getInterpolatedValue("gpu.buffer.to.", size, "");
+		}
+		pTimeGPU += getInterpolatedValue("gpu.buffer.from.", size, "");
 
 		String[] parts = complexity.split("\\+");
 		for (String part : parts) {
@@ -85,7 +91,10 @@ public class OpenCLDecider {
 						* (getInterpolatedValue("gpu.kernel.execution.", size,
 								"." + v));
 			} catch (Exception e) {
-				System.out.println("Failed to get " + part);
+				if (System.getenv("DEBUG") != null) {
+					System.out.println("Failed to get " + part);
+				}
+				
 			}
 
 		}

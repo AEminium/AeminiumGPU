@@ -46,13 +46,13 @@ public abstract class GenericProgram implements Program {
 			startT = System.nanoTime();
 			cpuExecution();
 			long cpuT = System.nanoTime() - startT;
-			System.out.println("GPUreal: " + gpuT);
-			System.out.println("CPUreal: " + cpuT);
+			System.out.println("> GPUreal: " + gpuT);
+			System.out.println("> CPUreal: " + cpuT);
 			
 			if ( isGpu == (gpuT < cpuT) ) {
-				System.out.println("GPUvsCPU: right");
+				System.out.println("> GPUvsCPU: right");
 			} else {
-				System.out.println("GPUvsCPU: wrong");
+				System.out.println("> GPUvsCPU: wrong");
 			}
 			return;
 		}
