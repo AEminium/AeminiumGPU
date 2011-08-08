@@ -153,8 +153,6 @@ public class Recorder {
 		final long gpuTime = System.nanoTime() - t;
 		
 		// Record CPU Times
-		
-		
 		Runnable cpu = new Runnable() {
 			@Override
 			public void run() {

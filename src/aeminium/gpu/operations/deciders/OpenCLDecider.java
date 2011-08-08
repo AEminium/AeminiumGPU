@@ -50,7 +50,7 @@ public class OpenCLDecider {
 		}
 	}
 
-	private static long getCPUEstimation(int size, String code,
+	public static long getCPUEstimation(int size, String code,
 			String complexity, boolean isRange) {
 		long pTimeCPU = 0;
 		String[] parts = complexity.split("\\+");
@@ -70,7 +70,7 @@ public class OpenCLDecider {
 		return pTimeCPU;
 	}
 
-	private static long getGPUEstimation(int size, String code,
+	public static long getGPUEstimation(int size, String code,
 			String complexity, boolean isRange) {
 		long pTimeGPU = 0;
 		// Buffer times
@@ -102,12 +102,13 @@ public class OpenCLDecider {
 		return pTimeGPU;
 	}
 
-	private static long getInterpolatedValue(String prefix, int size,
+	public static long getInterpolatedValue(String prefix, int size,
 			String sufix) {
-		int sb = 1 * (int) Math.pow(10, ("" + size).length());
-		int st = 1 * (int) Math.pow(10, ("" + size).length() + 1);
+		
+		int sb = (int) Math.pow(10,Math.floor(Math.log10(size)));
+		int st = (int) Math.pow(10,Math.ceil(Math.log10(size)));
 
-		int cutPoint = Integer.parseInt(("" + size).substring(0, 1));
+		float cutPoint = size / ((float) st);
 		long bottom = 0;
 		long top = 0;
 		try {
@@ -122,7 +123,7 @@ public class OpenCLDecider {
 		} catch (Exception e) {
 			return bottom;
 		}
-		return (bottom * cutPoint + top * (10 - cutPoint)) / 10;
+		return (long) (bottom * cutPoint + top * (1 - cutPoint));
 	}
 
 	private static long getOrFail(String key) {
