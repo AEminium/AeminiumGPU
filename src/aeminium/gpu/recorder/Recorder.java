@@ -1,5 +1,7 @@
 package aeminium.gpu.recorder;
 
+import java.util.Random;
+
 import aeminium.gpu.collections.lists.FloatList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.DefaultDeviceFactory;
@@ -11,7 +13,7 @@ import aeminium.gpu.utils.TimeoutController.TimeoutException;
 
 public class Recorder {
 	
-	int times = 30;
+	int times = 10;
 	public int[] sizes = new int[] {
 			10, 100, 1000, 10000, 100000, 1000000, 10000000
 	};
@@ -32,24 +34,6 @@ public class Recorder {
 			}
 			public String getSource() {
 				return "return input;";
-			}
-		});
-		executeExprMultipleSizes("plus", new LambdaMapper<Float,Float>() {
-			@Override
-			public Float map(Float input) {
-				return input-input;
-			}
-			public String getSource() {
-				return "return input+input;";
-			}
-		});
-		executeExprMultipleSizes("minus", new LambdaMapper<Float,Float>() {
-			@Override
-			public Float map(Float input) {
-				return input+input;
-			}
-			public String getSource() {
-				return "return input-input;";
 			}
 		});
 		executeExprMultipleSizes("mul", new LambdaMapper<Float,Float>() {
@@ -79,15 +63,6 @@ public class Recorder {
 				return "return sin(input);";
 			}
 		});
-		executeExprMultipleSizes("cos", new LambdaMapper<Float,Float>() {
-			@Override
-			public Float map(Float input) {
-				return (float) Math.cos(input);
-			}
-			public String getSource() {
-				return "return cos(input);";
-			}
-		});
 		executeExprMultipleSizes("pow", new LambdaMapper<Float,Float>() {
 			@Override
 			public Float map(Float input) {
@@ -115,6 +90,15 @@ public class Recorder {
 				return "return floor(input);";
 			}
 		});
+		executeExprMultipleSizes("min", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return (float) Math.min(input, 0);
+			}
+			public String getSource() {
+				return "return min(input, 0);";
+			}
+		});
 		finish();
 	}
 	
@@ -125,10 +109,7 @@ public class Recorder {
 	public void executeExprMultipleSizes(String name, LambdaMapper<Float,Float> expr) {
 		PList<Float> input;
 		for (int size : sizes) {
-			input = new FloatList();
-			for (int i = 0; i < size; i++) {
-				input.add(new Float(i));
-			}
+			input = generateRandomFloatList(size);
 			executeExprMultipleTimes(name, expr, input);
 		}
 	}
@@ -168,5 +149,14 @@ public class Recorder {
 			loggerCPU.saveTime("execution", 2 * gpuTime);
 		}
 			
+	}
+	
+	private static PList<Float> generateRandomFloatList(int size) {
+		Random r = new Random(123412341234L);
+		PList<Float> t = new FloatList();
+		for (int i = 0; i < size; i++) {
+			t.add((float) r.nextFloat());
+		}
+		return t;
 	}
 }
