@@ -60,7 +60,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 	}
 
 	protected boolean willRunOnGPU() {
-		return OpenCLDecider.useGPU(input.size(), reduceFun.getSource(),
+		return OpenCLDecider.useGPU(input.size(), 1, reduceFun.getSource(),
 				reduceFun.getSourceComplexity());
 	}
 	

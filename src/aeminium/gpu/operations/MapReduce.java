@@ -60,7 +60,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	}
 	
 	protected boolean willRunOnGPU() {
-		return OpenCLDecider.useGPU(input.size(), mapFun.getSource() + reduceFun.getSource(),  mergeComplexities(mapFun.getSourceComplexity(), reduceFun.getSourceComplexity()));
+		return OpenCLDecider.useGPU(input.size(), 1, mapFun.getSource() + reduceFun.getSource(),  mergeComplexities(mapFun.getSourceComplexity(), reduceFun.getSourceComplexity()));
 	}
 	
 	

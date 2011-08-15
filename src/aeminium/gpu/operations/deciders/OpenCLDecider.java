@@ -4,8 +4,10 @@ import aeminium.gpu.recorder.Configuration;
 
 public class OpenCLDecider {
 
-	public static boolean useGPU(int size, String code, String complexity) {		
-		boolean b = decide(size, code, complexity);
+	private static final int LOOP_LIMIT = 20;
+
+	public static boolean useGPU(int size, int rsize, String code, String complexity) {		
+		boolean b = decide(size, rsize, code, complexity);
 		if (System.getenv("BENCH") != null) {
 			if (b) {
 				System.out.println("> GPUchoice");
@@ -16,11 +18,11 @@ public class OpenCLDecider {
 		return b;
 	}
 
-	public static boolean decide(int size, String code, String complexity) {
-		return OpenCLDecider.decide(size, code, complexity, false);
+	public static boolean decide(int size, int rsize, String code, String complexity) {
+		return OpenCLDecider.decide(size, rsize, code, complexity, false);
 	}
 	
-	public static boolean decide(int size, String code, String complexity, boolean isRange) {
+	public static boolean decide(int size, int rsize, String code, String complexity, boolean isRange) {
 		if (System.getProperties().containsKey("ForceGPU"))
 			return true;
 		if (System.getProperties().containsKey("ForceCPU"))
@@ -32,8 +34,8 @@ public class OpenCLDecider {
 		}
 
 		try {
-			long gpuTime = getGPUEstimation(size, code, complexity, isRange);
-			long cpuTime = getCPUEstimation(size, code, complexity, isRange);
+			long gpuTime = getGPUEstimation(size, rsize, code, complexity, isRange);
+			long cpuTime = getCPUEstimation(size, rsize, code, complexity, isRange);
 
 			if (System.getenv("BENCH") != null) {
 				System.out.println("> GPUexp: " + gpuTime);
@@ -50,7 +52,7 @@ public class OpenCLDecider {
 		}
 	}
 
-	public static long getCPUEstimation(int size, String code,
+	public static long getCPUEstimation(int size, int rsize, String code,
 			String complexity, boolean isRange) {
 		long pTimeCPU = 0;
 		String[] parts = complexity.split("\\+");
@@ -58,9 +60,16 @@ public class OpenCLDecider {
 			String[] kv = part.split("\\*");
 			try {
 				int times = Integer.parseInt(kv[0]);
-				String v = kv[1];
-				pTimeCPU += times
-						* (getInterpolatedValue("cpu.execution.", size, "." + v));
+				String v = OpenCLDecider.sameOperationAs(kv[1]);
+				if (v.equals("fieldaccess")) continue;
+				if ((v.equals("mul") || v.equals("pow")) && times < LOOP_LIMIT) continue;
+				if (v.equals("sin") || v.equals("cos")) {
+					times *= 2.77;
+				} else {
+					times *= 0.6;
+				}
+				pTimeCPU += times *
+						(getInterpolatedValue("cpu.execution.", size, "." + v));
 			} catch (Exception e) {
 				System.out.println("Failed to get " + part + ":>" + e);
 				e.printStackTrace();
@@ -70,35 +79,43 @@ public class OpenCLDecider {
 		return pTimeCPU;
 	}
 
-	public static long getGPUEstimation(int size, String code,
+	private static String sameOperationAs(String op) {
+		if (op.equals("div") || op.equals("plus")|| op.equals("minus"))
+			return "mul";
+		return op;
+	}
+
+	public static long getGPUEstimation(int size, int rsize, String code,
 			String complexity, boolean isRange) {
 		long pTimeGPU = 0;
 		// Buffer times
 		if (!isRange) {
 			pTimeGPU += getInterpolatedValue("gpu.buffer.to.", size, "");
 		}
-		pTimeGPU += getInterpolatedValue("gpu.buffer.from.", size, "");
+		if (rsize > 1) {
+			pTimeGPU += getInterpolatedValue("gpu.buffer.from.", rsize, "");
+		}
+		
+		// Using cache
+		// pTimeGPU += getInterpolatedValue("gpu.kernel.compilation.", size, ".plus");
 
 		String[] parts = complexity.split("\\+");
+		long mx = 0;
 		for (String part : parts) {
 			String[] kv = part.split("\\*");
 			try {
 				int times = Integer.parseInt(kv[0]);
-				String v = kv[1];
-				pTimeGPU += (getInterpolatedValue("gpu.kernel.compilation.",
-						size, "." + v));
-				pTimeGPU += times
-						* (getInterpolatedValue("gpu.kernel.execution.", size,
-								"." + v));
+				String v = OpenCLDecider.sameOperationAs(kv[1]);
+				if (v.equals("fieldaccess")) continue;
+				mx = Math.max(mx, times * (getInterpolatedValue("execution.",
+						size, "." + v)));
 			} catch (Exception e) {
 				if (System.getenv("DEBUG") != null) {
 					System.out.println("Failed to get " + part);
-				}
-				
+				}	
 			}
-
 		}
-
+		pTimeGPU += mx;
 		return pTimeGPU;
 	}
 

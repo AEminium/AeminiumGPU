@@ -27,6 +27,15 @@ public class Recorder {
 	}
 	
 	public void run() {
+		executeExprMultipleSizes("min", new LambdaMapper<Float,Float>() {
+			@Override
+			public Float map(Float input) {
+				return (float) Math.min(input, 0);
+			}
+			public String getSource() {
+				return "return (float) min((float)input, (float)0);";
+			}
+		});
 		executeExprMultipleSizes("unit", new LambdaMapper<Float,Float>() {
 			@Override
 			public Float map(Float input) {
@@ -88,15 +97,6 @@ public class Recorder {
 			}
 			public String getSource() {
 				return "return floor(input);";
-			}
-		});
-		executeExprMultipleSizes("min", new LambdaMapper<Float,Float>() {
-			@Override
-			public Float map(Float input) {
-				return (float) Math.min(input, 0);
-			}
-			public String getSource() {
-				return "return min(input, 0);";
 			}
 		});
 		finish();
