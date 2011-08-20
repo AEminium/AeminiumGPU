@@ -80,8 +80,10 @@ public class OpenCLDecider {
 	}
 
 	private static String sameOperationAs(String op) {
-		if (op.equals("div") || op.equals("plus")|| op.equals("minus"))
+		if (op.equals("div") || op.equals("plus")|| op.equals("minus") || op.equals("mod"))
 			return "mul";
+		if (op.equals("cos"))
+			return "sin";
 		return op;
 	}
 
@@ -107,7 +109,7 @@ public class OpenCLDecider {
 				int times = Integer.parseInt(kv[0]);
 				String v = OpenCLDecider.sameOperationAs(kv[1]);
 				if (v.equals("fieldaccess")) continue;
-				mx = Math.max(mx, times * (getInterpolatedValue("execution.",
+				mx = Math.max(mx, times * (getInterpolatedValue("gpu.kernel.execution.",
 						size, "." + v)));
 			} catch (Exception e) {
 				if (System.getenv("DEBUG") != null) {
