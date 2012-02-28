@@ -8,6 +8,7 @@ import aeminium.gpu.executables.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.ReduceCodeGen;
+import aeminium.gpu.operations.generator.ReduceTemplateSource;
 import aeminium.gpu.operations.utils.ExtractTypes;
 
 import com.nativelibs4java.opencl.CLBuffer;
@@ -15,7 +16,7 @@ import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
 import com.nativelibs4java.opencl.CLQueue;
 
-public class Reduce<O> extends GenericProgram implements Program {
+public class Reduce<O> extends GenericProgram implements Program, ReduceTemplateSource<O> {
 
 	static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
 
@@ -74,7 +75,7 @@ public class Reduce<O> extends GenericProgram implements Program {
 	// Pipeline
 
 	@Override
-	protected String getSource() {
+	public String getSource() {
 		return gen.getReduceKernelSource();
 	}
 

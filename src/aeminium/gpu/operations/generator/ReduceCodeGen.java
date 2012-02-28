@@ -3,7 +3,6 @@ package aeminium.gpu.operations.generator;
 import java.util.HashMap;
 
 import aeminium.gpu.buffers.BufferHelper;
-import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
 
@@ -35,7 +34,7 @@ public class ReduceCodeGen {
 		this.id = id;
 	}
 
-	public ReduceCodeGen(Reduce reduceOp) {
+	public ReduceCodeGen(ReduceTemplateSource reduceOp) {
 		inputType = BufferHelper.getCLTypeOf(reduceOp.getInputType());
 		outputType = BufferHelper.getCLTypeOf(reduceOp.getOutputType());
 		clSource = reduceOp.getReduceFun().getSource();

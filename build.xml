@@ -9,7 +9,7 @@
     <property name="templates.dir"     value="templates"/>
 	<property name="verbose" value="false" />
    
-    <property name="main-class"  value="aeminium.gpu.examples.MapReduceExample"/>
+    <property name="main-class"  value="aeminium.gpu.examples.MatrixExample"/>
 	<property name="bench-class"  value="aeminium.gpu.recorder.Recorder"/>
      <property name="lib.dir"     value="lib"/>
    
