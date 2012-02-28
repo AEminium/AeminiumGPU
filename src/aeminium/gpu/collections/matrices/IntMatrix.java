@@ -2,7 +2,9 @@ package aeminium.gpu.collections.matrices;
 
 import aeminium.gpu.collections.lists.IntList;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.operations.PartialReduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
+import aeminium.gpu.operations.functions.LambdaReducer;
 
 public class IntMatrix extends AbstractMatrix<Integer> {
 
@@ -38,6 +40,12 @@ public class IntMatrix extends AbstractMatrix<Integer> {
 	public <O> PMatrix<O> map(LambdaMapper<Integer, O> mapper) {
 		IntList output = (IntList) elements().map(mapper).evaluate();
 		return (PMatrix<O>) new IntMatrix(output.getArray(), rows, cols);
+	}
+	
+	@Override
+	public PList<Integer> reduceLines(LambdaReducer<Integer> lambdaReducer) {
+		PartialReduce<Integer> reduceOperation = new PartialReduce<Integer>(lambdaReducer, this, this.rows, device);
+		return reduceOperation.getOutput();
 	}
 
 	@Override

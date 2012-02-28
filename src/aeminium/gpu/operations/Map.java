@@ -68,7 +68,7 @@ public class Map<I,O> extends GenericProgram implements Program {
 	
 	
 	@Override
-	protected String getSource() {
+	public String getSource() {
 		return gen.getMapKernelSource();
 	}
 	

@@ -1,5 +1,6 @@
 package aeminium.gpu.examples;
 
+import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.matrices.IntMatrix;
 import aeminium.gpu.collections.matrices.PMatrix;
 import aeminium.gpu.operations.functions.LambdaMapper;
@@ -45,6 +46,28 @@ public class MatrixExample {
 				return 0;
 			}
 		});
+		
+		PList<Integer> li = m.reduceLines(new LambdaReducer<Integer>() {
+			
+			public String getSource() {
+				return "return reduce_input_first + reduce_input_second;";
+			}
+			
+			@Override
+			public Integer combine(Integer input, Integer other) {
+				return input+other;
+			}
+
+			@Override
+			public Integer getSeed() {
+				return 0;
+			}
+			
+		});
+
+		for (int c=0; c<li.length(); c++) {
+			System.out.println("c:" + c + " -> " + li.get(c) + ", " + li.length());
+		}
 		
 		System.out.println("Number of cells:" + i);
 		

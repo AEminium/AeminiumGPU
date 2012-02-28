@@ -75,7 +75,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	// Pipeline
 	
 	@Override
-	protected String getSource() {
+	public String getSource() {
 		return gen.getReduceKernelSource();
 	}
 	

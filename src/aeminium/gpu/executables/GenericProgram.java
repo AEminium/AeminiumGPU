@@ -26,7 +26,6 @@ public abstract class GenericProgram implements Program {
 		device.execute(this);
 	}
 	
-	
 	public void execute() {
 		/* Do we have a GPU available?*/
 		if (device == null) {
@@ -97,8 +96,8 @@ public abstract class GenericProgram implements Program {
 	
 	// CL Definitions
 	
-	abstract protected String getSource();
-	abstract public String getKernelName();
+	public abstract String getSource();
+	public abstract String getKernelName();
 	
 	// Pipeline Helpers
 	

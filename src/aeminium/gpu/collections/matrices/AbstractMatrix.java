@@ -1,6 +1,5 @@
 package aeminium.gpu.collections.matrices;
 
-import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.functions.LambdaReducer;
@@ -42,8 +41,6 @@ public abstract class AbstractMatrix<T>  implements PMatrix<T> {
 	public int cols() {
 		return cols;
 	}
-	
-	abstract public PList<T> elements();
 
 	@Override
 	public T reduce(LambdaReducer<T> reducer) {
