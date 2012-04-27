@@ -18,7 +18,8 @@ import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
 import com.nativelibs4java.opencl.CLQueue;
 
-public class PartialReduce<O> extends GenericProgram implements Program, ReduceTemplateSource<O> {
+public class PartialReduce<O> extends GenericProgram implements Program,
+		ReduceTemplateSource<O> {
 
 	static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
 
@@ -34,12 +35,13 @@ public class PartialReduce<O> extends GenericProgram implements Program, ReduceT
 
 	// Constructors
 
-	public PartialReduce(LambdaReducer<O> reduceFun2, PMatrix<O> list, int outputSize, GPUDevice dev) {
+	public PartialReduce(LambdaReducer<O> reduceFun2, PMatrix<O> list,
+			int outputSize, GPUDevice dev) {
 		this(reduceFun2, list, outputSize, "", dev);
 	}
 
-	public PartialReduce(LambdaReducer<O> reduceFun, PMatrix<O> list, int outputSize, String other,
-			GPUDevice dev) {
+	public PartialReduce(LambdaReducer<O> reduceFun, PMatrix<O> list,
+			int outputSize, String other, GPUDevice dev) {
 		this.device = dev;
 		this.input = list.elements();
 		this.outputSize = outputSize;
@@ -53,7 +55,8 @@ public class PartialReduce<O> extends GenericProgram implements Program, ReduceT
 		this(reduceFun2, "", dev);
 	}
 
-	protected PartialReduce(LambdaReducer<O> reduceFun2, String other, GPUDevice dev) {
+	protected PartialReduce(LambdaReducer<O> reduceFun2, String other,
+			GPUDevice dev) {
 		this.device = dev;
 		this.reduceFun = reduceFun2;
 		this.setOtherSources(other);
@@ -61,17 +64,17 @@ public class PartialReduce<O> extends GenericProgram implements Program, ReduceT
 	}
 
 	protected boolean willRunOnGPU() {
-		return OpenCLDecider.useGPU(input.size(), outputSize, reduceFun.getSource(),
-				reduceFun.getSourceComplexity());
+		return OpenCLDecider.useGPU(input.size(), outputSize,
+				reduceFun.getSource(), reduceFun.getSourceComplexity());
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void cpuExecution() {
 		output = (PList<O>) CollectionFactory.listFromType(getOutputType());
 		O acc = reduceFun.getSeed();
-		for (int i=0; i<input.size(); i++) {
+		for (int i = 0; i < input.size(); i++) {
 			acc = reduceFun.combine(acc, input.get(i));
-			if ((i+1) % outputSize == 0) {
+			if ((i + 1) % outputSize == 0) {
 				output.add(acc);
 				acc = reduceFun.getSeed();
 			}
@@ -92,25 +95,25 @@ public class PartialReduce<O> extends GenericProgram implements Program, ReduceT
 	@Override
 	public void prepareBuffers(CLContext ctx) {
 		inbuffer = BufferHelper.createInputOutputBufferFor(ctx, input);
-		outbuffer = BufferHelper.createInputOutputBufferFor(ctx, getOutputType(), outputSize);
+		outbuffer = BufferHelper.createInputOutputBufferFor(ctx,
+				getOutputType(), outputSize);
 	}
 
 	@Override
 	public void execute(CLContext ctx, CLQueue q) {
 		synchronized (kernel) {
-			kernel.setArgs(inbuffer, outbuffer, 
-					(long)input.size(), 
-					(long) outputSize, 
-					(long) (input.size() / outputSize));
-			kernelCompletion = kernel.enqueueNDRange(q, new int[] { outputSize }, null,
-					new CLEvent[] {});
+			kernel.setArgs(inbuffer, outbuffer, (long) input.size(),
+					(long) outputSize, (long) (input.size() / outputSize));
+			kernelCompletion = kernel.enqueueNDRange(q,
+					new int[] { outputSize }, null, new CLEvent[] {});
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
-		output = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q, kernelCompletion, getOutputType(), outputSize); 
+		output = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q,
+				kernelCompletion, getOutputType(), outputSize);
 	}
 
 	@Override
@@ -119,7 +122,7 @@ public class PartialReduce<O> extends GenericProgram implements Program, ReduceT
 		this.outbuffer.release();
 		super.release();
 	}
-	
+
 	// Output
 
 	public PList<O> getOutput() {
@@ -164,5 +167,5 @@ public class PartialReduce<O> extends GenericProgram implements Program, ReduceT
 	public String getKernelName() {
 		return gen.getReduceKernelName();
 	}
-	
+
 }

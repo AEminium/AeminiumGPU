@@ -16,4 +16,5 @@ public interface PMatrix<T> extends PCollection<T>, MappableToMatrix<T>, Partial
 	public void set(int i, int j, T e);
 	
 	public PList<T> elements();
+
 }

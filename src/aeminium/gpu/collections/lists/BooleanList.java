@@ -7,8 +7,8 @@ public class BooleanList extends AbstractList<Boolean> {
 	protected int[] box;
 	
 	
-	protected int TRUE = 1;
-	protected int FALSE = 0; 
+	protected static int TRUE = 1;
+	protected static int FALSE = 0; 
 	
 	public BooleanList() {
 		this(new int[DEFAULT_SIZE], 0);
@@ -20,7 +20,7 @@ public class BooleanList extends AbstractList<Boolean> {
 		this.box = box;
 	}
 	
-	public int encode(Boolean b) {
+	public static int encode(Boolean b) {
 		return (b) ? TRUE : FALSE;
 	}
 	

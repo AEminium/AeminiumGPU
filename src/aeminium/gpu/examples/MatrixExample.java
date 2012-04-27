@@ -20,7 +20,6 @@ public class MatrixExample {
 			}
 		}
 		
-		
 		m = m.map(new LambdaMapper<Integer, Integer>() {
 
 			@Override
