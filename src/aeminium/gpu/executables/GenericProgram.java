@@ -28,6 +28,7 @@ public abstract class GenericProgram implements Program {
 	
 	public void execute() {
 		/* Do we have a GPU available?*/
+
 		if (device == null) {
 			if (System.getenv("DEBUG") != null) {
 				System.out.println("No GPU device available.");
@@ -60,7 +61,7 @@ public abstract class GenericProgram implements Program {
 		if (willRunOnGPU()) {
 			gpuExecution();
 		} else {
-			cpuExecution();
+			gpuExecution(); // FIXME cpu
 		}
 	}
 	
@@ -102,13 +103,17 @@ public abstract class GenericProgram implements Program {
 	// Pipeline Helpers
 	
 	protected CLKernel getOrCreateKernel(CLContext ctx) {
+		return getOrCreateKernel(ctx, getKernelName());
+	}
+
+	protected CLKernel getOrCreateKernel(CLContext ctx, String kernel) {
 		program = getProgram(ctx);
-		return createKernel(program);
+		return createKernel(program, kernel);
 	}
 	
-	protected CLKernel createKernel(CLProgram program) {
+	protected CLKernel createKernel(CLProgram program, String kernel) {
 		try {
-			return program.createKernel(getKernelName());
+			return program.createKernel(kernel);
 		} catch (CLBuildException e) {
 			e.printStackTrace();
 			System.exit(1);

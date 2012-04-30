@@ -6,6 +6,7 @@ import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lazyness.LazyEvaluator;
 import aeminium.gpu.collections.lazyness.LazyPList;
+import aeminium.gpu.collections.lazyness.RandomList;
 import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
@@ -17,6 +18,7 @@ import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.MapCodeGen;
 import aeminium.gpu.operations.mergers.MapToMapMerger;
 import aeminium.gpu.operations.mergers.MapToReduceMerger;
+import aeminium.gpu.operations.random.MersenneTwisterGPU;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -85,6 +87,11 @@ public class Map<I,O> extends GenericProgram implements Program {
 		if (input instanceof Range) {
 			Pointer<Integer> ptr = Pointer.allocateInts(1).order(ctx.getByteOrder());
 			inbuffer = ctx.createBuffer(CLMem.Usage.Input, ptr, false);
+		} else if (input instanceof RandomList) {
+			RandomList randomInput = (RandomList) input;
+			MersenneTwisterGPU mt = new MersenneTwisterGPU(device, input.size(), randomInput.getSeed());
+			device.execute(mt);
+			inbuffer = mt.getOutputBuffer();
 		} else {
 			inbuffer = BufferHelper.createInputBufferFor(ctx, input);
 		}
