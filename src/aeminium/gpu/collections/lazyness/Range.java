@@ -1,5 +1,6 @@
 package aeminium.gpu.collections.lazyness;
 
+import aeminium.gpu.collections.lazyness.helpers.IdentityMapper;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
@@ -9,19 +10,6 @@ import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
 
 public class Range implements PList<Integer> {
-	
-	public class IdentityMapper extends LambdaMapper<Integer, Integer> {
-
-		@Override
-		public Integer map(Integer input) {
-			return input;
-		}
-		
-		@Override
-		public String getSource() {
-			return "return input;";
-		}
-	}
 	
 	private int max;
 	protected GPUDevice device;
@@ -39,7 +27,7 @@ public class Range implements PList<Integer> {
 	
 	@Override
 	public Integer reduce(LambdaReducer<Integer> reducer) {
-		PList<Integer> result = map(new IdentityMapper());
+		PList<Integer> result = map(new IdentityMapper<Integer>());
 		Reduce<Integer> reduceOperation = new Reduce<Integer>(reducer, result, device);
 		return reduceOperation.getOutput();
 	}
@@ -62,7 +50,6 @@ public class Range implements PList<Integer> {
 	@Override
 	public void add(Integer e) {
 		throw new ReadOnlyListException();
-
 	}
 
 	@Override
