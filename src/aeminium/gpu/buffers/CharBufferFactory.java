@@ -8,10 +8,9 @@ import aeminium.gpu.collections.lists.PList;
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
-import com.nativelibs4java.opencl.CLKernel;
-import com.nativelibs4java.opencl.CLKernel.LocalSize;
 import com.nativelibs4java.opencl.CLMem;
 import com.nativelibs4java.opencl.CLQueue;
+import com.nativelibs4java.opencl.LocalSize;
 
 public class CharBufferFactory implements IBufferFactory {
 
@@ -55,7 +54,7 @@ public class CharBufferFactory implements IBufferFactory {
 	@Override
 	public LocalSize createSharedBufferFor(CLContext context, String type,
 			int size) {
-		return new CLKernel.LocalSize(size);
+		return new LocalSize(size);
 	}
 
 	@Override
