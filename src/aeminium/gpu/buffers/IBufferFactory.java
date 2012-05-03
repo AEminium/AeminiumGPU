@@ -5,8 +5,8 @@ import aeminium.gpu.collections.lists.PList;
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
-import com.nativelibs4java.opencl.CLKernel;
 import com.nativelibs4java.opencl.CLQueue;
+import com.nativelibs4java.opencl.LocalSize;
 
 public interface IBufferFactory {
 	
@@ -16,7 +16,7 @@ public interface IBufferFactory {
 
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size);
 	
-	public CLKernel.LocalSize createSharedBufferFor(CLContext context, String type, int size);
+	public LocalSize createSharedBufferFor(CLContext context, String type, int size);
 
 	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev,
 			int size);
