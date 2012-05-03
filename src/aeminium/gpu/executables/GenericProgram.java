@@ -28,6 +28,7 @@ public abstract class GenericProgram implements Program {
 	
 	public void execute() {
 		/* Do we have a GPU available?*/
+
 		if (device == null) {
 			if (System.getenv("DEBUG") != null) {
 				System.out.println("No GPU device available.");
@@ -56,6 +57,16 @@ public abstract class GenericProgram implements Program {
 			return;
 		}
 		
+		if (System.getenv("FORCE") != null) {
+			if (System.getenv("FORCE").equals("GPU")) {
+				gpuExecution();
+			} else {
+				cpuExecution();
+			}
+			return;
+		}
+
+
 		/* Regular decision */
 		if (willRunOnGPU()) {
 			gpuExecution();
@@ -102,13 +113,21 @@ public abstract class GenericProgram implements Program {
 	// Pipeline Helpers
 	
 	protected CLKernel getOrCreateKernel(CLContext ctx) {
-		program = getProgram(ctx);
-		return createKernel(program);
+		return getOrCreateKernel(ctx, getKernelName());
+	}
+
+	protected CLKernel getOrCreateKernel(CLContext ctx, String kernelName) {
+		program = compileProgram(ctx);
+		return getKernel(program, kernelName);
 	}
 	
-	protected CLKernel createKernel(CLProgram program) {
+	protected CLProgram compileProgram(CLContext ctx) {
 		try {
-			return program.createKernel(getKernelName());
+			if (System.getenv("OPENCL") != null) {
+				System.out.println("Compiling Source");
+				System.out.println(getSource());
+			}
+			return ctx.createProgram(getSource()).build();
 		} catch (CLBuildException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -116,13 +135,9 @@ public abstract class GenericProgram implements Program {
 		}
 	}
 	
-	protected CLProgram getProgram(CLContext ctx) {
+	protected CLKernel getKernel(CLProgram program, String kernelName) {
 		try {
-			if (System.getenv("OPENCL") != null) {
-				System.out.println("Compiling Source");
-				System.out.println(getSource());
-			}
-			return ctx.createProgram(getSource()).build();
+			return program.createKernel(kernelName);
 		} catch (CLBuildException e) {
 			e.printStackTrace();
 			System.exit(1);

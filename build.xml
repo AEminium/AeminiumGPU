@@ -9,7 +9,7 @@
     <property name="templates.dir"     value="templates"/>
 	<property name="verbose" value="false" />
    
-    <property name="main-class"  value="aeminium.gpu.examples.MatrixExample"/>
+    <property name="main-class"  value="aeminium.gpu.examples.RandomExample"/>
 	<property name="bench-class"  value="aeminium.gpu.recorder.Recorder"/>
      <property name="lib.dir"     value="lib"/>
    
@@ -29,13 +29,14 @@
    
     <target name="compile">  
         <mkdir dir="${classes.dir}"/>  
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"/>
+	<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" debug="true" debuglevel="lines,vars,source"/>
     </target>  
    
     <target name="jar" depends="compile">  
         <mkdir dir="${jar.dir}"/>  
         <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
 			<fileset dir="." includes="**/*.clt" />
+		<fileset dir="." includes="data/*" />
             <manifest>  
                 <attribute name="Main-Class" value="${main-class}"/>  
             </manifest>  

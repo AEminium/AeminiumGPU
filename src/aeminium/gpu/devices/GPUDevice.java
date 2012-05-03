@@ -26,7 +26,7 @@ public class GPUDevice {
 			p = context.createProgram(kernel).build();
 			p.release();
 		} catch (CLBuildException e) {
-			// GPU not available during compilation. 
+			// GPU not available during offline compilation.
 		}
 		
 	}
@@ -106,6 +106,10 @@ public class GPUDevice {
 
 	public void setQueue(CLQueue queue) {
 		this.queue = queue;
+	}
+
+	public void refreshQueue() {
+		queue = context.createDefaultProfilingQueue();
 	}
 
 	

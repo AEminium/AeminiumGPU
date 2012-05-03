@@ -5,31 +5,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 
 public class Template {
 	private String source;
 	
 	public Template(TemplateWrapper t) {
-		
-		// First try inside the Jar
-		InputStream is = t.getInputStream();
-		if (is != null) {
-			readStream(t.toString(), new BufferedReader(new InputStreamReader(is)));
-			return;
-		} 
-		
-		// Fallback to local file.
-		File f = new File(t.getFileName());
-		if (f.exists()) {
-			readStream(f);
-			return;
-		}
-		
-		System.out.println("Could not load file: " + t.getFileName());
-		System.exit(1);
+		readStream(t.toString(), t.getReader());
 	}
 	
 	public Template(File f) {
