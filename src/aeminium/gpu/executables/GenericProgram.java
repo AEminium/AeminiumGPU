@@ -57,11 +57,21 @@ public abstract class GenericProgram implements Program {
 			return;
 		}
 		
+		if (System.getenv("FORCE") != null) {
+			if (System.getenv("FORCE").equals("GPU")) {
+				gpuExecution();
+			} else {
+				cpuExecution();
+			}
+			return;
+		}
+
+
 		/* Regular decision */
 		if (willRunOnGPU()) {
 			gpuExecution();
 		} else {
-			gpuExecution(); // FIXME cpu
+			cpuExecution();
 		}
 	}
 	
@@ -106,14 +116,18 @@ public abstract class GenericProgram implements Program {
 		return getOrCreateKernel(ctx, getKernelName());
 	}
 
-	protected CLKernel getOrCreateKernel(CLContext ctx, String kernel) {
-		program = getProgram(ctx);
-		return createKernel(program, kernel);
+	protected CLKernel getOrCreateKernel(CLContext ctx, String kernelName) {
+		program = compileProgram(ctx);
+		return getKernel(program, kernelName);
 	}
 	
-	protected CLKernel createKernel(CLProgram program, String kernel) {
+	protected CLProgram compileProgram(CLContext ctx) {
 		try {
-			return program.createKernel(kernel);
+			if (System.getenv("OPENCL") != null) {
+				System.out.println("Compiling Source");
+				System.out.println(getSource());
+			}
+			return ctx.createProgram(getSource()).build();
 		} catch (CLBuildException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -121,13 +135,9 @@ public abstract class GenericProgram implements Program {
 		}
 	}
 	
-	protected CLProgram getProgram(CLContext ctx) {
+	protected CLKernel getKernel(CLProgram program, String kernelName) {
 		try {
-			if (System.getenv("OPENCL") != null) {
-				System.out.println("Compiling Source");
-				System.out.println(getSource());
-			}
-			return ctx.createProgram(getSource()).build();
+			return program.createKernel(kernelName);
 		} catch (CLBuildException e) {
 			e.printStackTrace();
 			System.exit(1);
