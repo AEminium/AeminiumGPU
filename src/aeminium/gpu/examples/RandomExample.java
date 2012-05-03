@@ -8,11 +8,11 @@ public class RandomExample {
 	public static void main(String[] args) {
 		int N = 1034;
 
-		PList<Double> input = new RandomList(N);
-		input = input.map(new LambdaMapper<Double, Double>() {
+		PList<Float> input = new RandomList(N, 123);
+		input = input.map(new LambdaMapper<Float, Float>() {
 
 			@Override
-			public Double map(Double input) {
+			public Float map(Float input) {
 				return input;
 			}
 

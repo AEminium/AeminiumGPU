@@ -16,7 +16,7 @@ typedef struct{
   unsigned int seed;
 } mt_struct_stripped;
 
-#define   MT_RNG_COUNT 4096
+#define   MT_RNG_COUNT {{MT_RNG_COUNT}}
 #define          MT_MM 9
 #define          MT_NN 19
 #define       MT_WMASK 0xFFFFFFFFU
@@ -51,6 +51,7 @@ __kernel void MersenneTwister(__global float* d_Rand,
     for (iState = 1; iState < MT_NN; iState++)
 	mt[iState] = (1812433253U * (mt[iState - 1] ^ (mt[iState - 1] >> 30)) + iState) & MT_WMASK;
 
+
     iState = 0;
     mti1 = mt[0];
     for (iOut = 0; iOut < nPerRng; iOut++) {
@@ -76,7 +77,7 @@ __kernel void MersenneTwister(__global float* d_Rand,
 	x ^= (x >> MT_SHIFT1);
 
 	//Convert to (0, 1] float and write to global memory
-	d_Rand[globalID + iOut * MT_RNG_COUNT] = ((float)x + 1.0f) / 4294967296.0f;
+	d_Rand[globalID + iOut * MT_RNG_COUNT] = ((float)x)/(4294967296.0 + 1.0);
     }
 }
 
@@ -97,7 +98,7 @@ void BoxMullerTrans(__global float *u1, __global float *u2)
 __kernel void BoxMuller(__global float *d_Rand, int nPerRng)
 {
     int globalID = get_global_id(0);
-
+	return;
     for (int iOut = 0; iOut < nPerRng; iOut += 2)
 	BoxMullerTrans(&d_Rand[globalID + (iOut + 0) * MT_RNG_COUNT],
 		       &d_Rand[globalID + (iOut + 1) * MT_RNG_COUNT]);

@@ -23,13 +23,13 @@ import com.nativelibs4java.opencl.CLQueue;
 public class MersenneTwisterGPU extends GenericProgram {
 
 	private int PATH_N = 24000;
-	private int MT_RNG_COUNT = 128; //4096;
+	private int MT_RNG_COUNT = 4096;
 	private int N_PER_RNG = alignUp(divUp(PATH_N, MT_RNG_COUNT), 2);
 
 	private static int sizeof_mt_struct_stripped = 4 * 4; // 4 * sizeof(int)
 
 	protected int seed;
-	private int size = -1;
+	private int size;
 
 	CLKernel boxmuller;
 	CLBuffer<?> parameters;
@@ -40,8 +40,6 @@ public class MersenneTwisterGPU extends GenericProgram {
 		this.seed = seed;
 		this.size = size;
 		MT_RNG_COUNT = size / N_PER_RNG;
-		MT_RNG_COUNT = 32;
-
 	}
 
 	@Override
@@ -50,7 +48,7 @@ public class MersenneTwisterGPU extends GenericProgram {
 	    d = d.order(ctx.getByteOrder());
 	    loadMTGPU(d,seed, PathHelper.openFileAsStream("data/MersenneTwister.dat"));
 	    parameters = ctx.createBuffer(CLMem.Usage.Input, d);
-	    output = ctx.createBuffer(Usage.Output, Pointer.allocateDoubles(this.size)); // FIXME with this.size
+	    output = ctx.createBuffer(Usage.Output, Pointer.allocateFloats(this.size));
 	}
 
 	@Override
@@ -62,7 +60,7 @@ public class MersenneTwisterGPU extends GenericProgram {
 		    // Ask for 1-dimensional execution of length dataSize, with auto choice of local workgroup size :
 			kernelCompletion = kernel.enqueueNDRange(q, new int[] { MT_RNG_COUNT }, new CLEvent[] {});
 		}
-		boxmuller = createKernel(program, "BoxMuller");
+		boxmuller = getKernel(program, "BoxMuller");
 		synchronized (boxmuller) {
 			boxmuller.setArgs(output, N_PER_RNG);
 			kernelCompletion = boxmuller.enqueueNDRange(q, new int[] { MT_RNG_COUNT }, new CLEvent[] { kernelCompletion });
@@ -72,7 +70,6 @@ public class MersenneTwisterGPU extends GenericProgram {
 
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
-		q.enqueueWaitForEvents(kernelCompletion);
 		outputFinal = output;
 	}
 
@@ -106,7 +103,9 @@ public class MersenneTwisterGPU extends GenericProgram {
 	@Override
 	public String getSource() {
 		Template t = new Template(new TemplateWrapper("opencl/MersenneTwister.clt"));
-		return t.apply(new HashMap<String,String>());
+		HashMap<String,String> d = new HashMap<String,String>();
+		d.put("MT_RNG_COUNT", "" + MT_RNG_COUNT);
+		return t.apply(d);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package aeminium.gpu.collections.lazyness;
 
+import java.util.Random;
+
 import aeminium.gpu.collections.lazyness.helpers.IdentityMapper;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.DefaultDeviceFactory;
@@ -8,28 +10,36 @@ import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.random.MersenneTwisterFast;
 
-public class RandomList implements PList<Double> {
+public class RandomList implements PList<Float> {
 
-	private int max;
+	protected int max;
+	protected int seed;
 	protected GPUDevice device;
+	protected MersenneTwisterFast mt = null;
 
 	public RandomList(int max) {
+		this(max, new Random().nextInt());
+	}
+
+	public RandomList(int max, int seed) {
 		this.max = max;
+		this.seed = seed;
 		device = (new DefaultDeviceFactory()).getDevice();
 	}
 
 
 	@Override
-	public <O> PList<O> map(LambdaMapper<Double, O> mapper) {
-		Map<Double, O> mapOperation = new Map<Double, O>(mapper, this, device);
+	public <O> PList<O> map(LambdaMapper<Float, O> mapper) {
+		Map<Float, O> mapOperation = new Map<Float, O>(mapper, this, device);
 		return mapOperation.getOutput();
 	}
 
 	@Override
-	public Double reduce(LambdaReducer<Double> reducer) {
-		PList<Double> result = map(new IdentityMapper<Double>());
-		Reduce<Double> reduceOperation = new Reduce<Double>(reducer, result, device);
+	public Float reduce(LambdaReducer<Float> reducer) {
+		PList<Float> result = map(new IdentityMapper<Float>());
+		Reduce<Float> reduceOperation = new Reduce<Float>(reducer, result, device);
 		return reduceOperation.getOutput();
 	}
 
@@ -50,32 +60,34 @@ public class RandomList implements PList<Double> {
 	}
 
 	@Override
-	public void add(Double e) {
+	public void add(Float e) {
 		throw new ReadOnlyListException();
 	}
 
 	@Override
-	public void add(int index, Double e) {
+	public void add(int index, Float e) {
 		throw new ReadOnlyListException();
 	}
 
 	@Override
-	public void remove(Double o) {
+	public void remove(Float o) {
 		throw new ReadOnlyListException();
 	}
 
 	@Override
-	public Double remove(int index) {
+	public Float remove(int index) {
 		throw new ReadOnlyListException();
 	}
 
 	@Override
-	public Double get(int index) {
-		return Math.random();
+	public Float get(int index) {
+		if (mt == null)
+			mt = new MersenneTwisterFast(seed);
+		return mt.nextFloat();
 	}
 
 	@Override
-	public void set(int index, Double e) {
+	public void set(int index, Float e) {
 		throw new ReadOnlyListException();
 	}
 
@@ -85,24 +97,24 @@ public class RandomList implements PList<Double> {
 	}
 
 	@Override
-	public PList<Double> subList(int fromIndex, int toIndex) {
+	public PList<Float> subList(int fromIndex, int toIndex) {
 		assert(toIndex >= fromIndex);
 		return new RandomList(toIndex - fromIndex);
 	}
 
 	@Override
 	public Class<?> getType() {
-		return Double.class;
+		return Float.class;
 	}
 
 	@Override
-	public PList<Double> evaluate() {
+	public PList<Float> evaluate() {
 		return this;
 	}
 
 
 	public int getSeed() {
-		return 777;
+		return seed;
 	}
 
 }
