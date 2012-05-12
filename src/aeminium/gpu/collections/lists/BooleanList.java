@@ -2,7 +2,9 @@ package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
-public class BooleanList extends AbstractList<Boolean> {
+import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
+
+public class BooleanList extends AbstractList<Boolean> implements ConcreteCollection {
 
 	protected int[] box;
 	

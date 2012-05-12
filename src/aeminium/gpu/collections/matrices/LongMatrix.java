@@ -2,8 +2,9 @@ package aeminium.gpu.collections.matrices;
 
 import aeminium.gpu.collections.lists.LongList;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class LongMatrix extends AbstractMatrix<Long> {
+public class LongMatrix extends AbstractMatrix<Long> implements ConcreteCollection {
 
 	protected long[] box;
 	

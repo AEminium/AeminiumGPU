@@ -25,5 +25,6 @@ public class RandomExample {
 
 		for (int i=0; i<20; i++)
 			System.out.println("E(" + i + ") = " + input.get(i));
+		
 	}
 }

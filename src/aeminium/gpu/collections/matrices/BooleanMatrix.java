@@ -2,8 +2,9 @@ package aeminium.gpu.collections.matrices;
 
 import aeminium.gpu.collections.lists.BooleanList;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class BooleanMatrix extends AbstractMatrix<Boolean> {
+public class BooleanMatrix extends AbstractMatrix<Boolean> implements ConcreteCollection {
 
 	protected int[] box;
 	

@@ -1,7 +1,12 @@
 package aeminium.gpu.collections.lazyness;
 
-import aeminium.gpu.collections.lazyness.helpers.IdentityMapper;
+import org.bridj.Pointer;
+
+import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.collections.matrices.PMatrix;
+import aeminium.gpu.collections.properties.evaluation.LazyCollection;
+import aeminium.gpu.collections.properties.evaluation.LazyGPUHelper;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.Map;
@@ -9,7 +14,24 @@ import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
 
-public class Range implements PList<Integer> {
+import com.nativelibs4java.opencl.CLBuffer;
+import com.nativelibs4java.opencl.CLContext;
+import com.nativelibs4java.opencl.CLMem;
+
+public class Range implements PList<Integer>, LazyCollection {
+	
+	protected class IntegerIdentityMapper extends LambdaMapper<Integer,Integer> {
+		@Override
+		public Integer map(Integer input) {
+			return input;
+		}
+		
+		@Override
+		public String getSource() {
+			return "return input;";
+		}
+	}
+	
 	
 	private int max;
 	protected GPUDevice device;
@@ -27,7 +49,7 @@ public class Range implements PList<Integer> {
 	
 	@Override
 	public Integer reduce(LambdaReducer<Integer> reducer) {
-		PList<Integer> result = map(new IdentityMapper<Integer>());
+		PList<Integer> result = map(new IntegerIdentityMapper());
 		Reduce<Integer> reduceOperation = new Reduce<Integer>(reducer, result, device);
 		return reduceOperation.getOutput();
 	}
@@ -95,6 +117,24 @@ public class Range implements PList<Integer> {
 	@Override
 	public PList<Integer> evaluate() {
 		return this;
+	}
+
+	@Override
+	public PMatrix<Integer> groupBy(int cols) {
+		return CollectionFactory.matrixfromPList(this, cols);
+	}
+
+	@Override
+	public LazyGPUHelper getGPUHelper() {
+		return new LazyGPUHelper() {
+
+			@Override
+			public CLBuffer<?> getInputBuffer(CLContext ctx) {
+				Pointer<Integer> ptr = Pointer.allocateInts(1);
+				return ctx.createBuffer(CLMem.Usage.Input, ptr, false);
+			}
+			
+		};
 	}
 
 }

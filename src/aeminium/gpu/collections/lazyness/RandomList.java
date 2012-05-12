@@ -2,8 +2,11 @@ package aeminium.gpu.collections.lazyness;
 
 import java.util.Random;
 
-import aeminium.gpu.collections.lazyness.helpers.IdentityMapper;
+import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.collections.matrices.PMatrix;
+import aeminium.gpu.collections.properties.evaluation.LazyCollection;
+import aeminium.gpu.collections.properties.evaluation.LazyGPUHelper;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.Map;
@@ -11,9 +14,25 @@ import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.random.MersenneTwisterFast;
+import aeminium.gpu.operations.random.MersenneTwisterGPU;
 
-public class RandomList implements PList<Float> {
+import com.nativelibs4java.opencl.CLBuffer;
+import com.nativelibs4java.opencl.CLContext;
 
+public class RandomList implements PList<Float>, LazyCollection {
+
+	protected class FloatIdentityMapper extends LambdaMapper<Float,Float> {
+		@Override
+		public Float map(Float input) {
+			return input;
+		}
+		
+		@Override
+		public String getSource() {
+			return "return input;";
+		}
+	}
+	
 	protected int max;
 	protected int seed;
 	protected GPUDevice device;
@@ -38,7 +57,7 @@ public class RandomList implements PList<Float> {
 
 	@Override
 	public Float reduce(LambdaReducer<Float> reducer) {
-		PList<Float> result = map(new IdentityMapper<Float>());
+		PList<Float> result = map(new FloatIdentityMapper());
 		Reduce<Float> reduceOperation = new Reduce<Float>(reducer, result, device);
 		return reduceOperation.getOutput();
 	}
@@ -116,5 +135,23 @@ public class RandomList implements PList<Float> {
 	public int getSeed() {
 		return seed;
 	}
+	
+	@Override
+	public PMatrix<Float> groupBy(int cols) {
+		return CollectionFactory.matrixfromPList(this, cols);
+	}
 
+	@Override
+	public LazyGPUHelper getGPUHelper() {
+		return new LazyGPUHelper() {
+
+			@Override
+			public CLBuffer<?> getInputBuffer(CLContext ctx) {
+				MersenneTwisterGPU mt = new MersenneTwisterGPU(device, size(), getSeed());
+				device.execute(mt);
+				return mt.getOutputBuffer();
+			}
+			
+		};
+	}
 }

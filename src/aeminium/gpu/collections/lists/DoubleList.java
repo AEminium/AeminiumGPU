@@ -2,7 +2,9 @@ package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
-public class DoubleList extends AbstractList<Double> {
+import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
+
+public class DoubleList extends AbstractList<Double> implements ConcreteCollection {
 
 	protected double[] box;
 	

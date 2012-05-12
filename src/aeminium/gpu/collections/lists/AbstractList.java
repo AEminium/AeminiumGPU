@@ -1,5 +1,7 @@
 package aeminium.gpu.collections.lists;
 
+import aeminium.gpu.collections.factories.CollectionFactory;
+import aeminium.gpu.collections.matrices.PMatrix;
 import aeminium.gpu.collections.properties.Mappable;
 import aeminium.gpu.collections.properties.Reductionable;
 import aeminium.gpu.devices.DefaultDeviceFactory;
@@ -59,6 +61,10 @@ public abstract class AbstractList<T> implements PList<T>, Mappable<T>, Reductio
 	public T reduce(LambdaReducer<T> reducer) {
 		Reduce<T> reduceOperation = new Reduce<T>(reducer, this, device);
 		return reduceOperation.getOutput();
+	}
+	
+	public PMatrix<T> groupBy(int cols) {
+		return CollectionFactory.matrixfromPList(this, cols);
 	}
 	
 }

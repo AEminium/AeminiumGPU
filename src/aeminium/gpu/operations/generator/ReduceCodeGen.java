@@ -16,6 +16,8 @@ public class ReduceCodeGen {
 	private String otherSources = "";
 	private String id;
 	private String[] parameters;
+	private boolean isRange = false;
+	private boolean hasSeed = false;
 	
 	public ReduceCodeGen(String inputType, String outputType, 
 			String clSource, String seedSource, String[] pars, String id) {
@@ -58,17 +60,30 @@ public class ReduceCodeGen {
 
 	public String getReduceKernelSource() {
 		HashMap<String, String> mapping = new HashMap<String, String>();
-
+		Template t;
+		
 		mapping.put("input_type", inputType);
 		mapping.put("output_type", outputType);
 		
 		mapping.put("reduce_lambda_name", getReduceLambdaName());
 		mapping.put("reduce_kernel_name", getReduceKernelName());
 		mapping.put("reduce_lambda_def", getReduceLambdaSource());
-		mapping.put("seed_source", seedSource);
 		mapping.put("other_sources", otherSources);
+		
+		
+		if (isRange) {
+			mapping.put("get_input", "reduce_input[inputOffset]");
+		} else {
+			mapping.put("get_input", "inputOffset");
+		}
+		
+		if (hasSeed) {
+			mapping.put("seed_source", seedSource);
+			t = new Template(new TemplateWrapper("opencl/ReduceWithSeedKernel.clt"));
+		} else {
+			t = new Template(new TemplateWrapper("opencl/ReduceKernel.clt"));
+		}
 
-		Template t = new Template(new TemplateWrapper("opencl/ReduceKernel.clt"));
 		return t.apply(mapping);
 	}
 
@@ -80,4 +95,17 @@ public class ReduceCodeGen {
 		return "reduce_kernel_" + id;
 	}
 
+	public boolean isRange() {
+		return isRange;
+	}
+
+	public void setRange(boolean isRange) {
+		this.isRange = isRange;
+	}
+
+	public void setHasSeed(boolean b) {
+		hasSeed = b;
+	}
+
+	
 }

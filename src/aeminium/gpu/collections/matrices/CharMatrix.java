@@ -2,8 +2,9 @@ package aeminium.gpu.collections.matrices;
 
 import aeminium.gpu.collections.lists.CharList;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class CharMatrix extends AbstractMatrix<Character> {
+public class CharMatrix extends AbstractMatrix<Character> implements ConcreteCollection {
 
 	protected char[] box;
 	
