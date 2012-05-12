@@ -6,7 +6,7 @@ import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 
@@ -106,7 +106,7 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 
 
 	@Override
-	public T reduce(LambdaReducer<T> reducer) {
+	public T reduce(LambdaReducerWithSeed<T> reducer) {
 		if (!evaluated && evaluator.canMergeWithReduce(reducer)) {
 			Reduce<T> m = new Reduce<T>(reducer, this, this.getDevice());
 			return evaluator.mergeWithReducer(m);

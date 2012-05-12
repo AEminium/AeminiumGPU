@@ -9,7 +9,7 @@ import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public abstract class AbstractList<T> implements PList<T>, Mappable<T>, Reductionable<T> {
 
@@ -58,7 +58,7 @@ public abstract class AbstractList<T> implements PList<T>, Mappable<T>, Reductio
 	}
 	
 	@Override
-	public T reduce(LambdaReducer<T> reducer) {
+	public T reduce(LambdaReducerWithSeed<T> reducer) {
 		Reduce<T> reduceOperation = new Reduce<T>(reducer, this, device);
 		return reduceOperation.getOutput();
 	}

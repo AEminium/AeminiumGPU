@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import aeminium.gpu.collections.lists.IntList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public class TestMapToReduce extends TestCase {
 	
@@ -28,7 +28,7 @@ public class TestMapToReduce extends TestCase {
 				return "return 2 * input;";
 			}
 			
-		}).reduce(new LambdaReducer<Integer>() {
+		}).reduce(new LambdaReducerWithSeed<Integer>() {
 
 			@Override
 			public Integer combine(Integer input, Integer other) {
@@ -79,7 +79,7 @@ public class TestMapToReduce extends TestCase {
 				return "return 3 * input;";
 			}
 			
-		}).reduce(new LambdaReducer<Integer>() {
+		}).reduce(new LambdaReducerWithSeed<Integer>() {
 
 			@Override
 			public Integer combine(Integer input, Integer other) {
@@ -118,7 +118,7 @@ public class TestMapToReduce extends TestCase {
 				return "return 2.0 * input;";
 			}
 			
-		}).reduce(new LambdaReducer<Float>() {
+		}).reduce(new LambdaReducerWithSeed<Float>() {
 
 			@Override
 			public Float combine(Float input, Float other) {

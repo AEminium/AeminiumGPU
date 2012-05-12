@@ -10,7 +10,7 @@ import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 import aeminium.gpu.operations.generator.MapReduceCodeGen;
 import aeminium.gpu.operations.utils.ExtractTypes;
 
@@ -28,7 +28,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	protected PList<I> input;
 	private O output;
 	protected LambdaMapper<I,O> mapFun;
-	protected LambdaReducer<O> reduceFun;
+	protected LambdaReducerWithSeed<O> reduceFun;
 	
 	protected CLBuffer<?> inbuffer;
 	private CLBuffer<O> outbuffer;
@@ -41,7 +41,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	
 	// Constructors
 	
-	public MapReduce(LambdaMapper<I,O> mapper, LambdaReducer<O> reducer, PList<I> list, String other, GPUDevice dev) {
+	public MapReduce(LambdaMapper<I,O> mapper, LambdaReducerWithSeed<O> reducer, PList<I> list, String other, GPUDevice dev) {
 		this.device = dev;
 		this.input = list;
 		this.mapFun = mapper;
@@ -223,11 +223,11 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		this.output = output;
 	}
 
-	public LambdaReducer<O> getReduceFun() {
+	public LambdaReducerWithSeed<O> getReduceFun() {
 		return reduceFun;
 	}
 
-	public void setReduceFun(LambdaReducer<O> reduceFun) {
+	public void setReduceFun(LambdaReducerWithSeed<O> reduceFun) {
 		this.reduceFun = reduceFun;
 	}
 	

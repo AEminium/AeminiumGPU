@@ -1,6 +1,6 @@
 package aeminium.gpu.operations.generator;
 
-import aeminium.gpu.operations.functions.LambdaNoSeedReducer;
+import aeminium.gpu.operations.functions.LambdaReducer;
 
 
 public interface ReduceTemplateSource<T> {
@@ -9,7 +9,7 @@ public interface ReduceTemplateSource<T> {
 
 	String getOutputType();
 
-	LambdaNoSeedReducer<T> getReduceFun();
+	LambdaReducer<T> getReduceFun();
 
 	String getOpenCLSeed();
 

@@ -4,7 +4,7 @@ import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.matrices.IntMatrix;
 import aeminium.gpu.collections.matrices.PMatrix;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public class MatrixExample {
 	public static void main(String[] args) {
@@ -32,7 +32,7 @@ public class MatrixExample {
 			}
 		});
 		
-		int i = m.reduce(new LambdaReducer<Integer>() {
+		int i = m.reduce(new LambdaReducerWithSeed<Integer>() {
 			
 			public String getSource() {
 				return "return reduce_input_first + reduce_input_second;";
@@ -49,7 +49,7 @@ public class MatrixExample {
 			}
 		});
 		
-		PList<Integer> li = m.reduceLines(new LambdaReducer<Integer>() {
+		PList<Integer> li = m.reduceLines(new LambdaReducerWithSeed<Integer>() {
 			
 			public String getSource() {
 				return "return reduce_input_first + reduce_input_second;";

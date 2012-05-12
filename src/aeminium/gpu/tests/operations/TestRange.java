@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public class TestRange extends TestCase {
 	
@@ -32,7 +32,7 @@ public class TestRange extends TestCase {
 
 	public void testReduceRange() { 
 		PList<Integer> example = new Range(10);
-		Integer output = example.reduce(new LambdaReducer<Integer>() {
+		Integer output = example.reduce(new LambdaReducerWithSeed<Integer>() {
 
 			@Override
 			public Integer combine(Integer input, Integer other) {
@@ -69,7 +69,7 @@ public class TestRange extends TestCase {
 			
 		});
 		
-		Integer output = example.reduce(new LambdaReducer<Integer>() {
+		Integer output = example.reduce(new LambdaReducerWithSeed<Integer>() {
 
 			@Override
 			public Integer combine(Integer input, Integer other) {

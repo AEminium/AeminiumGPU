@@ -3,7 +3,7 @@ package aeminium.gpu.examples;
 import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public class MapReduceExample {
 	public static void main(String[] args) {
@@ -23,7 +23,7 @@ public class MapReduceExample {
 			}
 			
 		});
-		int sum = input.reduce(new LambdaReducer<Integer>(){
+		int sum = input.reduce(new LambdaReducerWithSeed<Integer>(){
 
 			@Override
 			public Integer combine(Integer input, Integer other) {

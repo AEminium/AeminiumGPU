@@ -3,7 +3,7 @@ package aeminium.gpu.tests.operations;
 import junit.framework.TestCase;
 import aeminium.gpu.collections.lists.IntList;
 import aeminium.gpu.collections.lists.PList;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public class TestReduce extends TestCase {
 	
@@ -15,7 +15,7 @@ public class TestReduce extends TestCase {
 			example.add(1);
 		}
 		
-		Integer output = example.reduce(new LambdaReducer<Integer>() {
+		Integer output = example.reduce(new LambdaReducerWithSeed<Integer>() {
 
 			@Override
 			public Integer combine(Integer input, Integer other) {

@@ -8,8 +8,8 @@ import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
-import aeminium.gpu.operations.functions.LambdaNoSeedReducer;
 import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 import aeminium.gpu.operations.generator.ReduceCodeGen;
 import aeminium.gpu.operations.generator.ReduceTemplateSource;
 import aeminium.gpu.operations.utils.ExtractTypes;
@@ -27,7 +27,7 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 	protected PList<O> input;
 	protected PList<O> output;
 	protected int outputSize;
-	protected LambdaNoSeedReducer<O> reduceFun;
+	protected LambdaReducer<O> reduceFun;
 
 	protected CLBuffer<?> inbuffer;
 	private CLBuffer<?> outbuffer;
@@ -36,12 +36,12 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 
 	// Constructors
 
-	public PartialReduce(LambdaNoSeedReducer<O> reduceFun2, PList<O> list,
+	public PartialReduce(LambdaReducer<O> reduceFun2, PList<O> list,
 			int outputSize, GPUDevice dev) {
 		this(reduceFun2, list, outputSize, "", dev);
 	}
 
-	public PartialReduce(LambdaNoSeedReducer<O> reduceFun, PList<O> list,
+	public PartialReduce(LambdaReducer<O> reduceFun, PList<O> list,
 			int outputSize, String other, GPUDevice dev) {
 		this.device = dev;
 		this.input = list;
@@ -52,17 +52,17 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 		if (list instanceof Range) {
 			gen.setRange(true);
 		}
-		if (reduceFun instanceof LambdaReducer) {
+		if (reduceFun instanceof LambdaReducerWithSeed) {
 			gen.setHasSeed(true);
 		}
 	}
 
 	// only for subclasses
-	protected PartialReduce(LambdaNoSeedReducer<O> reduceFun2, GPUDevice dev) {
+	protected PartialReduce(LambdaReducer<O> reduceFun2, GPUDevice dev) {
 		this(reduceFun2, "", dev);
 	}
 
-	protected PartialReduce(LambdaNoSeedReducer<O> reduceFun2, String other,
+	protected PartialReduce(LambdaReducer<O> reduceFun2, String other,
 			GPUDevice dev) {
 		this.device = dev;
 		this.reduceFun = reduceFun2;
@@ -78,8 +78,8 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 	@SuppressWarnings("unchecked")
 	public void cpuExecution() {
 		output = (PList<O>) CollectionFactory.listFromType(getOutputType());
-		if (reduceFun instanceof LambdaReducer) {
-			LambdaReducer<O> red = (LambdaReducer<O>) reduceFun; 
+		if (reduceFun instanceof LambdaReducerWithSeed) {
+			LambdaReducerWithSeed<O> red = (LambdaReducerWithSeed<O>) reduceFun; 
 			O acc = red.getSeed();
 			for (int i = 0; i < input.size(); i++) {
 				acc = reduceFun.combine(acc, input.get(i));
@@ -154,8 +154,8 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 	// Utils
 
 	public String getOpenCLSeed() {
-		if (reduceFun instanceof LambdaReducer) {
-			return ((LambdaReducer<O>)reduceFun).getSeedSource();
+		if (reduceFun instanceof LambdaReducerWithSeed) {
+			return ((LambdaReducerWithSeed<O>)reduceFun).getSeedSource();
 		} else {
 			return "return 0;";
 		}
@@ -179,11 +179,11 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 		this.output = output;
 	}
 
-	public LambdaNoSeedReducer<O> getReduceFun() {
+	public LambdaReducer<O> getReduceFun() {
 		return reduceFun;
 	}
 
-	public void setReduceFun(LambdaNoSeedReducer<O> reduceFun) {
+	public void setReduceFun(LambdaReducer<O> reduceFun) {
 		this.reduceFun = reduceFun;
 	}
 

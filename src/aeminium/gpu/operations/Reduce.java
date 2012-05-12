@@ -6,7 +6,7 @@ import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 import aeminium.gpu.operations.generator.ReduceCodeGen;
 import aeminium.gpu.operations.generator.ReduceTemplateSource;
 import aeminium.gpu.operations.utils.ExtractTypes;
@@ -22,7 +22,7 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 
 	protected PList<O> input;
 	private O output;
-	protected LambdaReducer<O> reduceFun;
+	protected LambdaReducerWithSeed<O> reduceFun;
 
 	protected CLBuffer<?> inbuffer;
 	private CLBuffer<?> outbuffer;
@@ -35,28 +35,28 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 
 	// Constructors
 
-	public Reduce(LambdaReducer<O> reduceFun2, PList<O> list, GPUDevice dev) {
+	public Reduce(LambdaReducerWithSeed<O> reduceFun2, PList<O> list, GPUDevice dev) {
 		this(reduceFun2, list, "", dev);
 	}
 
-	public Reduce(LambdaReducer<O> reduceFun, PList<O> list, String other,
+	public Reduce(LambdaReducerWithSeed<O> reduceFun, PList<O> list, String other,
 			GPUDevice dev) {
 		this.device = dev;
 		this.input = list;
 		this.reduceFun = reduceFun;
 		this.setOtherSources(other);
 		gen = new ReduceCodeGen(this);
-		if (reduceFun instanceof LambdaReducer) {
+		if (reduceFun instanceof LambdaReducerWithSeed) {
 			gen.setHasSeed(true);
 		}
 	}
 
 	// only for subclasses
-	protected Reduce(LambdaReducer<O> reduceFun2, GPUDevice dev) {
+	protected Reduce(LambdaReducerWithSeed<O> reduceFun2, GPUDevice dev) {
 		this(reduceFun2, "", dev);
 	}
 
-	protected Reduce(LambdaReducer<O> reduceFun2, String other, GPUDevice dev) {
+	protected Reduce(LambdaReducerWithSeed<O> reduceFun2, String other, GPUDevice dev) {
 		this.device = dev;
 		this.reduceFun = reduceFun2;
 		this.setOtherSources(other);
@@ -243,11 +243,11 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 		this.output = output;
 	}
 
-	public LambdaReducer<O> getReduceFun() {
+	public LambdaReducerWithSeed<O> getReduceFun() {
 		return reduceFun;
 	}
 
-	public void setReduceFun(LambdaReducer<O> reduceFun) {
+	public void setReduceFun(LambdaReducerWithSeed<O> reduceFun) {
 		this.reduceFun = reduceFun;
 	}
 

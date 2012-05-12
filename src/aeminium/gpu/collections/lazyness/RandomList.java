@@ -12,7 +12,7 @@ import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 import aeminium.gpu.operations.random.MersenneTwisterFast;
 import aeminium.gpu.operations.random.MersenneTwisterGPU;
 
@@ -56,7 +56,7 @@ public class RandomList implements PList<Float>, LazyCollection {
 	}
 
 	@Override
-	public Float reduce(LambdaReducer<Float> reducer) {
+	public Float reduce(LambdaReducerWithSeed<Float> reducer) {
 		PList<Float> result = map(new FloatIdentityMapper());
 		Reduce<Float> reduceOperation = new Reduce<Float>(reducer, result, device);
 		return reduceOperation.getOutput();

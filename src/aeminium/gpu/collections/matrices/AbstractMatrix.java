@@ -6,8 +6,8 @@ import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.PartialReduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaNoSeedReducer;
 import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public abstract class AbstractMatrix<T>  implements PMatrix<T> {
 
@@ -54,12 +54,12 @@ public abstract class AbstractMatrix<T>  implements PMatrix<T> {
 	}
 	
 	@Override
-	public T reduce(LambdaReducer<T> reducer) {
+	public T reduce(LambdaReducerWithSeed<T> reducer) {
 		return elements().reduce(reducer);
 	}
 	
 	@Override
-	public PList<T> reduceLines(LambdaNoSeedReducer<T> lambdaReducer) {
+	public PList<T> reduceLines(LambdaReducer<T> lambdaReducer) {
 		PartialReduce<T> reduceOperation = new PartialReduce<T>(lambdaReducer, this.elements(), this.rows, device);
 		return reduceOperation.getOutput();
 	}

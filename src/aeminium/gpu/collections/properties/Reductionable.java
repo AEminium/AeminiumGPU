@@ -1,7 +1,7 @@
 package aeminium.gpu.collections.properties;
 
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public interface Reductionable<T> {
-	public T reduce(LambdaReducer<T> reducer);
+	public T reduce(LambdaReducerWithSeed<T> reducer);
 }

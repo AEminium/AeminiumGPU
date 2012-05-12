@@ -6,7 +6,7 @@ import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public class MapToMapMerger<I, M, O> {
 	
@@ -73,7 +73,7 @@ public class MapToMapMerger<I, M, O> {
 			}
 
 			@Override
-			public boolean canMergeWithReduce(LambdaReducer<O> reduceFun) {
+			public boolean canMergeWithReduce(LambdaReducerWithSeed<O> reduceFun) {
 				return true;
 			}
 
