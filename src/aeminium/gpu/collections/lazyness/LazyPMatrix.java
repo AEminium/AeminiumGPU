@@ -6,16 +6,17 @@ import aeminium.gpu.collections.matrices.AbstractMatrix;
 public class LazyPMatrix<T> extends AbstractMatrix<T> {
 
 	private PList<T> source;
+
 	public LazyPMatrix(PList<T> src, int cols, int rows) {
 		super(cols, rows);
 		source = src;
 	}
-	
+
 	@Override
 	public T get(int i, int j) {
 		return source.get(i * cols + j);
 	}
-	
+
 	@Override
 	public void set(int i, int j, T e) {
 		source.set(i * cols + j, e);

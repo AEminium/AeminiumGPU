@@ -19,38 +19,39 @@ import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLMem;
 
 public class Range implements PList<Integer>, LazyCollection {
-	
-	protected class IntegerIdentityMapper extends LambdaMapper<Integer,Integer> {
+
+	protected class IntegerIdentityMapper extends
+			LambdaMapper<Integer, Integer> {
 		@Override
 		public Integer map(Integer input) {
 			return input;
 		}
-		
+
 		@Override
 		public String getSource() {
 			return "return input;";
 		}
 	}
-	
-	
+
 	private int max;
 	protected GPUDevice device;
-	
+
 	public Range(int max) {
 		this.max = max;
 		device = (new DefaultDeviceFactory()).getDevice();
 	}
-	
+
 	@Override
 	public <O> PList<O> map(LambdaMapper<Integer, O> mapper) {
 		Map<Integer, O> mapOperation = new Map<Integer, O>(mapper, this, device);
 		return mapOperation.getOutput();
 	}
-	
+
 	@Override
 	public Integer reduce(LambdaReducerWithSeed<Integer> reducer) {
 		PList<Integer> result = map(new IntegerIdentityMapper());
-		Reduce<Integer> reduceOperation = new Reduce<Integer>(reducer, result, device);
+		Reduce<Integer> reduceOperation = new Reduce<Integer>(reducer, result,
+				device);
 		return reduceOperation.getOutput();
 	}
 
@@ -66,7 +67,7 @@ public class Range implements PList<Integer>, LazyCollection {
 
 	@Override
 	public boolean isEmpty() {
-		return (max > 0); 
+		return (max > 0);
 	}
 
 	@Override
@@ -76,7 +77,7 @@ public class Range implements PList<Integer>, LazyCollection {
 
 	@Override
 	public void add(int index, Integer e) {
-		throw new ReadOnlyListException();		
+		throw new ReadOnlyListException();
 	}
 
 	@Override
@@ -133,7 +134,7 @@ public class Range implements PList<Integer>, LazyCollection {
 				Pointer<Integer> ptr = Pointer.allocateInts(1);
 				return ctx.createBuffer(CLMem.Usage.Input, ptr, false);
 			}
-			
+
 		};
 	}
 

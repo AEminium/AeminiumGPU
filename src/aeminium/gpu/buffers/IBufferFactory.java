@@ -9,17 +9,19 @@ import com.nativelibs4java.opencl.CLQueue;
 import com.nativelibs4java.opencl.LocalSize;
 
 public interface IBufferFactory {
-	
-	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list);
-	
+
+	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			PList<T> list);
+
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list);
 
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size);
-	
-	public LocalSize createSharedBufferFor(CLContext context, String type, int size);
 
-	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev,
+	public LocalSize createSharedBufferFor(CLContext context, String type,
 			int size);
+
+	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
+			CLEvent ev, int size);
 
 	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
 			CLEvent ev);

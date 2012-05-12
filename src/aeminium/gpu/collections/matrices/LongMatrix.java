@@ -4,16 +4,17 @@ import aeminium.gpu.collections.lists.LongList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class LongMatrix extends AbstractMatrix<Long> implements ConcreteCollection {
+public class LongMatrix extends AbstractMatrix<Long> implements
+		ConcreteCollection {
 
 	protected long[] box;
-	
+
 	public LongMatrix(int m, int n) {
-		this(new long[m*n], m, n);
+		this(new long[m * n], m, n);
 	}
-	
+
 	public LongMatrix(long[] box, int m, int n) {
-		super(m,n);
+		super(m, n);
 		this.box = box;
 	}
 
@@ -31,10 +32,10 @@ public class LongMatrix extends AbstractMatrix<Long> implements ConcreteCollecti
 	public Class<?> getType() {
 		return Long.class;
 	}
-	
+
 	@Override
 	public PList<Long> elements() {
-		return new LongList(box,size);
+		return new LongList(box, size);
 	}
-		
+
 }

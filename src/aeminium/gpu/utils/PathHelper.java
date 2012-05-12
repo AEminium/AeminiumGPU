@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 
 public class PathHelper {
 
-
 	public static InputStream openFileAsStream(String fname) {
 		// First try inside the Jar
 		InputStream is = PathHelper.class.getResourceAsStream("/" + fname);
@@ -32,8 +31,8 @@ public class PathHelper {
 		return null;
 	}
 
-
 	public static BufferedReader openFile(String fname) {
-		return new BufferedReader(new InputStreamReader(openFileAsStream(fname)));
+		return new BufferedReader(
+				new InputStreamReader(openFileAsStream(fname)));
 	}
 }

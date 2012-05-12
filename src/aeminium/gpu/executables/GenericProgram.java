@@ -18,16 +18,17 @@ public abstract class GenericProgram implements Program {
 
 	protected String otherSources;
 	protected long startTime;
-	
-	
+
 	protected abstract boolean willRunOnGPU();
+
 	public abstract void cpuExecution();
+
 	public void gpuExecution() {
 		device.execute(this);
 	}
-	
+
 	public void execute() {
-		/* Do we have a GPU available?*/
+		/* Do we have a GPU available? */
 
 		if (device == null) {
 			if (System.getenv("DEBUG") != null) {
@@ -36,27 +37,27 @@ public abstract class GenericProgram implements Program {
 			cpuExecution();
 			return;
 		}
-		
+
 		if (System.getenv("BENCH") != null) {
 			boolean isGpu = willRunOnGPU();
 			long startT = System.nanoTime();
 			gpuExecution();
 			long gpuT = System.nanoTime() - startT;
-			
+
 			startT = System.nanoTime();
 			cpuExecution();
 			long cpuT = System.nanoTime() - startT;
 			System.out.println("> GPUreal: " + gpuT);
 			System.out.println("> CPUreal: " + cpuT);
-			
-			if ( isGpu == (gpuT < cpuT) ) {
+
+			if (isGpu == (gpuT < cpuT)) {
 				System.out.println("> GPUvsCPU: right");
 			} else {
 				System.out.println("> GPUvsCPU: wrong");
 			}
 			return;
 		}
-		
+
 		if (System.getenv("FORCE") != null) {
 			if (System.getenv("FORCE").equals("GPU")) {
 				gpuExecution();
@@ -66,7 +67,6 @@ public abstract class GenericProgram implements Program {
 			return;
 		}
 
-
 		/* Regular decision */
 		if (willRunOnGPU()) {
 			gpuExecution();
@@ -74,24 +74,25 @@ public abstract class GenericProgram implements Program {
 			cpuExecution();
 		}
 	}
-	
-	
-	
+
 	// Pipeline
-	
+
 	public void prepareSource(CLContext ctx) {
 		kernel = getOrCreateKernel(ctx);
 	}
+
 	abstract public void prepareBuffers(CLContext ctx);
+
 	abstract public void execute(CLContext ctx, CLQueue q);
+
 	abstract public void retrieveResults(CLContext ctx, CLQueue q);
-	
+
 	@Override
 	public void waitExecution(CLContext context, CLQueue queue) {
 		kernelCompletion.waitFor();
 		kernelCompletion = null;
 	}
-	
+
 	public void release() {
 		if (program != null) {
 			program.release();
@@ -104,14 +105,15 @@ public abstract class GenericProgram implements Program {
 		}
 		System.gc();
 	}
-	
+
 	// CL Definitions
-	
+
 	public abstract String getSource();
+
 	public abstract String getKernelName();
-	
+
 	// Pipeline Helpers
-	
+
 	protected CLKernel getOrCreateKernel(CLContext ctx) {
 		return getOrCreateKernel(ctx, getKernelName());
 	}
@@ -120,7 +122,7 @@ public abstract class GenericProgram implements Program {
 		program = compileProgram(ctx);
 		return getKernel(program, kernelName);
 	}
-	
+
 	protected CLProgram compileProgram(CLContext ctx) {
 		try {
 			if (System.getenv("OPENCL") != null) {
@@ -134,7 +136,7 @@ public abstract class GenericProgram implements Program {
 			return null;
 		}
 	}
-	
+
 	protected CLKernel getKernel(CLProgram program, String kernelName) {
 		try {
 			return program.createKernel(kernelName);
@@ -144,18 +146,17 @@ public abstract class GenericProgram implements Program {
 			return null;
 		}
 	}
-	
-	
+
 	// Getters/Setters
-	
+
 	public void setDevice(GPUDevice dev) {
 		device = dev;
 	}
-	
+
 	public GPUDevice getDevice() {
 		return device;
 	}
-	
+
 	public void setOtherSources(String otherSources) {
 		this.otherSources = otherSources;
 	}
@@ -163,7 +164,7 @@ public abstract class GenericProgram implements Program {
 	public String getOtherSources() {
 		return otherSources;
 	}
-	
+
 	public ProgramLogger getLogger() {
 		return logger;
 	}

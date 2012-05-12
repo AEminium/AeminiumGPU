@@ -11,25 +11,25 @@ public class Configuration {
 
 	protected static final Properties properties;
 	protected static String filename;
-	
+
 	static {
 		filename = System.getenv("AEMINIUMGPU_CONFIG");
-		if ( filename == null ) {
-			filename = System.getProperty("user.home") + System.getProperty("file.separator") + ".aeminiumgpurc";
+		if (filename == null) {
+			filename = System.getProperty("user.home")
+					+ System.getProperty("file.separator") + ".aeminiumgpurc";
 		}
 		File file = new File(filename);
 		properties = new Properties();
-		if ( file.exists()  && file.canRead()) {
+		if (file.exists() && file.canRead()) {
 			FileReader freader;
 			try {
 				freader = new FileReader(file);
 				properties.load(freader);
 				freader.close();
-			}  catch (IOException e) {
-			} 
+			} catch (IOException e) {
+			}
 		}
 	}
-	
 
 	public static String get(String key) {
 		return properties.getProperty(key);
@@ -39,7 +39,7 @@ public class Configuration {
 		properties.setProperty(key, value);
 		save();
 	}
-	
+
 	public static void append(String key, String value) {
 		String val = get(key);
 		if (val == null) {
@@ -50,7 +50,7 @@ public class Configuration {
 		properties.setProperty(key, val + value);
 		save();
 	}
-	
+
 	private static void save() {
 		File file = new File(filename);
 		try {

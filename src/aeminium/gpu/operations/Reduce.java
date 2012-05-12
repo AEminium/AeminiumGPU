@@ -16,7 +16,8 @@ import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
 import com.nativelibs4java.opencl.CLQueue;
 
-public class Reduce<O> extends GenericProgram implements Program, ReduceTemplateSource<O> {
+public class Reduce<O> extends GenericProgram implements Program,
+		ReduceTemplateSource<O> {
 
 	static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
 
@@ -35,12 +36,13 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 
 	// Constructors
 
-	public Reduce(LambdaReducerWithSeed<O> reduceFun2, PList<O> list, GPUDevice dev) {
+	public Reduce(LambdaReducerWithSeed<O> reduceFun2, PList<O> list,
+			GPUDevice dev) {
 		this(reduceFun2, list, "", dev);
 	}
 
-	public Reduce(LambdaReducerWithSeed<O> reduceFun, PList<O> list, String other,
-			GPUDevice dev) {
+	public Reduce(LambdaReducerWithSeed<O> reduceFun, PList<O> list,
+			String other, GPUDevice dev) {
 		this.device = dev;
 		this.input = list;
 		this.reduceFun = reduceFun;
@@ -56,7 +58,8 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 		this(reduceFun2, "", dev);
 	}
 
-	protected Reduce(LambdaReducerWithSeed<O> reduceFun2, String other, GPUDevice dev) {
+	protected Reduce(LambdaReducerWithSeed<O> reduceFun2, String other,
+			GPUDevice dev) {
 		this.device = dev;
 		this.reduceFun = reduceFun2;
 		this.setOtherSources(other);
@@ -67,7 +70,7 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 		return OpenCLDecider.useGPU(input.size(), 1, reduceFun.getSource(),
 				reduceFun.getSourceComplexity());
 	}
-	
+
 	public void cpuExecution() {
 		output = this.getReduceFun().getSeed();
 		for (int i = 0; i < input.size(); i++) {

@@ -8,13 +8,13 @@ import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
-public class MapToReduceMerger<I,O> {
-	
-	private Map<I,O> first;
+public class MapToReduceMerger<I, O> {
+
+	private Map<I, O> first;
 	private Reduce<O> second;
 	private PList<I> current;
-	
-	public MapToReduceMerger(Map<I,O> f, Reduce<O> s, PList<I> c) {
+
+	public MapToReduceMerger(Map<I, O> f, Reduce<O> s, PList<I> c) {
 		first = f;
 		second = s;
 		current = c;
@@ -23,13 +23,15 @@ public class MapToReduceMerger<I,O> {
 	@SuppressWarnings("unchecked")
 	public O getOutput() {
 		LazyEvaluator<O> eval = new LazyEvaluator<O>() {
-			
+
 			@Override
 			public O evaluate() {
 				StringBuilder extraCode = new StringBuilder();
 				extraCode.append(first.getOtherSources());
 				extraCode.append(second.getOtherSources());
-				MapReduce<I,O> op = new MapReduce<I,O>(first.getMapFun(), second.getReduceFun(), current, extraCode.toString(), first.getDevice());
+				MapReduce<I, O> op = new MapReduce<I, O>(first.getMapFun(),
+						second.getReduceFun(), current, extraCode.toString(),
+						first.getDevice());
 				return op.getOutput();
 			}
 
@@ -57,7 +59,6 @@ public class MapToReduceMerger<I,O> {
 			public O mergeWithReducer(Reduce<O> reduceOp) {
 				return null;
 			}
-
 
 		};
 		return (O) eval.evaluate();

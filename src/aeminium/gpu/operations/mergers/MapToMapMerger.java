@@ -9,12 +9,12 @@ import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public class MapToMapMerger<I, M, O> {
-	
-	private Map<I,M> first;
-	private Map<M,O> second;
+
+	private Map<I, M> first;
+	private Map<M, O> second;
 	private PList<I> current;
-	
-	public MapToMapMerger(Map<I,M> f, Map<M,O> s, PList<I> c) {
+
+	public MapToMapMerger(Map<I, M> f, Map<M, O> s, PList<I> c) {
 		first = f;
 		second = s;
 		current = c;
@@ -23,8 +23,8 @@ public class MapToMapMerger<I, M, O> {
 	public PList<O> getOutput() {
 		LazyEvaluator<O> eval = new LazyEvaluator<O>() {
 
-			private Map<I,O> fakeMap() {
-				LambdaMapper<I,O> fakeLambda = new LambdaMapper<I, O>() {
+			private Map<I, O> fakeMap() {
+				LambdaMapper<I, O> fakeLambda = new LambdaMapper<I, O>() {
 
 					@Override
 					public O map(I o) {
@@ -33,26 +33,29 @@ public class MapToMapMerger<I, M, O> {
 
 					@Override
 					public String getSource() {
-						return String.format("return %s(%s(input));", second.getMapOpenCLName(), first.getMapOpenCLName());
+						return String.format("return %s(%s(input));",
+								second.getMapOpenCLName(),
+								first.getMapOpenCLName());
 					}
 				};
-				
+
 				StringBuilder extraCode = new StringBuilder();
 				extraCode.append(first.getOtherSources());
 				extraCode.append(second.getOtherSources());
 				extraCode.append(first.getMapOpenCLSource());
 				extraCode.append(second.getMapOpenCLSource());
-				Map<I,O> op = new Map<I,O>(fakeLambda,current,extraCode.toString(), first.getDevice()) {
+				Map<I, O> op = new Map<I, O>(fakeLambda, current,
+						extraCode.toString(), first.getDevice()) {
 					public String getOutputType() {
 						return second.getOutputType();
 					}
 				};
 				return op;
 			}
-			
+
 			@Override
 			public PList<O> evaluate() {
-				Map<I,O> op = fakeMap();
+				Map<I, O> op = fakeMap();
 				return op.getOutput();
 			}
 
@@ -68,7 +71,8 @@ public class MapToMapMerger<I, M, O> {
 
 			@Override
 			public <O2> PList<O2> mergeWithMap(Map<O, O2> mapOp) {
-				MapToMapMerger<I,O,O2> merger = new MapToMapMerger<I,O,O2>(fakeMap(), mapOp, current);
+				MapToMapMerger<I, O, O2> merger = new MapToMapMerger<I, O, O2>(
+						fakeMap(), mapOp, current);
 				return merger.getOutput();
 			}
 
@@ -79,7 +83,8 @@ public class MapToMapMerger<I, M, O> {
 
 			@Override
 			public O mergeWithReducer(Reduce<O> reduceOp) {
-				MapToReduceMerger<I,O> merger = new MapToReduceMerger<I,O>(fakeMap(), reduceOp, current);
+				MapToReduceMerger<I, O> merger = new MapToReduceMerger<I, O>(
+						fakeMap(), reduceOp, current);
 				return merger.getOutput();
 			}
 		};

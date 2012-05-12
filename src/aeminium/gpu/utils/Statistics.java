@@ -2,7 +2,8 @@ package aeminium.gpu.utils;
 
 public class Statistics {
 	/**
-	 * @param population an array, the population
+	 * @param population
+	 *            an array, the population
 	 * @return the variance
 	 */
 	public static double variance(long[] population) {
@@ -22,7 +23,8 @@ public class Statistics {
 	}
 
 	/**
-	 * @param population an array, the population
+	 * @param population
+	 *            an array, the population
 	 * @return the standard deviation
 	 */
 	public static double standard_deviation(long[] population) {

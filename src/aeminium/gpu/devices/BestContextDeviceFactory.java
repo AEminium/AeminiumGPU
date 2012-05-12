@@ -10,7 +10,7 @@ public class BestContextDeviceFactory implements DeviceFactory {
 		if (JavaCL.listGPUPoweredPlatforms().length > 0) {
 			try {
 				return new GPUDevice(JavaCL.createBestContext());
-			} catch(CLException e) {
+			} catch (CLException e) {
 				return null;
 			}
 		} else {

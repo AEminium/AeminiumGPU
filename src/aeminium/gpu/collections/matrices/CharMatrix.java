@@ -4,16 +4,17 @@ import aeminium.gpu.collections.lists.CharList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class CharMatrix extends AbstractMatrix<Character> implements ConcreteCollection {
+public class CharMatrix extends AbstractMatrix<Character> implements
+		ConcreteCollection {
 
 	protected char[] box;
-	
+
 	public CharMatrix(int m, int n) {
-		this(new char[m*n], m, n);
+		this(new char[m * n], m, n);
 	}
-	
+
 	public CharMatrix(char[] box, int m, int n) {
-		super(m,n);
+		super(m, n);
 		this.box = box;
 	}
 
@@ -31,10 +32,10 @@ public class CharMatrix extends AbstractMatrix<Character> implements ConcreteCol
 	public Class<?> getType() {
 		return Character.class;
 	}
-	
+
 	@Override
 	public PList<Character> elements() {
-		return new CharList(box,size);
+		return new CharList(box, size);
 	}
-		
+
 }

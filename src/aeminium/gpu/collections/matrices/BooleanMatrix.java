@@ -4,16 +4,17 @@ import aeminium.gpu.collections.lists.BooleanList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class BooleanMatrix extends AbstractMatrix<Boolean> implements ConcreteCollection {
+public class BooleanMatrix extends AbstractMatrix<Boolean> implements
+		ConcreteCollection {
 
 	protected int[] box;
-	
+
 	public BooleanMatrix(int m, int n) {
-		this(new int[m*n], m, n);
+		this(new int[m * n], m, n);
 	}
-	
+
 	public BooleanMatrix(int[] box, int m, int n) {
-		super(m,n);
+		super(m, n);
 		this.box = box;
 	}
 
@@ -31,10 +32,10 @@ public class BooleanMatrix extends AbstractMatrix<Boolean> implements ConcreteCo
 	public Class<?> getType() {
 		return Boolean.class;
 	}
-	
+
 	@Override
 	public PList<Boolean> elements() {
-		return new BooleanList(box,size);
+		return new BooleanList(box, size);
 	}
-		
+
 }

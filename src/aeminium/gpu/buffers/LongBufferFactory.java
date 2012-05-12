@@ -16,21 +16,24 @@ public class LongBufferFactory implements IBufferFactory {
 
 	@Override
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
-		return context.createLongBuffer(CLMem.Usage.Input, Pointer.pointerToLongs(((LongList) list).getArray()), true);
-	}
-	
-	@Override
-	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list) {
-		return context.createLongBuffer(CLMem.Usage.InputOutput, Pointer.pointerToLongs(((LongList) list).getArray()), true);
+		return context.createLongBuffer(CLMem.Usage.Input,
+				Pointer.pointerToLongs(((LongList) list).getArray()), true);
 	}
 
+	@Override
+	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			PList<T> list) {
+		return context.createLongBuffer(CLMem.Usage.InputOutput,
+				Pointer.pointerToLongs(((LongList) list).getArray()), true);
+	}
 
 	@Override
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size) {
-		Pointer<Long> ptr = Pointer.allocateLongs(size).order(context.getByteOrder());
+		Pointer<Long> ptr = Pointer.allocateLongs(size).order(
+				context.getByteOrder());
 		return context.createBuffer(CLMem.Usage.Output, ptr, true);
 	}
-	
+
 	@Override
 	public LocalSize createSharedBufferFor(CLContext context, String type,
 			int size) {
@@ -38,8 +41,8 @@ public class LongBufferFactory implements IBufferFactory {
 	}
 
 	@Override
-	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev,
-			int size) {
+	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
+			CLEvent ev, int size) {
 		return new LongList(outbuffer.read(q, ev).getLongs(), size);
 	}
 

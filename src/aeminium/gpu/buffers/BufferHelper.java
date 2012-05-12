@@ -70,7 +70,7 @@ public class BufferHelper {
 			IBufferFactory f = getFactory(list);
 			return f.createInputBufferFor(context, list);
 		}
-		
+
 	}
 
 	public static <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,

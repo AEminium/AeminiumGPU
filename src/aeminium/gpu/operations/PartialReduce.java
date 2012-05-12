@@ -79,7 +79,7 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 	public void cpuExecution() {
 		output = (PList<O>) CollectionFactory.listFromType(getOutputType());
 		if (reduceFun instanceof LambdaReducerWithSeed) {
-			LambdaReducerWithSeed<O> red = (LambdaReducerWithSeed<O>) reduceFun; 
+			LambdaReducerWithSeed<O> red = (LambdaReducerWithSeed<O>) reduceFun;
 			O acc = red.getSeed();
 			for (int i = 0; i < input.size(); i++) {
 				acc = reduceFun.combine(acc, input.get(i));
@@ -98,7 +98,7 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 				}
 			}
 		}
-		
+
 	}
 
 	// Pipeline
@@ -155,7 +155,7 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 
 	public String getOpenCLSeed() {
 		if (reduceFun instanceof LambdaReducerWithSeed) {
-			return ((LambdaReducerWithSeed<O>)reduceFun).getSeedSource();
+			return ((LambdaReducerWithSeed<O>) reduceFun).getSeedSource();
 		} else {
 			return "return 0;";
 		}

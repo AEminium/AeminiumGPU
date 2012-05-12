@@ -15,39 +15,42 @@ import com.nativelibs4java.opencl.LocalSize;
 public class CharBufferFactory implements IBufferFactory {
 
 	public static byte[] encodeCharToBytes(char[] c) {
-	    byte[] b = new byte[c.length];
-	    for (int i = 0; i < c.length; i++)
-	      b[i] = (byte)(c[i] & 0x007F);
+		byte[] b = new byte[c.length];
+		for (int i = 0; i < c.length; i++)
+			b[i] = (byte) (c[i] & 0x007F);
 
-	    return b;
+		return b;
 	}
-	
+
 	public static char[] decodeBytesToChar(byte[] ascii) {
 		String tmp = new String(ascii);
 		return tmp.toCharArray();
 	}
-	
-	
+
 	@Override
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
 		char[] ar = ((CharList) list).getArray();
 		byte[] car = encodeCharToBytes(ar);
-		return context.createByteBuffer(CLMem.Usage.Input, Pointer.pointerToBytes(car), true);
+		return context.createByteBuffer(CLMem.Usage.Input,
+				Pointer.pointerToBytes(car), true);
 	}
 
 	@Override
-	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list) {
+	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			PList<T> list) {
 		char[] ar = ((CharList) list).getArray();
 		byte[] car = encodeCharToBytes(ar);
-		
-		Pointer<Byte> ptr = Pointer.allocateBytes(list.size()).order(context.getByteOrder());
+
+		Pointer<Byte> ptr = Pointer.allocateBytes(list.size()).order(
+				context.getByteOrder());
 		ptr.setBytes(car);
 		return context.createBuffer(CLMem.Usage.InputOutput, ptr, true);
 	}
-	
+
 	@Override
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size) {
-		Pointer<Byte> ptr = Pointer.allocateBytes(size).order(context.getByteOrder());
+		Pointer<Byte> ptr = Pointer.allocateBytes(size).order(
+				context.getByteOrder());
 		return context.createBuffer(CLMem.Usage.Output, ptr, true);
 	}
 
@@ -64,9 +67,10 @@ public class CharBufferFactory implements IBufferFactory {
 		char[] content = decodeBytesToChar(pcontent);
 		return new CharList(content, size);
 	}
-	
+
 	@Override
-	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev) {
+	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
+			CLEvent ev) {
 		char[] content = decodeBytesToChar(outbuffer.read(q, ev).getBytes(1));
 		return content[0];
 	}

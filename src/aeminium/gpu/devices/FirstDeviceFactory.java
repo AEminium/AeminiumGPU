@@ -15,11 +15,12 @@ public class FirstDeviceFactory implements DeviceFactory {
 			for (CLDevice dev : plat.listCPUDevices(true)) {
 				// INFO: Uncomment to know which device is being used.
 				// System.out.println("O:" + dev.getName());
-				CLContext ctx = plat.createContext(new HashMap<ContextProperties,Object>(), dev);
+				CLContext ctx = plat.createContext(
+						new HashMap<ContextProperties, Object>(), dev);
 				return new GPUDevice(ctx);
 			}
 		}
 		return null;
 	}
-	
+
 }

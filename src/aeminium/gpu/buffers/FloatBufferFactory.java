@@ -16,21 +16,25 @@ public class FloatBufferFactory implements IBufferFactory {
 
 	@Override
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
-		return context.createFloatBuffer(CLMem.Usage.Input, Pointer.pointerToFloats(((FloatList) list).getArray()), true);
+		return context.createFloatBuffer(CLMem.Usage.Input,
+				Pointer.pointerToFloats(((FloatList) list).getArray()), true);
 
 	}
-	
+
 	@Override
-	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context, PList<T> list) {
-		return context.createFloatBuffer(CLMem.Usage.InputOutput, Pointer.pointerToFloats(((FloatList) list).getArray()), true);
+	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			PList<T> list) {
+		return context.createFloatBuffer(CLMem.Usage.InputOutput,
+				Pointer.pointerToFloats(((FloatList) list).getArray()), true);
 	}
 
 	@Override
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size) {
-		Pointer<Float> ptr = Pointer.allocateFloats(size).order(context.getByteOrder());
+		Pointer<Float> ptr = Pointer.allocateFloats(size).order(
+				context.getByteOrder());
 		return context.createBuffer(CLMem.Usage.Output, ptr, true);
 	}
-	
+
 	@Override
 	public LocalSize createSharedBufferFor(CLContext context, String type,
 			int size) {
@@ -38,8 +42,8 @@ public class FloatBufferFactory implements IBufferFactory {
 	}
 
 	@Override
-	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev,
-			int size) {
+	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
+			CLEvent ev, int size) {
 		return new FloatList(outbuffer.read(q, ev).getFloats(), size);
 	}
 

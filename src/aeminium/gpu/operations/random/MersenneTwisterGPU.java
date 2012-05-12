@@ -44,26 +44,34 @@ public class MersenneTwisterGPU extends GenericProgram {
 
 	@Override
 	public void prepareBuffers(CLContext ctx) {
-		Pointer<?> d = Pointer.allocateBytes(MT_RNG_COUNT * sizeof_mt_struct_stripped);
-	    d = d.order(ctx.getByteOrder());
-	    loadMTGPU(d,seed, PathHelper.openFileAsStream("data/MersenneTwister.dat"));
-	    parameters = ctx.createBuffer(CLMem.Usage.Input, d);
-	    output = ctx.createBuffer(Usage.Output, Pointer.allocateFloats(this.size));
+		Pointer<?> d = Pointer.allocateBytes(MT_RNG_COUNT
+				* sizeof_mt_struct_stripped);
+		d = d.order(ctx.getByteOrder());
+		loadMTGPU(d, seed,
+				PathHelper.openFileAsStream("data/MersenneTwister.dat"));
+		parameters = ctx.createBuffer(CLMem.Usage.Input, d);
+		output = ctx.createBuffer(Usage.Output,
+				Pointer.allocateFloats(this.size));
 	}
 
 	@Override
 	public void execute(CLContext ctx, CLQueue q) {
 		synchronized (kernel) {
-		    // setArgs will throw an exception at runtime if the types / sizes of the arguments are incorrect
+			// setArgs will throw an exception at runtime if the types / sizes
+			// of the arguments are incorrect
 			kernel.setArgs(output, parameters, N_PER_RNG);
 
-		    // Ask for 1-dimensional execution of length dataSize, with auto choice of local workgroup size :
-			kernelCompletion = kernel.enqueueNDRange(q, new int[] { MT_RNG_COUNT }, new CLEvent[] {});
+			// Ask for 1-dimensional execution of length dataSize, with auto
+			// choice of local workgroup size :
+			kernelCompletion = kernel.enqueueNDRange(q,
+					new int[] { MT_RNG_COUNT }, new CLEvent[] {});
 		}
 		boxmuller = getKernel(program, "BoxMuller");
 		synchronized (boxmuller) {
 			boxmuller.setArgs(output, N_PER_RNG);
-			kernelCompletion = boxmuller.enqueueNDRange(q, new int[] { MT_RNG_COUNT }, new CLEvent[] { kernelCompletion });
+			kernelCompletion = boxmuller.enqueueNDRange(q,
+					new int[] { MT_RNG_COUNT },
+					new CLEvent[] { kernelCompletion });
 		}
 
 	}
@@ -87,7 +95,9 @@ public class MersenneTwisterGPU extends GenericProgram {
 			for (int i = 0; i < MT_RNG_COUNT; i++) {
 				fis.read(buffer);
 				p.setBytesAtOffset(c, buffer);
-				p.setIntAtOffset(c + buffer.length - 4, seed); // Replace last parameter by seed.
+				p.setIntAtOffset(c + buffer.length - 4, seed); // Replace last
+																// parameter by
+																// seed.
 				c += buffer.length;
 			}
 		} catch (IOException e) {
@@ -102,8 +112,9 @@ public class MersenneTwisterGPU extends GenericProgram {
 
 	@Override
 	public String getSource() {
-		Template t = new Template(new TemplateWrapper("opencl/MersenneTwister.clt"));
-		HashMap<String,String> d = new HashMap<String,String>();
+		Template t = new Template(new TemplateWrapper(
+				"opencl/MersenneTwister.clt"));
+		HashMap<String, String> d = new HashMap<String, String>();
 		d.put("MT_RNG_COUNT", "" + MT_RNG_COUNT);
 		return t.apply(d);
 	}
@@ -117,23 +128,22 @@ public class MersenneTwisterGPU extends GenericProgram {
 	private static int divUp(int a, int b) {
 		return ((a % b) != 0) ? (a / b + 1) : (a / b);
 	}
+
 	private static int alignUp(int a, int b) {
 		return ((a % b) != 0) ? (a - a % b + b) : a;
 	}
-
-
 
 	@Override
 	protected boolean willRunOnGPU() {
 		return true;
 	}
 
-
 	@Override
 	public void cpuExecution() {
 		// Will never be called
 		return;
 	}
+
 	public CLBuffer<?> getOutputBuffer() {
 		return outputFinal;
 	}

@@ -4,16 +4,17 @@ import aeminium.gpu.collections.lists.FloatList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class FloatMatrix extends AbstractMatrix<Float> implements ConcreteCollection {
+public class FloatMatrix extends AbstractMatrix<Float> implements
+		ConcreteCollection {
 
 	protected float[] box;
-	
+
 	public FloatMatrix(int m, int n) {
-		this(new float[m*n], m, n);
+		this(new float[m * n], m, n);
 	}
-	
+
 	public FloatMatrix(float[] box, int m, int n) {
-		super(m,n);
+		super(m, n);
 		this.box = box;
 	}
 
@@ -31,10 +32,10 @@ public class FloatMatrix extends AbstractMatrix<Float> implements ConcreteCollec
 	public Class<?> getType() {
 		return Float.class;
 	}
-	
+
 	@Override
 	public PList<Float> elements() {
-		return new FloatList(box,size);
+		return new FloatList(box, size);
 	}
-		
+
 }

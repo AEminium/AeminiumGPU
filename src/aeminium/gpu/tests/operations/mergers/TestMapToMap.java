@@ -7,11 +7,11 @@ import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
 
 public class TestMapToMap extends TestCase {
-	
+
 	private static int TEST_SIZE = 10;
 	private static int MERGES = 10;
-	
-	public void testMapIntToInt() { 
+
+	public void testMapIntToInt() {
 		PList<Integer> example = new IntList();
 		for (int i = 0; i < TEST_SIZE; i++) {
 			example.add(i);
@@ -25,47 +25,46 @@ public class TestMapToMap extends TestCase {
 				public Integer map(Integer input) {
 					return 2 * input;
 				}
-				
+
 				public String getSource() {
 					return "return 2 * input;";
 				}
-				
+
 			});
 			m *= 2;
 		}
-		
+
 		assertTrue(output instanceof LazyPList<?>);
 		assertEquals(MERGES, ((LazyPList<Integer>) output).getLazynessLevel());
-		
+
 		for (int i = 0; i < TEST_SIZE; i++) {
-			assertEquals(m * i,output.get(i).intValue());
+			assertEquals(m * i, output.get(i).intValue());
 		}
 	}
-	
-	
+
 	public void testClearAfterMap() {
 		PList<Integer> example = new IntList();
 		for (int i = 0; i < TEST_SIZE; i++) {
 			example.add(1);
 		}
-		
-		PList<Float> output = example.map(new LambdaMapper<Integer,Float>() {
+
+		PList<Float> output = example.map(new LambdaMapper<Integer, Float>() {
 
 			@Override
 			public Float map(Integer input) {
 				fail();
 				return 2.0f * input;
 			}
-			
+
 			@Override
 			public String getSource() {
 				return "return 2.0 * input;";
 			}
-			
+
 		});
 		output.clear();
 		output.add(1f);
 		assertEquals(1, output.size());
-		
+
 	}
 }

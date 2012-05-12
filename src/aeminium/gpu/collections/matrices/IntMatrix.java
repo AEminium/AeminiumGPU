@@ -4,16 +4,17 @@ import aeminium.gpu.collections.lists.IntList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class IntMatrix extends AbstractMatrix<Integer> implements ConcreteCollection {
+public class IntMatrix extends AbstractMatrix<Integer> implements
+		ConcreteCollection {
 
 	protected int[] box;
-	
+
 	public IntMatrix(int m, int n) {
-		this(new int[m*n], m, n);
+		this(new int[m * n], m, n);
 	}
-	
+
 	public IntMatrix(int[] box, int m, int n) {
-		super(m,n);
+		super(m, n);
 		this.box = box;
 	}
 
@@ -31,10 +32,10 @@ public class IntMatrix extends AbstractMatrix<Integer> implements ConcreteCollec
 	public Class<?> getType() {
 		return Integer.class;
 	}
-	
+
 	@Override
 	public PList<Integer> elements() {
-		return new IntList(box,size);
+		return new IntList(box, size);
 	}
-		
+
 }

@@ -21,18 +21,18 @@ import com.nativelibs4java.opencl.CLContext;
 
 public class RandomList implements PList<Float>, LazyCollection {
 
-	protected class FloatIdentityMapper extends LambdaMapper<Float,Float> {
+	protected class FloatIdentityMapper extends LambdaMapper<Float, Float> {
 		@Override
 		public Float map(Float input) {
 			return input;
 		}
-		
+
 		@Override
 		public String getSource() {
 			return "return input;";
 		}
 	}
-	
+
 	protected int max;
 	protected int seed;
 	protected GPUDevice device;
@@ -48,7 +48,6 @@ public class RandomList implements PList<Float>, LazyCollection {
 		device = (new DefaultDeviceFactory()).getDevice();
 	}
 
-
 	@Override
 	public <O> PList<O> map(LambdaMapper<Float, O> mapper) {
 		Map<Float, O> mapOperation = new Map<Float, O>(mapper, this, device);
@@ -58,10 +57,10 @@ public class RandomList implements PList<Float>, LazyCollection {
 	@Override
 	public Float reduce(LambdaReducerWithSeed<Float> reducer) {
 		PList<Float> result = map(new FloatIdentityMapper());
-		Reduce<Float> reduceOperation = new Reduce<Float>(reducer, result, device);
+		Reduce<Float> reduceOperation = new Reduce<Float>(reducer, result,
+				device);
 		return reduceOperation.getOutput();
 	}
-
 
 	@Override
 	public int size() {
@@ -117,7 +116,7 @@ public class RandomList implements PList<Float>, LazyCollection {
 
 	@Override
 	public PList<Float> subList(int fromIndex, int toIndex) {
-		assert(toIndex >= fromIndex);
+		assert (toIndex >= fromIndex);
 		return new RandomList(toIndex - fromIndex);
 	}
 
@@ -131,11 +130,10 @@ public class RandomList implements PList<Float>, LazyCollection {
 		return this;
 	}
 
-
 	public int getSeed() {
 		return seed;
 	}
-	
+
 	@Override
 	public PMatrix<Float> groupBy(int cols) {
 		return CollectionFactory.matrixfromPList(this, cols);
@@ -147,11 +145,12 @@ public class RandomList implements PList<Float>, LazyCollection {
 
 			@Override
 			public CLBuffer<?> getInputBuffer(CLContext ctx) {
-				MersenneTwisterGPU mt = new MersenneTwisterGPU(device, size(), getSeed());
+				MersenneTwisterGPU mt = new MersenneTwisterGPU(device, size(),
+						getSeed());
 				device.execute(mt);
 				return mt.getOutputBuffer();
 			}
-			
+
 		};
 	}
 }

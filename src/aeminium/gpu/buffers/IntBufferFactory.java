@@ -12,26 +12,28 @@ import com.nativelibs4java.opencl.CLMem;
 import com.nativelibs4java.opencl.CLQueue;
 import com.nativelibs4java.opencl.LocalSize;
 
-public class IntBufferFactory implements IBufferFactory{
+public class IntBufferFactory implements IBufferFactory {
 
 	@Override
 	public <T> CLBuffer<?> createInputBufferFor(CLContext context, PList<T> list) {
-		return context.createIntBuffer(CLMem.Usage.Input, Pointer.pointerToInts(((IntList) list).getArray()), true);
+		return context.createIntBuffer(CLMem.Usage.Input,
+				Pointer.pointerToInts(((IntList) list).getArray()), true);
 	}
-	
 
 	@Override
 	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
 			PList<T> list) {
-		return context.createIntBuffer(CLMem.Usage.InputOutput, Pointer.pointerToInts(((IntList) list).getArray()), true);
+		return context.createIntBuffer(CLMem.Usage.InputOutput,
+				Pointer.pointerToInts(((IntList) list).getArray()), true);
 	}
 
 	@Override
 	public CLBuffer<?> createOutputBufferFor(CLContext context, int size) {
-		Pointer<Integer> ptr = Pointer.allocateInts(size).order(context.getByteOrder());
+		Pointer<Integer> ptr = Pointer.allocateInts(size).order(
+				context.getByteOrder());
 		return context.createBuffer(CLMem.Usage.Output, ptr, true);
 	}
-	
+
 	@Override
 	public LocalSize createSharedBufferFor(CLContext context, String type,
 			int size) {
@@ -39,8 +41,8 @@ public class IntBufferFactory implements IBufferFactory{
 	}
 
 	@Override
-	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q, CLEvent ev,
-			int size) {
+	public PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
+			CLEvent ev, int size) {
 		return new IntList(outbuffer.read(q, ev).getInts(), size);
 	}
 
@@ -49,7 +51,6 @@ public class IntBufferFactory implements IBufferFactory{
 			CLEvent ev) {
 		return outbuffer.read(q, ev).getInts(1)[0];
 	}
-
 
 	@Override
 	public CLBuffer<?> createInputOutputBufferFor(CLContext context,

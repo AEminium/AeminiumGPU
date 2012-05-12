@@ -9,21 +9,21 @@ import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
-public abstract class AbstractMatrix<T>  implements PMatrix<T> {
+public abstract class AbstractMatrix<T> implements PMatrix<T> {
 
 	protected int cols;
 	protected int rows;
-	
+
 	protected int size;
 	protected GPUDevice device;
-	
+
 	public AbstractMatrix(int cols, int rows) {
 		device = (new DefaultDeviceFactory()).getDevice();
 		this.cols = cols;
 		this.rows = rows;
 		this.size = cols * rows;
 	}
-	
+
 	public GPUDevice getDevice() {
 		return device;
 	}
@@ -31,7 +31,7 @@ public abstract class AbstractMatrix<T>  implements PMatrix<T> {
 	public void setDevice(GPUDevice device) {
 		this.device = device;
 	}
-	
+
 	@Override
 	public int size() {
 		return size;
@@ -52,16 +52,17 @@ public abstract class AbstractMatrix<T>  implements PMatrix<T> {
 		PList<O> o = elements().map(mapper).evaluate();
 		return CollectionFactory.matrixfromPList(o, rows, cols);
 	}
-	
+
 	@Override
 	public T reduce(LambdaReducerWithSeed<T> reducer) {
 		return elements().reduce(reducer);
 	}
-	
+
 	@Override
 	public PList<T> reduceLines(LambdaReducer<T> lambdaReducer) {
-		PartialReduce<T> reduceOperation = new PartialReduce<T>(lambdaReducer, this.elements(), this.rows, device);
+		PartialReduce<T> reduceOperation = new PartialReduce<T>(lambdaReducer,
+				this.elements(), this.rows, device);
 		return reduceOperation.getOutput();
 	}
-	
+
 }

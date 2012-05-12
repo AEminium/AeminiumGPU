@@ -4,16 +4,17 @@ import aeminium.gpu.collections.lists.DoubleList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class DoubleMatrix extends AbstractMatrix<Double> implements ConcreteCollection {
+public class DoubleMatrix extends AbstractMatrix<Double> implements
+		ConcreteCollection {
 
 	protected double[] box;
-	
+
 	public DoubleMatrix(int m, int n) {
-		this(new double[m*n], m, n);
+		this(new double[m * n], m, n);
 	}
-	
+
 	public DoubleMatrix(double[] box, int m, int n) {
-		super(m,n);
+		super(m, n);
 		this.box = box;
 	}
 
@@ -31,10 +32,10 @@ public class DoubleMatrix extends AbstractMatrix<Double> implements ConcreteColl
 	public Class<?> getType() {
 		return Double.class;
 	}
-	
+
 	@Override
 	public PList<Double> elements() {
-		return new DoubleList(box,size);
+		return new DoubleList(box, size);
 	}
-		
+
 }

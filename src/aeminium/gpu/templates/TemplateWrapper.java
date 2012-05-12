@@ -9,7 +9,7 @@ public class TemplateWrapper {
 
 	public TemplateWrapper(String file) {
 		fname = "templates/" + file;
-		
+
 	}
 
 	public BufferedReader getReader() {

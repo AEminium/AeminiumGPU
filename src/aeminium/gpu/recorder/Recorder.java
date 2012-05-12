@@ -12,127 +12,139 @@ import aeminium.gpu.utils.TimeoutController;
 import aeminium.gpu.utils.TimeoutController.TimeoutException;
 
 public class Recorder {
-	
+
 	int times = 10;
-	public int[] sizes = new int[] {
-			10, 100, 1000, 10000, 100000, 1000000, 10000000
-	};
-	
+	public int[] sizes = new int[] { 10, 100, 1000, 10000, 100000, 1000000,
+			10000000 };
+
 	GPUDevice dev = new DefaultDeviceFactory().getDevice();
 	RecordTracker tracker = new RecordTracker();
-	
+
 	public static void main(String[] args) {
 		Recorder b = new Recorder();
 		b.run();
 	}
-	
+
 	public void run() {
-		executeExprMultipleSizes("min", new LambdaMapper<Float,Float>() {
+		executeExprMultipleSizes("min", new LambdaMapper<Float, Float>() {
 			@Override
 			public Float map(Float input) {
 				return (float) Math.min(input, 0);
 			}
+
 			public String getSource() {
 				return "return (float) min((float)input, (float)0);";
 			}
 		});
-		executeExprMultipleSizes("unit", new LambdaMapper<Float,Float>() {
+		executeExprMultipleSizes("unit", new LambdaMapper<Float, Float>() {
 			@Override
 			public Float map(Float input) {
 				return input;
 			}
+
 			public String getSource() {
 				return "return input;";
 			}
 		});
-		executeExprMultipleSizes("mul", new LambdaMapper<Float,Float>() {
+		executeExprMultipleSizes("mul", new LambdaMapper<Float, Float>() {
 			@Override
 			public Float map(Float input) {
-				return input*input;
+				return input * input;
 			}
+
 			public String getSource() {
 				return "return input*input;";
 			}
 		});
-		executeExprMultipleSizes("eq", new LambdaMapper<Float,Float>() {
+		executeExprMultipleSizes("eq", new LambdaMapper<Float, Float>() {
 			@Override
 			public Float map(Float input) {
-				return (input==1f) ? 1f : 2f;
+				return (input == 1f) ? 1f : 2f;
 			}
+
 			public String getSource() {
 				return "return (input==1.0) ? 1.0 : 2.0;";
 			}
 		});
-		executeExprMultipleSizes("sin", new LambdaMapper<Float,Float>() {
+		executeExprMultipleSizes("sin", new LambdaMapper<Float, Float>() {
 			@Override
 			public Float map(Float input) {
 				return (float) Math.sin(input);
 			}
+
 			public String getSource() {
 				return "return sin(input);";
 			}
 		});
-		executeExprMultipleSizes("pow", new LambdaMapper<Float,Float>() {
+		executeExprMultipleSizes("pow", new LambdaMapper<Float, Float>() {
 			@Override
 			public Float map(Float input) {
-				return (float) Math.pow(input,4);
+				return (float) Math.pow(input, 4);
 			}
+
 			public String getSource() {
 				return "return pow(input,4);";
 			}
 		});
-		executeExprMultipleSizes("log", new LambdaMapper<Float,Float>() {
+		executeExprMultipleSizes("log", new LambdaMapper<Float, Float>() {
 			@Override
 			public Float map(Float input) {
 				return (float) Math.log(input);
 			}
+
 			public String getSource() {
 				return "return log(input);";
 			}
 		});
-		executeExprMultipleSizes("floor", new LambdaMapper<Float,Float>() {
+		executeExprMultipleSizes("floor", new LambdaMapper<Float, Float>() {
 			@Override
 			public Float map(Float input) {
 				return (float) Math.floor(input);
 			}
+
 			public String getSource() {
 				return "return floor(input);";
 			}
 		});
 		finish();
 	}
-	
+
 	private void finish() {
 		tracker.makeAverages();
 	}
 
-	public void executeExprMultipleSizes(String name, LambdaMapper<Float,Float> expr) {
+	public void executeExprMultipleSizes(String name,
+			LambdaMapper<Float, Float> expr) {
 		PList<Float> input;
 		for (int size : sizes) {
 			input = generateRandomFloatList(size);
 			executeExprMultipleTimes(name, expr, input);
 		}
 	}
-	
-	
-	public void executeExprMultipleTimes(String name, LambdaMapper<Float,Float> expr, PList<Float> input) {
+
+	public void executeExprMultipleTimes(String name,
+			LambdaMapper<Float, Float> expr, PList<Float> input) {
 		System.out.println("Op:" + name + ", Size:" + input.size());
-		LoggerTimer loggerGPU = new LoggerTimer("gpu",times, input.size(), name, tracker);
-		LoggerTimer loggerCPU = new LoggerTimer("cpu",times, input.size(), name, tracker);
+		LoggerTimer loggerGPU = new LoggerTimer("gpu", times, input.size(),
+				name, tracker);
+		LoggerTimer loggerCPU = new LoggerTimer("cpu", times, input.size(),
+				name, tracker);
 		for (int i = 0; i < times; i++) {
 			executeExpr(name, expr, input, loggerGPU, loggerCPU);
 			System.gc();
 		}
 	}
-	
-	public void executeExpr(String name, final LambdaMapper<Float,Float> expr, final PList<Float> input, LoggerTimer loggerGPU, final LoggerTimer loggerCPU) {
+
+	public void executeExpr(String name, final LambdaMapper<Float, Float> expr,
+			final PList<Float> input, LoggerTimer loggerGPU,
+			final LoggerTimer loggerCPU) {
 		// Record GPU Times
 		long t = System.nanoTime();
 		Map<Float, Float> op = new Map<Float, Float>(expr, input, dev);
 		op.setLogger(loggerGPU);
 		dev.execute(op);
 		final long gpuTime = System.nanoTime() - t;
-		
+
 		// Record CPU Times
 		Runnable cpu = new Runnable() {
 			@Override
@@ -148,9 +160,9 @@ public class Recorder {
 		} catch (TimeoutException e) {
 			loggerCPU.saveTime("execution", 2 * gpuTime);
 		}
-			
+
 	}
-	
+
 	private static PList<Float> generateRandomFloatList(int size) {
 		Random r = new Random(123412341234L);
 		PList<Float> t = new FloatList();

@@ -7,27 +7,27 @@ import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public class TestMapToReduce extends TestCase {
-	
+
 	private static int TEST_SIZE = 32;
-	
-	public void testMapToReduce() { 
+
+	public void testMapToReduce() {
 		PList<Integer> example = new IntList();
 		for (int i = 0; i < TEST_SIZE; i++) {
 			example.add(1);
 		}
-		
-		Integer output = example.map(new LambdaMapper<Integer,Integer>() {
+
+		Integer output = example.map(new LambdaMapper<Integer, Integer>() {
 
 			@Override
 			public Integer map(Integer input) {
 				return 2 * input;
 			}
-			
+
 			@Override
 			public String getSource() {
 				return "return 2 * input;";
 			}
-			
+
 		}).reduce(new LambdaReducerWithSeed<Integer>() {
 
 			@Override
@@ -39,46 +39,46 @@ public class TestMapToReduce extends TestCase {
 			public Integer getSeed() {
 				return 0;
 			}
-			
+
 			@Override
 			public String getSource() {
 				return "return reduce_input_first + reduce_input_second;";
 			}
-			
+
 		});
-		assertEquals(2 * TEST_SIZE,output.intValue());
+		assertEquals(2 * TEST_SIZE, output.intValue());
 	}
-	
-	public void testMapToMapToReduce() { 
+
+	public void testMapToMapToReduce() {
 		PList<Integer> example = new IntList();
 		for (int i = 0; i < TEST_SIZE; i++) {
 			example.add(1);
 		}
-		
-		Integer output = example.map(new LambdaMapper<Integer,Integer>() {
+
+		Integer output = example.map(new LambdaMapper<Integer, Integer>() {
 
 			@Override
 			public Integer map(Integer input) {
 				return 2 * input;
 			}
-			
+
 			@Override
 			public String getSource() {
 				return "return 2 * input;";
 			}
-			
-		}).map(new LambdaMapper<Integer,Integer>() {
+
+		}).map(new LambdaMapper<Integer, Integer>() {
 
 			@Override
 			public Integer map(Integer input) {
 				return 3 * input;
 			}
-			
+
 			@Override
 			public String getSource() {
 				return "return 3 * input;";
 			}
-			
+
 		}).reduce(new LambdaReducerWithSeed<Integer>() {
 
 			@Override
@@ -90,34 +90,34 @@ public class TestMapToReduce extends TestCase {
 			public Integer getSeed() {
 				return 0;
 			}
-			
+
 			@Override
 			public String getSource() {
 				return "return reduce_input_first + reduce_input_second;";
 			}
-			
+
 		});
-		assertEquals(2 * 3 * TEST_SIZE,output.intValue());
+		assertEquals(2 * 3 * TEST_SIZE, output.intValue());
 	}
-	
-	public void testMapToReduceWithDifferentTypes() { 
+
+	public void testMapToReduceWithDifferentTypes() {
 		PList<Integer> example = new IntList();
 		for (int i = 0; i < TEST_SIZE; i++) {
 			example.add(1);
 		}
-		
-		Float output = example.map(new LambdaMapper<Integer,Float>() {
+
+		Float output = example.map(new LambdaMapper<Integer, Float>() {
 
 			@Override
 			public Float map(Integer input) {
 				return 2.0f * input;
 			}
-			
+
 			@Override
 			public String getSource() {
 				return "return 2.0 * input;";
 			}
-			
+
 		}).reduce(new LambdaReducerWithSeed<Float>() {
 
 			@Override
@@ -129,14 +129,14 @@ public class TestMapToReduce extends TestCase {
 			public Float getSeed() {
 				return 0f;
 			}
-			
+
 			@Override
 			public String getSource() {
 				return "return reduce_input_first + reduce_input_second;";
 			}
-			
+
 		});
-		assertEquals((float) (2.0 * TEST_SIZE),output.floatValue());
+		assertEquals((float) (2.0 * TEST_SIZE), output.floatValue());
 	}
-	
+
 }
