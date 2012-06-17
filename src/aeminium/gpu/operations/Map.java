@@ -2,8 +2,7 @@ package aeminium.gpu.operations;
 
 import aeminium.gpu.buffers.BufferHelper;
 import aeminium.gpu.collections.factories.CollectionFactory;
-import aeminium.gpu.collections.lazyness.LazyEvaluator;
-import aeminium.gpu.collections.lazyness.LazyPList;
+import aeminium.gpu.collections.lazyness.LazyGPUList;
 import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
@@ -11,10 +10,7 @@ import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 import aeminium.gpu.operations.generator.MapCodeGen;
-import aeminium.gpu.operations.mergers.MapToMapMerger;
-import aeminium.gpu.operations.mergers.MapToReduceMerger;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -116,48 +112,7 @@ public class Map<I, O> extends GenericProgram implements Program {
 	// Output
 
 	public PList<O> getOutput() {
-		final Map<I, O> innerMap = this;
-
-		// Lazy return
-		LazyEvaluator<O> operation = new LazyEvaluator<O>() {
-
-			@Override
-			public PList<O> evaluate() {
-				innerMap.execute();
-				return output;
-			}
-
-			@Override
-			public Class<?> getType() {
-				return BufferHelper.getClassOf(getOutputType());
-			}
-
-			@Override
-			public <K> boolean canMergeWithMap(LambdaMapper<O, K> mapFun) {
-				return true;
-			}
-
-			@Override
-			public <K> PList<K> mergeWithMap(Map<O, K> mapOp) {
-				MapToMapMerger<I, O, K> merger = new MapToMapMerger<I, O, K>(
-						innerMap, mapOp, input);
-				return merger.getOutput();
-			}
-
-			@Override
-			public boolean canMergeWithReduce(LambdaReducerWithSeed<O> reduceFun) {
-				return true;
-			}
-
-			@Override
-			public O mergeWithReducer(Reduce<O> reduceOp) {
-				MapToReduceMerger<I, O> merger = new MapToReduceMerger<I, O>(
-						innerMap, reduceOp, input);
-				return merger.getOutput();
-			}
-
-		};
-		return new LazyPList<O>(operation, input.size());
+		return new LazyGPUList<O>(outbuffer, otherSources, input.size(), device, kernelCompletion);
 	}
 
 	// Utils
