@@ -2,6 +2,7 @@ package aeminium.gpu.buffers;
 
 import java.util.HashMap;
 
+import aeminium.gpu.collections.lazyness.LazyGPUList;
 import aeminium.gpu.collections.lists.BooleanList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.LazyCollection;
@@ -75,6 +76,9 @@ public class BufferHelper {
 
 	public static <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
 			PList<T> list) {
+		if (list instanceof LazyGPUList) {
+			return ((LazyGPUList<T>) list).getCLBuffer();
+		}
 		IBufferFactory f = getFactory(list);
 		return f.createInputOutputBufferFor(context, list);
 	}
@@ -105,6 +109,7 @@ public class BufferHelper {
 
 	public static PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
 			CLEvent ev, int size, PList<?> list) {
+		System.out.println("T: " + list.getType());
 		return extractFromBuffer(outbuffer, q, ev, list.getType()
 				.getSimpleName(), size);
 	}

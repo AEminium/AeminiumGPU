@@ -1,5 +1,7 @@
 package aeminium.gpu.collections.lazyness;
 
+import com.nativelibs4java.opencl.CLBuffer;
+
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
@@ -18,5 +20,7 @@ public interface LazyEvaluator<T> {
 	public boolean canMergeWithReduce(LambdaReducerWithSeed<T> reduceFun);
 
 	public T mergeWithReducer(Reduce<T> reduceOp);
+
+	public CLBuffer<?> getCLBuffer();
 
 }

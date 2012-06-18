@@ -97,9 +97,9 @@ public abstract class GenericProgram implements Program {
 		if (program != null) {
 			program.release();
 		}
-		if (kernelCompletion != null) {
+		/*if (kernelCompletion != null) {
 			kernelCompletion.release();
-		}
+		}*/
 		if (kernel != null) {
 			kernel.release();
 		}

@@ -92,7 +92,12 @@ public class LazyGPUList<T> extends AbstractList<T> implements PList<T> {
 
 	@Override
 	public Class<?> getType() {
-		return cpuList.getType();
+		return BufferHelper.getClassOf(type);
+
+	}
+
+	public CLBuffer<?> getCLBuffer() {
+		return buffer;
 	}
 
 }

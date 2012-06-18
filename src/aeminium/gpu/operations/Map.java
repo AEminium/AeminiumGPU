@@ -95,24 +95,27 @@ public class Map<I, O> extends GenericProgram implements Program {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	// @SuppressWarnings("unchecked")
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
-		output = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q,
-				kernelCompletion, getOutputType(), input.size());
+		// output = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q,
+		//		kernelCompletion, getOutputType(), input.size());
 	}
 
 	@Override
 	public void release() {
 		super.release();
 		this.inbuffer.release();
-		this.outbuffer.release();
 	}
 
 	// Output
 
 	public PList<O> getOutput() {
-		return new LazyGPUList<O>(outbuffer, otherSources, input.size(), device, kernelCompletion);
+		this.execute();
+		if (output != null)
+			return output;
+		else
+			return new LazyGPUList<O>(outbuffer, getOutputType(), input.size(), device, kernelCompletion);
 	}
 
 	// Utils
