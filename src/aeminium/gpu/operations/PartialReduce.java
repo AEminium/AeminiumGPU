@@ -167,5 +167,9 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 	public String getKernelName() {
 		return gen.getReduceKernelName();
 	}
+	
+	public String getFeatures() {
+		return reduceFun.getFeatures() + ",2";
+	}
 
 }

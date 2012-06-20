@@ -37,6 +37,20 @@ public abstract class GenericProgram implements Program {
 			return;
 		}
 		
+		if (System.getenv("FEATURES") != null) {
+			long startT = System.nanoTime();
+			gpuExecution();
+			long gpuT = System.nanoTime() - startT;
+			
+			startT = System.nanoTime();
+			cpuExecution();
+			long cpuT = System.nanoTime() - startT;
+			
+			
+			String features = this.getFeatures() + "," + cpuT + "," + gpuT + "," + (gpuT < cpuT);
+			System.out.println("Features: " + features);
+		}
+		
 		if (System.getenv("BENCH") != null) {
 			boolean isGpu = willRunOnGPU();
 			long startT = System.nanoTime();
@@ -78,7 +92,6 @@ public abstract class GenericProgram implements Program {
 	
 	
 	// Pipeline
-	
 	public void prepareSource(CLContext ctx) {
 		kernel = getOrCreateKernel(ctx);
 	}
@@ -109,6 +122,10 @@ public abstract class GenericProgram implements Program {
 	
 	public abstract String getSource();
 	public abstract String getKernelName();
+	
+	public String getFeatures() {
+		return null;
+	}
 	
 	// Pipeline Helpers
 	
@@ -144,6 +161,7 @@ public abstract class GenericProgram implements Program {
 			return null;
 		}
 	}
+	
 	
 	
 	// Getters/Setters

@@ -252,5 +252,9 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 	public String getKernelName() {
 		return gen.getReduceKernelName();
 	}
+	
+	public String getFeatures() {
+		return reduceFun.getFeatures() + ",1";
+	}
 
 }

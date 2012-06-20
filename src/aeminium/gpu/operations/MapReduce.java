@@ -243,5 +243,30 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	public String getKernelName() {
 		return gen.getReduceKernelName();
 	}
+	
+	public String getFeatures() {
+		if (reduceFun.getFeatures() == null) return mapFun.getFeatures() + ",1";
+		if (mapFun.getFeatures() == null) return reduceFun.getFeatures() + ",2";
+		
+		String[] parts;
+		int[] features = new int[27];
+		parts = mapFun.getFeatures().split(",");
+		int i = 0;
+		for (String p : parts) {
+			int t = Integer.parseInt(p);
+			features[i++] = t;
+		}
+		parts = reduceFun.getFeatures().split(",");
+		i = 0;
+		for (String p : parts) {
+			int t = Integer.parseInt(p);
+			features[i++] += t;
+		}
+		StringBuilder sb = new StringBuilder();
+		for (i=0; i<features.length; i++) {
+			sb.append(features[i] + ",");
+		}
+		return sb.toString() + "3";
+	}
 
 }

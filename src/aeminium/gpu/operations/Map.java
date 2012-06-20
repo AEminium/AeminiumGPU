@@ -82,6 +82,10 @@ public class Map<I,O> extends GenericProgram implements Program {
 		return gen.getMapLambdaName();
 	}
 	
+	public String getFeatures() {
+		return mapFun.getFeatures() + ",0";
+	}
+	
 	@Override
 	public void prepareBuffers(CLContext ctx) {
 		if (input instanceof Range) {
