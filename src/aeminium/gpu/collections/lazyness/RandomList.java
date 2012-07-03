@@ -2,7 +2,6 @@ package aeminium.gpu.collections.lazyness;
 
 import java.util.Random;
 
-import aeminium.gpu.collections.lazyness.helpers.IdentityMapper;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
@@ -14,6 +13,19 @@ import aeminium.gpu.operations.random.MersenneTwisterFast;
 
 public class RandomList implements PList<Float> {
 
+	public class IdentityMapper extends LambdaMapper<Float, Float> {
+
+		@Override
+		public Float map(Float input) {
+			return input;
+		}
+		
+		@Override
+		public String getSource() {
+			return "return input;";
+		}
+	}
+	
 	protected int max;
 	protected int seed;
 	protected GPUDevice device;
@@ -38,7 +50,7 @@ public class RandomList implements PList<Float> {
 
 	@Override
 	public Float reduce(LambdaReducer<Float> reducer) {
-		PList<Float> result = map(new IdentityMapper<Float>());
+		PList<Float> result = map(new IdentityMapper());
 		Reduce<Float> reduceOperation = new Reduce<Float>(reducer, result, device);
 		return reduceOperation.getOutput();
 	}

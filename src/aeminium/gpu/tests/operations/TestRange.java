@@ -50,7 +50,7 @@ public class TestRange extends TestCase {
 			}
 			
 		});
-
+		
 		assertEquals(new Integer(45),output);
 	}
 	
