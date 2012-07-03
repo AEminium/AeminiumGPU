@@ -47,7 +47,7 @@ public abstract class GenericProgram implements Program {
 			long cpuT = System.nanoTime() - startT;
 			
 			
-			String features = this.getFeatures() + "," + cpuT + "," + gpuT + "," + (gpuT < cpuT);
+			String features = this.getFeatures() + "," + cpuT + "," + gpuT + "," + ((gpuT < cpuT) ? 1 : 0);
 			System.out.println("Features: " + features);
 		}
 		
@@ -123,9 +123,7 @@ public abstract class GenericProgram implements Program {
 	public abstract String getSource();
 	public abstract String getKernelName();
 	
-	public String getFeatures() {
-		return null;
-	}
+	public abstract String getFeatures();
 	
 	// Pipeline Helpers
 	

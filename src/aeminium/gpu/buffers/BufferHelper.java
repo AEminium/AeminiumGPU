@@ -117,5 +117,15 @@ public class BufferHelper {
 		}
 		return in;
 	}
+
+	
+	public static Object getSize(int i, String string) {
+		if (string.equals("Integer")) return i*4;
+		if (string.equals("Character")) return i;
+		if (string.equals("Long")) return i*8;
+		if (string.equals("Float")) return i*4;
+		if (string.equals("Double")) return i*8;
+		return i*4;
+	}
 	
 }

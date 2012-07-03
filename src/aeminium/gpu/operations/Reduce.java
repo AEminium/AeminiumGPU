@@ -10,6 +10,7 @@ import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.ReduceCodeGen;
 import aeminium.gpu.operations.generator.ReduceTemplateSource;
 import aeminium.gpu.operations.utils.ExtractTypes;
+import aeminium.gpu.operations.utils.FeatureHelper;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -254,7 +255,8 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 	}
 	
 	public String getFeatures() {
-		return reduceFun.getFeatures() + ",1";
+		return FeatureHelper.getFullFeatures(reduceFun.getFeatures(), input.size(),
+				getInputType(), 1, getOutputType(), 1);
 	}
 
 }

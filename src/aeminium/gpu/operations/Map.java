@@ -19,6 +19,7 @@ import aeminium.gpu.operations.generator.MapCodeGen;
 import aeminium.gpu.operations.mergers.MapToMapMerger;
 import aeminium.gpu.operations.mergers.MapToReduceMerger;
 import aeminium.gpu.operations.random.MersenneTwisterGPU;
+import aeminium.gpu.operations.utils.FeatureHelper;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -83,7 +84,8 @@ public class Map<I,O> extends GenericProgram implements Program {
 	}
 	
 	public String getFeatures() {
-		return mapFun.getFeatures() + ",0";
+		return FeatureHelper.getFullFeatures(mapFun.getFeatures(), input.size(),
+				getInputType(), input.size(), getOutputType(), 0);
 	}
 	
 	@Override

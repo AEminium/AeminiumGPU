@@ -12,6 +12,7 @@ import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.ReduceCodeGen;
 import aeminium.gpu.operations.generator.ReduceTemplateSource;
 import aeminium.gpu.operations.utils.ExtractTypes;
+import aeminium.gpu.operations.utils.FeatureHelper;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -169,7 +170,8 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 	}
 	
 	public String getFeatures() {
-		return reduceFun.getFeatures() + ",2";
+		return FeatureHelper.getFullFeatures(reduceFun.getFeatures(), input.size(),
+				getInputType(), outputSize, getOutputType(), 2);
 	}
 
 }

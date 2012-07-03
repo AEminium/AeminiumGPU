@@ -137,4 +137,9 @@ public class MersenneTwisterGPU extends GenericProgram {
 	public CLBuffer<?> getOutputBuffer() {
 		return outputFinal;
 	}
+
+	@Override
+	public String getFeatures() {
+		return null; // TODO: Mersenne Twister Cost
+	}
 }
