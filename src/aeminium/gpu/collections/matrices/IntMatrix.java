@@ -2,8 +2,9 @@ package aeminium.gpu.collections.matrices;
 
 import aeminium.gpu.collections.lists.IntList;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class IntMatrix extends AbstractMatrix<Integer> {
+public class IntMatrix extends AbstractMatrix<Integer> implements ConcreteCollection {
 
 	protected int[] box;
 	

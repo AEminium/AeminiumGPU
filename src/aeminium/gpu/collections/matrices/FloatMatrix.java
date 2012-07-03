@@ -2,8 +2,9 @@ package aeminium.gpu.collections.matrices;
 
 import aeminium.gpu.collections.lists.FloatList;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class FloatMatrix extends AbstractMatrix<Float> {
+public class FloatMatrix extends AbstractMatrix<Float> implements ConcreteCollection {
 
 	protected float[] box;
 	

@@ -8,6 +8,11 @@
 // Specific Reduce Lambda Function
 {{reduce_lambda_def}}
 
+inline {{output_type}} get_accumulator() {
+	{{seed_source}}
+}
+
+
 __kernel void {{reduce_kernel_name}}(                  
    __global const {{input_type}}* reduce_input,
    __global {{output_type}}* reduce_output,
@@ -21,10 +26,8 @@ __kernel void {{reduce_kernel_name}}(
         long inputStart = block * blockLength;
         long inputEnd = min(inputStart + blockLength, dataLength);
         
-        int inputOffset = inputStart;
-        {{output_type}} total = ({{output_type}}) {{get_input}};
-        inputOffset++;
-        for (; inputOffset < inputEnd; inputOffset++)
+        {{output_type}} total = ({{output_type}}) get_accumulator();
+        for (int inputOffset = inputStart; inputOffset < inputEnd; inputOffset++)
                 MERGE(total, {{get_input}});
         
         reduce_output[block] = total;

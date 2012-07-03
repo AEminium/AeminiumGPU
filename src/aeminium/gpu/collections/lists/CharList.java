@@ -2,7 +2,9 @@ package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
-public class CharList extends AbstractList<Character> {
+import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
+
+public class CharList extends AbstractList<Character> implements ConcreteCollection {
 
 	protected char[] box;
 	

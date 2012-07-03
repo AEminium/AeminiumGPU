@@ -2,7 +2,9 @@ package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
-public class LongList extends AbstractList<Long> {
+import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
+
+public class LongList extends AbstractList<Long> implements ConcreteCollection {
 
 	protected long[] box;
 	

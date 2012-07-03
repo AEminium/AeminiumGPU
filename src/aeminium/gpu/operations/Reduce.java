@@ -47,6 +47,9 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 		this.reduceFun = reduceFun;
 		this.setOtherSources(other);
 		gen = new ReduceCodeGen(this);
+		if (reduceFun instanceof LambdaReducer) {
+			gen.setHasSeed(true);
+		}
 	}
 
 	// only for subclasses

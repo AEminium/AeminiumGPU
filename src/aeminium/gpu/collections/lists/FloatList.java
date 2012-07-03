@@ -2,7 +2,9 @@ package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
-public class FloatList extends AbstractList<Float> {
+import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
+
+public class FloatList extends AbstractList<Float> implements ConcreteCollection {
 
 	protected float[] box;
 	

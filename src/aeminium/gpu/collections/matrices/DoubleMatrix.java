@@ -2,8 +2,9 @@ package aeminium.gpu.collections.matrices;
 
 import aeminium.gpu.collections.lists.DoubleList;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
-public class DoubleMatrix extends AbstractMatrix<Double> {
+public class DoubleMatrix extends AbstractMatrix<Double> implements ConcreteCollection {
 
 	protected double[] box;
 	
