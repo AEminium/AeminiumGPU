@@ -12,7 +12,7 @@ import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaNoSeedReducer;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -47,7 +47,7 @@ public class Range implements PList<Integer>, LazyCollection {
 	}
 	
 	@Override
-	public Integer reduce(LambdaReducer<Integer> reducer) {
+	public Integer reduce(LambdaNoSeedReducer<Integer> reducer) {
 		PList<Integer> result = map(new IntegerIdentityMapper());
 		Reduce<Integer> reduceOperation = new Reduce<Integer>(reducer, result, device);
 		return reduceOperation.getOutput();

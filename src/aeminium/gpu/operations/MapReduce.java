@@ -10,6 +10,7 @@ import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaMapper;
+import aeminium.gpu.operations.functions.LambdaNoSeedReducer;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.MapReduceCodeGen;
 import aeminium.gpu.operations.utils.ExtractTypes;
@@ -29,7 +30,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	protected PList<I> input;
 	private O output;
 	protected LambdaMapper<I,O> mapFun;
-	protected LambdaReducer<O> reduceFun;
+	protected LambdaNoSeedReducer<O> reduceFun;
 	
 	protected CLBuffer<?> inbuffer;
 	private CLBuffer<O> outbuffer;
@@ -42,11 +43,11 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	
 	// Constructors
 	
-	public MapReduce(LambdaMapper<I,O> mapper, LambdaReducer<O> reducer, PList<I> list, String other, GPUDevice dev) {
+	public MapReduce(LambdaMapper<I,O> mapper, LambdaNoSeedReducer<O> lambdaNoSeedReducer, PList<I> list, String other, GPUDevice dev) {
 		this.device = dev;
 		this.input = list;
 		this.mapFun = mapper;
-		this.reduceFun = reducer;
+		this.reduceFun = lambdaNoSeedReducer;
 		this.setOtherSources(other);
 		gen = new MapReduceCodeGen(this);
 		if (list instanceof Range) {
@@ -64,9 +65,25 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		return OpenCLDecider.useGPU(input.size(), 1, mapFun.getSource() + reduceFun.getSource(),  mergeComplexities(mapFun.getSourceComplexity(), reduceFun.getSourceComplexity()));
 	}
 	
-	
 	public void cpuExecution() {
-		O accumulator = this.getReduceFun().getSeed();
+		if (reduceFun instanceof LambdaReducer) {
+			cpuExecutionWithSeed();
+		} else {
+			cpuExecutionWithoutSeed();
+		}
+	}
+
+	// Pipeline
+
+	private void cpuExecutionWithoutSeed() {
+		output = mapFun.map(input.get(0));
+		for (int i = 1; i < input.size(); i++) {
+			output = reduceFun.combine(mapFun.map(input.get(i)), output);
+		}
+	}
+
+	private void cpuExecutionWithSeed() {
+		O accumulator = ((LambdaReducer<O>)this.getReduceFun()).getSeed();
 		for (int i = 0; i < input.size(); i++) {
 			accumulator = reduceFun.combine( mapFun.map(input.get(i)), accumulator);
 		}
@@ -197,7 +214,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 	// Utils
 	
 	public String getOpenCLSeed() {
-		return reduceFun.getSeedSource();
+		return ((LambdaReducer<?>)reduceFun).getSeedSource();
 	}
 
 	
@@ -224,7 +241,7 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		this.output = output;
 	}
 
-	public LambdaReducer<O> getReduceFun() {
+	public LambdaNoSeedReducer<O> getReduceFun() {
 		return reduceFun;
 	}
 

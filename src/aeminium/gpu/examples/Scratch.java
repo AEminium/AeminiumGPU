@@ -5,7 +5,7 @@ import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaNoSeedReducer;
 
-public class MapReduceExample {
+public class Scratch {
 	public static void main(String[] args) {
 		int N = 1034;
 		
@@ -23,6 +23,7 @@ public class MapReduceExample {
 			}
 			
 		});
+		input.get(0);
 		int sum = input.reduce(new LambdaNoSeedReducer<Integer>(){
 
 			@Override

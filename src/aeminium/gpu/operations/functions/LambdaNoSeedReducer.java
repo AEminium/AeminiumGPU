@@ -7,7 +7,7 @@ public abstract class LambdaNoSeedReducer<I> implements NoSeedReducer<I>, GPUFun
 	
 	private String id = null;
 	
-	/*  This method should be overridden by the Aeminium GPU Compiler */
+	/*  This methods should be overridden by the Aeminium GPU Compiler */
 	public String getSource() {
 		return null;
 	}
@@ -16,12 +16,14 @@ public abstract class LambdaNoSeedReducer<I> implements NoSeedReducer<I>, GPUFun
 		return null;
 	}
 	
-	/*  This method should be overridden by the Aeminium GPU Compiler */
 	public String[] getParameters() {
 		return new String[] { "reduce_input_first", "reduce_input_second" };
 	}
 	
-	/*  This method should be overridden by the Aeminium GPU Compiler */
+	public String getFeatures() {
+		return null;
+	}
+	
 	public String getId() {
 		if (id == null)
 			id = UniqCounter.getNewId(); 

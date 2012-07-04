@@ -11,7 +11,7 @@ import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.operations.functions.LambdaReducer;
+import aeminium.gpu.operations.functions.LambdaNoSeedReducer;
 import aeminium.gpu.operations.generator.MapCodeGen;
 import aeminium.gpu.operations.mergers.MapToMapMerger;
 import aeminium.gpu.operations.mergers.MapToReduceMerger;
@@ -145,7 +145,7 @@ public class Map<I,O> extends GenericProgram implements Program {
 			}
 
 			@Override
-			public boolean canMergeWithReduce(LambdaReducer<O> reduceFun) {
+			public boolean canMergeWithReduce(LambdaNoSeedReducer<O> reduceFun) {
 				return true;
 			}
 

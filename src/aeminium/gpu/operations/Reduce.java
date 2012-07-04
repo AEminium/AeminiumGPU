@@ -6,6 +6,7 @@ import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.executables.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
+import aeminium.gpu.operations.functions.LambdaNoSeedReducer;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.generator.ReduceCodeGen;
 import aeminium.gpu.operations.generator.ReduceTemplateSource;
@@ -23,7 +24,7 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 
 	protected PList<O> input;
 	private O output;
-	protected LambdaReducer<O> reduceFun;
+	protected LambdaNoSeedReducer<O> reduceFun;
 
 	protected CLBuffer<?> inbuffer;
 	private CLBuffer<?> outbuffer;
@@ -36,11 +37,11 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 
 	// Constructors
 
-	public Reduce(LambdaReducer<O> reduceFun2, PList<O> list, GPUDevice dev) {
+	public Reduce(LambdaNoSeedReducer<O> reduceFun2, PList<O> list, GPUDevice dev) {
 		this(reduceFun2, list, "", dev);
 	}
 
-	public Reduce(LambdaReducer<O> reduceFun, PList<O> list, String other,
+	public Reduce(LambdaNoSeedReducer<O> reduceFun, PList<O> list, String other,
 			GPUDevice dev) {
 		this.device = dev;
 		this.input = list;
@@ -53,11 +54,11 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 	}
 
 	// only for subclasses
-	protected Reduce(LambdaReducer<O> reduceFun2, GPUDevice dev) {
+	protected Reduce(LambdaNoSeedReducer<O> reduceFun2, GPUDevice dev) {
 		this(reduceFun2, "", dev);
 	}
 
-	protected Reduce(LambdaReducer<O> reduceFun2, String other, GPUDevice dev) {
+	protected Reduce(LambdaNoSeedReducer<O> reduceFun2, String other, GPUDevice dev) {
 		this.device = dev;
 		this.reduceFun = reduceFun2;
 		this.setOtherSources(other);
@@ -70,13 +71,29 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 	}
 	
 	public void cpuExecution() {
-		output = this.getReduceFun().getSeed();
-		for (int i = 0; i < input.size(); i++) {
-			output = reduceFun.combine(input.get(i), output);
+		if (reduceFun instanceof LambdaReducer) {
+			cpuExecutionWithSeed();
+		} else {
+			cpuExecutionWithoutSeed();
 		}
 	}
 
 	// Pipeline
+
+	private void cpuExecutionWithoutSeed() {
+		output = input.get(0);
+		for (int i = 1; i < input.size(); i++) {
+			output = reduceFun.combine(input.get(i), output);
+		}
+	}
+
+	private void cpuExecutionWithSeed() {
+		LambdaReducer<O> fun = (LambdaReducer<O>) this.getReduceFun();
+		output = fun.getSeed();
+		for (int i = 0; i < input.size(); i++) {
+			output = reduceFun.combine(input.get(i), output);
+		}
+	}
 
 	@Override
 	public String getSource() {
@@ -219,7 +236,11 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 	// Utils
 
 	public String getOpenCLSeed() {
-		return reduceFun.getSeedSource();
+		if (reduceFun instanceof LambdaReducer)
+			return ((LambdaReducer<?>)reduceFun).getSeedSource();
+		else {
+			return "return 0;";
+		}
 	}
 
 	public String getInputType() {
@@ -244,7 +265,7 @@ public class Reduce<O> extends GenericProgram implements Program, ReduceTemplate
 		this.output = output;
 	}
 
-	public LambdaReducer<O> getReduceFun() {
+	public LambdaNoSeedReducer<O> getReduceFun() {
 		return reduceFun;
 	}
 
