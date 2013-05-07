@@ -72,8 +72,7 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 	}
 
 	protected boolean willRunOnGPU() {
-		return OpenCLDecider.useGPU(input.size(), outputSize,
-				reduceFun.getSource(), reduceFun.getSourceComplexity());
+		return OpenCLDecider.useGPU(input.size(), this.getFeatures());
 	}
 
 	@SuppressWarnings("unchecked")

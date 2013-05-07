@@ -55,14 +55,8 @@ public class MapReduce<I,O> extends GenericProgram implements Program {
 		}
 	}
 	
-	private String mergeComplexities(String one, String two) {
-		if (one == null || one.length() == 0) return two;
-		if (two == null || two.length() == 0) return one;
-		return one + "+" + two;
-	}
-	
 	protected boolean willRunOnGPU() {
-		return OpenCLDecider.useGPU(input.size(), 1, mapFun.getSource() + reduceFun.getSource(),  mergeComplexities(mapFun.getSourceComplexity(), reduceFun.getSourceComplexity()));
+		return OpenCLDecider.useGPU(input.size(), this.getFeatures());
 	}
 	
 	public void cpuExecution() {
