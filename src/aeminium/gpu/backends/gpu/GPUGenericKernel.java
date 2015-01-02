@@ -1,4 +1,4 @@
-package aeminium.gpu.executables;
+package aeminium.gpu.backends.gpu;
 
 import aeminium.gpu.devices.GPUDevice;
 
@@ -9,89 +9,57 @@ import com.nativelibs4java.opencl.CLKernel;
 import com.nativelibs4java.opencl.CLProgram;
 import com.nativelibs4java.opencl.CLQueue;
 
-public abstract class GenericProgram implements Program {
+public abstract class GPUGenericKernel implements GPUKernel {
 	protected GPUDevice device;
 	protected CLProgram program;
 	protected CLKernel kernel;
 	protected CLEvent kernelCompletion;
-	protected ProgramLogger logger = null;
-
+	
 	protected String otherSources;
+
+
 	protected long startTime;
-
-	protected abstract boolean willRunOnGPU();
-
-	public abstract void cpuExecution();
-
-	public void gpuExecution() {
-		device.execute(this);
+	
+	protected int start;
+	protected int end;
+	protected int size;
+	
+	@Override
+	public void setLimits(int start, int end) {
+		this.start = start;
+		this.end = end;
+		this.size = end - size;
 	}
-
+	
+	@Override
 	public void execute() {
-		/* Do we have a GPU available? */
-
-		if (device == null) {
-			if (System.getenv("DEBUG") != null) {
-				System.out.println("No GPU device available.");
-			}
-			cpuExecution();
-			return;
-		}
-
-		if (System.getenv("BENCH") != null) {
-			boolean isGpu = willRunOnGPU();
-			long startT = System.nanoTime();
-			gpuExecution();
-			long gpuT = System.nanoTime() - startT;
-
-			startT = System.nanoTime();
-			cpuExecution();
-			long cpuT = System.nanoTime() - startT;
-			System.out.println("> GPUreal: " + gpuT);
-			System.out.println("> CPUreal: " + cpuT);
-
-			if (isGpu == (gpuT < cpuT)) {
-				System.out.println("> GPUvsCPU: right");
-			} else {
-				System.out.println("> GPUvsCPU: wrong");
-			}
-			return;
-		}
-
-		if (System.getenv("FORCE") != null) {
-			if (System.getenv("FORCE").equals("GPU")) {
-				gpuExecution();
-			} else {
-				cpuExecution();
-			}
-			return;
-		}
-
-		/* Regular decision */
-		if (willRunOnGPU()) {
-			gpuExecution();
-		} else {
-			cpuExecution();
-		}
+		device.startExecution(this);
 	}
-
-	// Pipeline
-
+	
+	@Override
+	public void waitForExecution() {
+		device.awaitExecution(this);
+	}
+	
+	@Override
 	public void prepareSource(CLContext ctx) {
 		kernel = getOrCreateKernel(ctx);
 	}
-
 	abstract public void prepareBuffers(CLContext ctx);
 
 	abstract public void execute(CLContext ctx, CLQueue q);
 
 	abstract public void retrieveResults(CLContext ctx, CLQueue q);
-
+	
 	@Override
 	public void waitExecution(CLContext context, CLQueue queue) {
 		kernelCompletion.waitFor();
 		kernelCompletion = null;
 	}
+	
+	// CL Definitions
+	public abstract String getSource();
+	public abstract String getKernelName();
 
 	public void release() {
 		if (program != null) {
@@ -105,15 +73,8 @@ public abstract class GenericProgram implements Program {
 		}
 		System.gc();
 	}
-
-	// CL Definitions
-
-	public abstract String getSource();
-
-	public abstract String getKernelName();
-
+	
 	// Pipeline Helpers
-
 	protected CLKernel getOrCreateKernel(CLContext ctx) {
 		return getOrCreateKernel(ctx, getKernelName());
 	}
@@ -122,7 +83,7 @@ public abstract class GenericProgram implements Program {
 		program = compileProgram(ctx);
 		return getKernel(program, kernelName);
 	}
-
+	
 	protected CLProgram compileProgram(CLContext ctx) {
 		try {
 			if (System.getenv("OPENCL") != null) {
@@ -146,31 +107,16 @@ public abstract class GenericProgram implements Program {
 			return null;
 		}
 	}
-
-	// Getters/Setters
-
-	public void setDevice(GPUDevice dev) {
-		device = dev;
-	}
-
-	public GPUDevice getDevice() {
-		return device;
+	
+	public String getOtherSources() {
+		return otherSources;
 	}
 
 	public void setOtherSources(String otherSources) {
 		this.otherSources = otherSources;
 	}
-
-	public String getOtherSources() {
-		return otherSources;
+	
+	public void setDevice(GPUDevice dev) {
+		this.device = dev;
 	}
-
-	public ProgramLogger getLogger() {
-		return logger;
-	}
-
-	public void setLogger(ProgramLogger logger) {
-		this.logger = logger;
-	}
-
 }

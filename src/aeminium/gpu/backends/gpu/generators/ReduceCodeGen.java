@@ -1,13 +1,13 @@
-package aeminium.gpu.operations.generator;
+package aeminium.gpu.backends.gpu.generators;
 
 import java.util.HashMap;
 
-import aeminium.gpu.buffers.BufferHelper;
+import aeminium.gpu.backends.gpu.buffers.BufferHelper;
 import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
 
 @SuppressWarnings("rawtypes")
-public class ReduceCodeGen {
+public class ReduceCodeGen implements GenericReduceCodeGen {
 
 	private String inputType;
 	private String outputType;
@@ -71,9 +71,9 @@ public class ReduceCodeGen {
 		mapping.put("other_sources", otherSources);
 
 		if (isRange) {
-			mapping.put("get_input", "reduce_input[inputOffset]");
-		} else {
 			mapping.put("get_input", "inputOffset");
+		} else {
+			mapping.put("get_input", "reduce_input[inputOffset]");
 		}
 
 		if (hasSeed) {
@@ -105,6 +105,16 @@ public class ReduceCodeGen {
 
 	public void setHasSeed(boolean b) {
 		hasSeed = b;
+	}
+
+	@Override
+	public String getMapLambdaSource() {
+		return null;
+	}
+
+	@Override
+	public String getMapLambdaName() {
+		return null;
 	}
 
 }

@@ -1,4 +1,4 @@
-package aeminium.gpu.operations.utils;
+package aeminium.gpu.utils;
 
 public class UniqCounter {
 

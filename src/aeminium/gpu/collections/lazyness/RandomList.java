@@ -1,7 +1,10 @@
 package aeminium.gpu.collections.lazyness;
 
+import java.util.Iterator;
 import java.util.Random;
 
+import aeminium.gpu.backends.cpu.MersenneTwisterFast;
+import aeminium.gpu.backends.gpu.MersenneTwisterGPU;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.matrices.PMatrix;
@@ -13,8 +16,6 @@ import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.operations.random.MersenneTwisterFast;
-import aeminium.gpu.operations.random.MersenneTwisterGPU;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -147,10 +148,35 @@ public class RandomList implements PList<Float>, LazyCollection {
 			public CLBuffer<?> getInputBuffer(CLContext ctx) {
 				MersenneTwisterGPU mt = new MersenneTwisterGPU(device, size(),
 						getSeed());
-				device.execute(mt);
+				device.startExecution(mt);
+				device.awaitExecution(mt);
 				return mt.getOutputBuffer();
 			}
 
 		};
+	}
+
+	@Override
+	public Iterator<Float> iterator() {
+		return new Iterator<Float>() {
+			
+			private int counter = 0;
+
+			@Override
+			public boolean hasNext() {
+				return counter < size();
+			}
+
+			@Override
+			public Float next() {
+				return get(counter++);
+			}
+			
+		};
+	}
+
+	@Override
+	public PList<Float> extend(PList<Float> extra) {
+		throw new ReadOnlyListException();
 	}
 }

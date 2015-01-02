@@ -9,7 +9,8 @@
     <property name="templates.dir"     value="templates"/>
 	<property name="verbose" value="false" />
    
-    <property name="main-class"  value="aeminium.gpu.examples.RandomExample"/>
+    <property name="main-class"  value="aeminium.gpu.examples.ReduceExample"/>
+	<property name="info-class"  value="aeminium.gpu.utils.HardwareReport"/>
 	<property name="bench-class"  value="aeminium.gpu.recorder.Recorder"/>
      <property name="lib.dir"     value="lib"/>
    
@@ -43,9 +44,26 @@
 			<zipgroupfileset dir="${lib.dir}" includes="**/*.jar" />
         </jar>  
     </target>  
+	
+	<target name="fetchruntime">
+		<exec executable="ant" dir="../AeminiumRuntime/">
+			<arg value="jar" />
+		</exec>
+		<copy file="../AeminiumRuntime/dist/AeminiumRuntime.jar" todir="${lib.dir}" />
+	</target>
    
     <target name="run" depends="jar">  
         <java fork="true" classname="${main-class}">
+        	<jvmarg value="-Xms512m" />
+			<jvmarg value="-Xmx1536m" />
+            <classpath>  
+                <path refid="classpath"/>  
+                <path location="${jar.dir}/${ant.project.name}.jar"/>  
+            </classpath>  
+        </java>  
+    </target>
+    <target name="info" depends="jar">  
+        <java fork="true" classname="${info-class}">
         	<jvmarg value="-Xms512m" />
 			<jvmarg value="-Xmx1536m" />
             <classpath>  

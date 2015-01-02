@@ -1,4 +1,4 @@
-package aeminium.gpu.operations.generator;
+package aeminium.gpu.backends.gpu.generators;
 
 import aeminium.gpu.operations.functions.LambdaReducer;
 

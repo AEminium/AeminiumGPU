@@ -1,39 +1,29 @@
 package aeminium.gpu.operations.deciders;
 
+import aeminium.gpu.devices.CPUDevice;
 import aeminium.gpu.recorder.Configuration;
 
 public class OpenCLDecider {
 
 	private static final int LOOP_LIMIT = 20;
 
-	public static boolean useGPU(int size, int rsize, String code,
+	public static int getSplitPoint(int units, int size, int rsize, String code,
 			String complexity) {
-		boolean b = decide(size, rsize, code, complexity);
-		if (System.getenv("BENCH") != null) {
-			if (b) {
-				System.out.println("> GPUchoice");
-			} else {
-				System.out.println("> CPUchoice");
-			}
-		}
-		return b;
+		return OpenCLDecider.decide(units, size, rsize, code, complexity, false);
 	}
 
-	public static boolean decide(int size, int rsize, String code,
-			String complexity) {
-		return OpenCLDecider.decide(size, rsize, code, complexity, false);
-	}
-
-	public static boolean decide(int size, int rsize, String code,
+	public static int decide(int units, int size, int rsize, String code,
 			String complexity, boolean isRange) {
 		if (System.getProperties().containsKey("ForceGPU"))
-			return true;
+			return 0;
 		if (System.getProperties().containsKey("ForceCPU"))
-			return false;
+			return units;
 
+		int tasks_per_cpu_core = units / (10 * CPUDevice.getParallelism());
+		int defaultSplit = units - (tasks_per_cpu_core * CPUDevice.getParallelism());
+		
 		if (complexity == null || complexity.length() == 0) {
-			// FIXME: best option for base case.
-			return size > 10000;
+			return defaultSplit;
 		}
 
 		try {
@@ -46,14 +36,18 @@ public class OpenCLDecider {
 				System.out.println("> GPUexp: " + gpuTime);
 				System.out.println("> CPUexp: " + cpuTime);
 			}
-			return gpuTime < cpuTime;
-
+			
+			if (cpuTime < gpuTime) {
+				return 0;
+			} else {
+				return defaultSplit;
+			}
 		} catch (Exception e) {
 			if (System.getenv("DEBUG") != null) {
 				System.out.println("Failed to to consider GPU vs CPU.");
 				e.printStackTrace();
 			}
-			return true;
+			return 0;
 		}
 	}
 

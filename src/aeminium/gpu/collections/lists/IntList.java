@@ -100,4 +100,18 @@ public class IntList extends AbstractList<Integer> implements
 		return Integer.class;
 	}
 
+	@Override
+	public PList<Integer> extend(PList<Integer> extra) {
+		if (extra instanceof IntList) {
+			IntList other = (IntList) extra;
+			ensureNMore(other.size());
+			System.arraycopy(other.box, 0, box, size, extra.size());
+		} else {
+			for (Integer b : extra) {
+				this.add(b);
+			}
+		}
+		return null;
+	}
+	
 }

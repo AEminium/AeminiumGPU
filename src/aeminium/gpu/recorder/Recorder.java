@@ -141,8 +141,8 @@ public class Recorder {
 		// Record GPU Times
 		long t = System.nanoTime();
 		Map<Float, Float> op = new Map<Float, Float>(expr, input, dev);
-		op.setLogger(loggerGPU);
-		dev.execute(op);
+		dev.setLogger(loggerGPU);
+		op.gpuExecution(0, input.size());
 		final long gpuTime = System.nanoTime() - t;
 
 		// Record CPU Times
@@ -151,7 +151,7 @@ public class Recorder {
 			public void run() {
 				Map<Float, Float> op = new Map<Float, Float>(expr, input, dev);
 				long t = System.nanoTime();
-				op.cpuExecution();
+				op.cpuExecution(0, input.size());
 				loggerCPU.saveTime("execution", System.nanoTime() - t);
 			}
 		};

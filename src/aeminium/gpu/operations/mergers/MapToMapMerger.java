@@ -34,22 +34,18 @@ public class MapToMapMerger<I, M, O> {
 					@Override
 					public String getSource() {
 						return String.format("return %s(%s(input));",
-								second.getMapOpenCLName(),
-								first.getMapOpenCLName());
+								second.getGPUMap().getMapOpenCLName(),
+								first.getGPUMap().getMapOpenCLName());
 					}
 				};
 
 				StringBuilder extraCode = new StringBuilder();
-				extraCode.append(first.getOtherSources());
-				extraCode.append(second.getOtherSources());
-				extraCode.append(first.getMapOpenCLSource());
-				extraCode.append(second.getMapOpenCLSource());
+				extraCode.append(first.getGPUMap().getOtherSources());
+				extraCode.append(second.getGPUMap().getOtherSources());
+				extraCode.append(first.getGPUMap().getMapOpenCLSource());
+				extraCode.append(second.getGPUMap().getMapOpenCLSource());
 				Map<I, O> op = new Map<I, O>(fakeLambda, current,
-						extraCode.toString(), first.getDevice()) {
-					public String getOutputType() {
-						return second.getOutputType();
-					}
-				};
+						extraCode.toString(), first.getDevice(), second.getGPUMap().getOutputType());
 				return op;
 			}
 

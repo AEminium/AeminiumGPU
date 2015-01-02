@@ -1,4 +1,4 @@
-package aeminium.gpu.buffers;
+package aeminium.gpu.backends.gpu.buffers;
 
 import java.util.HashMap;
 
@@ -62,7 +62,7 @@ public class BufferHelper {
 	}
 
 	public static <T> CLBuffer<?> createInputBufferFor(CLContext context,
-			PList<T> list) {
+			PList<T> list, int size) {
 		if (list instanceof LazyCollection) {
 			LazyCollection linput = (LazyCollection) list;
 			return linput.getGPUHelper().getInputBuffer(context);
@@ -75,8 +75,24 @@ public class BufferHelper {
 
 	public static <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
 			PList<T> list) {
-		IBufferFactory f = getFactory(list);
-		return f.createInputOutputBufferFor(context, list);
+		if (list instanceof LazyCollection) {
+			LazyCollection linput = (LazyCollection) list;
+			return linput.getGPUHelper().getInputBuffer(context);
+		} else {
+			IBufferFactory f = getFactory(list);
+			return f.createInputBufferFor(context, list);
+		}
+	}
+	
+	public static <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			PList<T> list, int size) {
+		if (list instanceof LazyCollection) {
+			LazyCollection linput = (LazyCollection) list;
+			return linput.getGPUHelper().getInputBuffer(context);
+		} else {
+			IBufferFactory f = getFactory(list);
+			return f.createInputBufferFor(context, list);
+		}
 	}
 
 	public static <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,

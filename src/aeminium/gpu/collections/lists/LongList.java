@@ -6,7 +6,7 @@ import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
 public class LongList extends AbstractList<Long> implements ConcreteCollection {
 
-	protected long[] box;
+	public long[] box;
 
 	public LongList() {
 		this(new long[DEFAULT_SIZE], 0);
@@ -100,4 +100,16 @@ public class LongList extends AbstractList<Long> implements ConcreteCollection {
 		}
 	}
 
+	@Override
+	public PList<Long> extend(PList<Long> extra) {
+		if (extra instanceof LongList) {
+			LongList other = (LongList) extra;
+			ensureNMore(extra.size());
+			System.arraycopy(other.box, 0, box, size, other.size());
+			size += extra.size();
+		} else {
+			for (int i=0; i<extra.size(); i++) this.add(extra.get(i));
+		}
+		return this;
+	}
 }

@@ -1,4 +1,4 @@
-package aeminium.gpu.operations.random;
+package aeminium.gpu.backends.gpu;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,7 +7,6 @@ import java.util.HashMap;
 import org.bridj.Pointer;
 
 import aeminium.gpu.devices.GPUDevice;
-import aeminium.gpu.executables.GenericProgram;
 import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
 import aeminium.gpu.utils.PathHelper;
@@ -20,7 +19,7 @@ import com.nativelibs4java.opencl.CLMem;
 import com.nativelibs4java.opencl.CLMem.Usage;
 import com.nativelibs4java.opencl.CLQueue;
 
-public class MersenneTwisterGPU extends GenericProgram {
+public class MersenneTwisterGPU extends GPUGenericKernel {
 
 	private int PATH_N = 24000;
 	private int MT_RNG_COUNT = 4096;
@@ -95,7 +94,7 @@ public class MersenneTwisterGPU extends GenericProgram {
 			for (int i = 0; i < MT_RNG_COUNT; i++) {
 				fis.read(buffer);
 				p.setBytesAtOffset(c, buffer);
-				p.setIntAtOffset(c + buffer.length - 4, seed); // Replace last
+				p.setIntAtIndex(c + buffer.length - 4, seed); // Replace last
 																// parameter by
 																// seed.
 				c += buffer.length;
@@ -133,16 +132,6 @@ public class MersenneTwisterGPU extends GenericProgram {
 		return ((a % b) != 0) ? (a - a % b + b) : a;
 	}
 
-	@Override
-	protected boolean willRunOnGPU() {
-		return true;
-	}
-
-	@Override
-	public void cpuExecution() {
-		// Will never be called
-		return;
-	}
 
 	public CLBuffer<?> getOutputBuffer() {
 		return outputFinal;

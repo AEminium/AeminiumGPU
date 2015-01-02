@@ -1,5 +1,7 @@
 package aeminium.gpu.collections.lists;
 
+import java.util.Iterator;
+
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.matrices.PMatrix;
 import aeminium.gpu.collections.properties.Mappable;
@@ -12,7 +14,7 @@ import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public abstract class AbstractList<T> implements PList<T>, Mappable<T>,
-		Reductionable<T> {
+		Reductionable<T>, Iterable<T> {
 
 	protected static final int DEFAULT_SIZE = 10000;
 	protected static final int INCREMENT_SIZE = 1000;
@@ -66,6 +68,25 @@ public abstract class AbstractList<T> implements PList<T>, Mappable<T>,
 
 	public PMatrix<T> groupBy(int cols) {
 		return CollectionFactory.matrixfromPList(this, cols);
+	}
+	
+	@Override
+	public Iterator<T> iterator() {
+		return new Iterator<T>() {
+			
+			private int counter = 0;
+
+			@Override
+			public boolean hasNext() {
+				return counter < size();
+			}
+
+			@Override
+			public T next() {
+				return get(counter++);
+			}
+			
+		};
 	}
 
 }

@@ -1,7 +1,7 @@
 package aeminium.gpu.devices;
 
-import aeminium.gpu.executables.Program;
-import aeminium.gpu.executables.ProgramLogger;
+import aeminium.gpu.backends.gpu.GPUKernel;
+import aeminium.gpu.operations.contracts.ProgramLogger;
 
 import com.nativelibs4java.opencl.CLBuildException;
 import com.nativelibs4java.opencl.CLContext;
@@ -12,6 +12,7 @@ import com.nativelibs4java.opencl.CLQueue;
 public class GPUDevice {
 	private CLContext context;
 	private CLQueue queue;
+	private ProgramLogger logger;
 
 	public GPUDevice(CLContext ctx) {
 		this.context = ctx;
@@ -31,20 +32,26 @@ public class GPUDevice {
 
 	}
 
-	public void execute(Program p) {
-		if (p.getLogger() != null) {
-			executeWithLogger(p);
+	public void startExecution(GPUKernel p) {
+		if (this.getLogger() != null) {
+			startExecutionWithLogger(p);
 			return;
 		}
 		p.prepareSource(context);
 		p.prepareBuffers(context);
 		p.execute(context, queue);
+	}
+	
+	public void awaitExecution(GPUKernel p) {
+		if (this.getLogger() != null) {
+			return;
+		}
 		p.retrieveResults(context, queue);
 		p.release();
 	}
 
-	private void executeWithLogger(Program p) {
-		ProgramLogger logger = p.getLogger();
+	private void startExecutionWithLogger(GPUKernel p) {
+		ProgramLogger logger = this.getLogger();
 		long startTime;
 
 		startTime = System.nanoTime();
@@ -108,6 +115,14 @@ public class GPUDevice {
 
 	public void refreshQueue() {
 		queue = context.createDefaultProfilingQueue();
+	}
+	
+	public ProgramLogger getLogger() {
+		return logger;
+	}
+
+	public void setLogger(ProgramLogger logger) {
+		this.logger = logger;
 	}
 
 }

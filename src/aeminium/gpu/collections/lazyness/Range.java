@@ -1,5 +1,7 @@
 package aeminium.gpu.collections.lazyness;
 
+import java.util.Iterator;
+
 import org.bridj.Pointer;
 
 import aeminium.gpu.collections.factories.CollectionFactory;
@@ -10,7 +12,6 @@ import aeminium.gpu.collections.properties.evaluation.LazyGPUHelper;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.Map;
-import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
@@ -50,9 +51,10 @@ public class Range implements PList<Integer>, LazyCollection {
 	@Override
 	public Integer reduce(LambdaReducerWithSeed<Integer> reducer) {
 		PList<Integer> result = map(new IntegerIdentityMapper());
-		Reduce<Integer> reduceOperation = new Reduce<Integer>(reducer, result,
+		return result.reduce(reducer);
+		/*Reduce<Integer> reduceOperation = new MapReduce<Integer>(reducer, this,
 				device);
-		return reduceOperation.getOutput();
+		return reduceOperation.getOutput();*/
 	}
 
 	@Override
@@ -137,5 +139,28 @@ public class Range implements PList<Integer>, LazyCollection {
 
 		};
 	}
+	
+	@Override
+	public Iterator<Integer> iterator() {
+		return new Iterator<Integer>() {
+			
+			private int counter = 0;
 
+			@Override
+			public boolean hasNext() {
+				return counter < size();
+			}
+
+			@Override
+			public Integer next() {
+				return counter++;
+			}
+			
+		};
+	}
+
+	@Override
+	public PList<Integer> extend(PList<Integer> extra) {
+		throw new ReadOnlyListException();
+	}
 }

@@ -1,9 +1,9 @@
-package aeminium.gpu.operations.generator;
+package aeminium.gpu.backends.gpu.generators;
 
 import java.util.HashMap;
 
-import aeminium.gpu.buffers.BufferHelper;
-import aeminium.gpu.operations.Map;
+import aeminium.gpu.backends.gpu.GPUMap;
+import aeminium.gpu.backends.gpu.buffers.BufferHelper;
 import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
 
@@ -18,7 +18,7 @@ public class MapCodeGen {
 	private String[] parameters;
 	private boolean isRange = false;
 
-	public MapCodeGen(Map mapOp) {
+	public MapCodeGen(GPUMap mapOp) {
 		inputType = BufferHelper.getCLTypeOf(mapOp.getInputType());
 		outputType = BufferHelper.getCLTypeOf(mapOp.getOutputType());
 		clSource = mapOp.getMapFun().getSource();

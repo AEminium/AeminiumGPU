@@ -1,38 +1,22 @@
 package aeminium.gpu.operations;
 
-import aeminium.gpu.buffers.BufferHelper;
+import aeminium.gpu.backends.cpu.CPUReduce;
+import aeminium.gpu.backends.gpu.GPUReduce;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
-import aeminium.gpu.executables.GenericProgram;
-import aeminium.gpu.executables.Program;
+import aeminium.gpu.operations.contracts.GenericProgram;
+import aeminium.gpu.operations.contracts.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.operations.generator.ReduceCodeGen;
-import aeminium.gpu.operations.generator.ReduceTemplateSource;
-import aeminium.gpu.operations.utils.ExtractTypes;
 
-import com.nativelibs4java.opencl.CLBuffer;
-import com.nativelibs4java.opencl.CLContext;
-import com.nativelibs4java.opencl.CLEvent;
-import com.nativelibs4java.opencl.CLQueue;
-
-public class Reduce<O> extends GenericProgram implements Program,
-		ReduceTemplateSource<O> {
-
-	static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
+public class Reduce<O> extends GenericProgram implements Program {
 
 	protected PList<O> input;
 	private O output;
 	protected LambdaReducerWithSeed<O> reduceFun;
-
-	protected CLBuffer<?> inbuffer;
-	private CLBuffer<?> outbuffer;
-
-	private ReduceCodeGen gen;
-
-	private int blocks;
-	private int threads;
-	private int current_size;
+	
+	protected GPUReduce<O, O> gpuOp;
+	protected CPUReduce<O, O> cpuOp;
 
 	// Constructors
 
@@ -46,11 +30,11 @@ public class Reduce<O> extends GenericProgram implements Program,
 		this.device = dev;
 		this.input = list;
 		this.reduceFun = reduceFun;
-		this.setOtherSources(other);
-		gen = new ReduceCodeGen(this);
-		if (reduceFun instanceof LambdaReducerWithSeed) {
-			gen.setHasSeed(true);
-		}
+		
+		cpuOp = new CPUReduce<O, O>(input, reduceFun);
+		gpuOp = new GPUReduce<O, O>(input, reduceFun);
+		gpuOp.setOtherSources(other);
+		gpuOp.setDevice(dev);
 	}
 
 	// only for subclasses
@@ -60,182 +44,55 @@ public class Reduce<O> extends GenericProgram implements Program,
 
 	protected Reduce(LambdaReducerWithSeed<O> reduceFun2, String other,
 			GPUDevice dev) {
-		this.device = dev;
-		this.reduceFun = reduceFun2;
-		this.setOtherSources(other);
-		gen = new ReduceCodeGen(this);
+		this(reduceFun2, null, other, dev);
 	}
 
-	protected boolean willRunOnGPU() {
-		return OpenCLDecider.useGPU(input.size(), 1, reduceFun.getSource(),
-				reduceFun.getSourceComplexity());
-	}
-
-	public void cpuExecution() {
-		output = this.getReduceFun().getSeed();
-		for (int i = 0; i < input.size(); i++) {
-			output = reduceFun.combine(input.get(i), output);
-		}
-	}
-
-	// Pipeline
-
+	
+	
 	@Override
-	public String getSource() {
-		return gen.getReduceKernelSource();
+	public int getParallelUnits() {
+		return this.input.size();
+	}
+	
+	@Override
+	protected int getBalanceSplitPoint() {
+		return OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(), 1,
+				reduceFun.getSource(), reduceFun.getSourceComplexity());
 	}
 
-	public String getReduceOpenCLSource() {
-		return gen.getReduceLambdaSource();
+	public void cpuExecution(int start, int end) {
+		cpuOp.setLimits(start, end);
+		cpuOp.execute();
 	}
 
 	@Override
-	public void prepareBuffers(CLContext ctx) {
-		inferBestValues();
-		inbuffer = BufferHelper.createInputOutputBufferFor(ctx, input);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void execute(CLContext ctx, CLQueue q) {
-
-		CLBuffer<?>[] tempBuffers = new CLBuffer<?>[2];
-		int depth = 0;
-		CLEvent[] eventsArr = new CLEvent[1];
-		int[] blockCountArr = new int[1];
-		current_size = input.length();
-
-		while (current_size > 1) {
-			int blocksInCurrentDepth = current_size
-					/ DEFAULT_MAX_REDUCTION_SIZE;
-			if (current_size > blocksInCurrentDepth
-					* DEFAULT_MAX_REDUCTION_SIZE) {
-				blocksInCurrentDepth++;
-			}
-			int iOutput = depth & 1;
-			CLBuffer<?> currentInput = (depth == 0) ? inbuffer
-					: tempBuffers[iOutput ^ 1];
-			outbuffer = (CLBuffer<O>) tempBuffers[iOutput];
-			if (outbuffer == null) {
-				tempBuffers[iOutput] = BufferHelper.createInputOutputBufferFor(
-						ctx, getOutputType(), blocksInCurrentDepth);
-				outbuffer = tempBuffers[iOutput];
-			}
-			synchronized (kernel) {
-				kernel.setArgs(currentInput, outbuffer, (long) current_size,
-						(long) blocksInCurrentDepth,
-						(long) DEFAULT_MAX_REDUCTION_SIZE);
-				int workgroupSize = blocksInCurrentDepth;
-				if (workgroupSize == 1)
-					workgroupSize = 2;
-				blockCountArr[0] = workgroupSize;
-				eventsArr[0] = kernel.enqueueNDRange(q, blockCountArr, null,
-						eventsArr);
-			}
-			current_size = blocksInCurrentDepth;
-			depth++;
-		}
-
-		kernelCompletion = eventsArr[eventsArr.length - 1];
-
-	}
-
-	@SuppressWarnings("unchecked")
-	public void debugBuffers(CLContext ctx, CLQueue q) {
-		PList<O> li;
-
-		System.out.println("i:");
-		li = (PList<O>) BufferHelper.extractFromBuffer(inbuffer, q,
-				kernelCompletion, getOutputType(), input.size());
-		for (int i = 0; i < 35; i++) {
-			System.out.print(li.get(i) + ",");
-		}
-		System.out.println("___");
-
-		System.out.println("o:");
-		li = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q,
-				kernelCompletion, getOutputType(), input.size());
-		for (int i = 0; i < 35; i++) {
-			System.out.print(li.get(i) + ",");
-		}
-		System.out.println("___");
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void retrieveResults(CLContext ctx, CLQueue q) {
-		output = (O) BufferHelper.extractElementFromBuffer(outbuffer, q,
-				kernelCompletion, getOutputType());
+	public void gpuExecution(int start, int end) {
+		gpuOp.setLimits(start, end);
+		gpuOp.execute();
 	}
 
 	@Override
-	public void release() {
-		this.inbuffer.release();
-		// this.outbuffer.release();
-		super.release();
-	}
-
-	// Helper Methods
-
-	private void inferBestValues() {
-		int max_threads = 16;
-		int max_blocks = (int) device.getDevice().getMaxWorkGroupSize()
-				/ max_threads;
-		int n = input.size();
-
-		if (n < max_threads) {
-			threads = n;
-			blocks = 1;
+	protected void mergeResults(boolean hasGPU, boolean hasCPU) {
+		if (!hasGPU) {
+			cpuOp.waitForExecution();
+			output = cpuOp.getOutput();
+		} else if (!hasCPU) {
+			gpuOp.waitForExecution();
+			output = gpuOp.getOutput();
 		} else {
-			threads = max_threads;
-			blocks = (n * 2 - 1) / (threads * 2);
-			blocks = (blocks > max_blocks) ? max_blocks : blocks;
-		}
-	}
-
-	static int getNextPowerOfTwo(int i) {
-		int shifted = 0;
-		boolean lost = false;
-		for (;;) {
-			int next = i >> 1;
-			if (next == 0) {
-				if (lost)
-					return 1 << (shifted + 1);
-				else
-					return 1 << shifted;
-			}
-			lost = lost || (next << 1 != i);
-			shifted++;
-			i = next;
+			gpuOp.waitForExecution();
+			cpuOp.waitForExecution();
+			output = gpuOp.getOutput();
+			output = reduceFun.combine(output, cpuOp.getOutput());
 		}
 	}
 
 	// Output
-
 	public O getOutput() {
-		// No need for lazyness in reduces.
-		execute();
+		execute(); // No need for lazyness in reduces.
 		return output;
 	}
-
-	// Utils
-
-	public String getOpenCLSeed() {
-		return reduceFun.getSeedSource();
-	}
-
-	public String getInputType() {
-		return input.getType().getSimpleName().toString();
-	}
-
-	public String getOutputType() {
-		return ExtractTypes.extractReturnTypeOutOf(reduceFun, "combine");
-	}
-
-	public int getOutputSize() {
-		return input.size();
-	}
-
+	
 	// Getters and Setters
 
 	public void setOutput(PList<O> output) {
@@ -253,10 +110,8 @@ public class Reduce<O> extends GenericProgram implements Program,
 	public void setReduceFun(LambdaReducerWithSeed<O> reduceFun) {
 		this.reduceFun = reduceFun;
 	}
-
-	@Override
-	public String getKernelName() {
-		return gen.getReduceKernelName();
+	
+	public GPUReduce<O, O> getGPUReduce() {
+		return gpuOp;
 	}
-
 }

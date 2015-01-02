@@ -105,5 +105,19 @@ public class CharList extends AbstractList<Character> implements
 			box = Arrays.copyOf(box, box.length + INCREMENT_SIZE);
 		}
 	}
+	
+	@Override
+	public PList<Character> extend(PList<Character> extra) {
+		if (extra instanceof CharList) {
+			CharList other = (CharList) extra;
+			ensureNMore(other.size());
+			System.arraycopy(other.box, 0, box, size, extra.size());
+		} else {
+			for (Character b : extra) {
+				this.add(b);
+			}
+		}
+		return null;
+	}
 
 }

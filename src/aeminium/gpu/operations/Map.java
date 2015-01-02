@@ -1,36 +1,31 @@
 package aeminium.gpu.operations;
 
-import aeminium.gpu.buffers.BufferHelper;
-import aeminium.gpu.collections.factories.CollectionFactory;
+import aeminium.gpu.backends.cpu.CPUMap;
+import aeminium.gpu.backends.gpu.GPUMap;
+import aeminium.gpu.backends.gpu.buffers.BufferHelper;
 import aeminium.gpu.collections.lazyness.LazyEvaluator;
 import aeminium.gpu.collections.lazyness.LazyPList;
-import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
-import aeminium.gpu.executables.GenericProgram;
-import aeminium.gpu.executables.Program;
+import aeminium.gpu.operations.contracts.GenericProgram;
+import aeminium.gpu.operations.contracts.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.operations.generator.MapCodeGen;
 import aeminium.gpu.operations.mergers.MapToMapMerger;
 import aeminium.gpu.operations.mergers.MapToReduceMerger;
-
-import com.nativelibs4java.opencl.CLBuffer;
-import com.nativelibs4java.opencl.CLContext;
-import com.nativelibs4java.opencl.CLEvent;
-import com.nativelibs4java.opencl.CLQueue;
+import aeminium.gpu.utils.ExtractTypes;
 
 public class Map<I, O> extends GenericProgram implements Program {
 
 	protected PList<I> input;
 	private PList<O> output;
 	protected LambdaMapper<I, O> mapFun;
-
-	protected CLBuffer<?> inbuffer;
-	private CLBuffer<?> outbuffer;
-
-	private MapCodeGen gen;
+	
+	
+	protected GPUMap<I, O> gpuOp;
+	protected CPUMap<I, O> cpuOp;
+	
 
 	// Constructors
 
@@ -43,74 +38,63 @@ public class Map<I, O> extends GenericProgram implements Program {
 		this.device = dev;
 		this.input = list;
 		this.mapFun = mapFun;
-		this.setOtherSources(other);
-		gen = new MapCodeGen(this);
-		if (list instanceof Range) {
-			gen.setRange(true);
-		}
+		
+		cpuOp = new CPUMap<I, O>(input, mapFun);
+		gpuOp = new GPUMap<I, O>(input, mapFun);
+		gpuOp.setOtherSources(other);
+		gpuOp.setDevice(dev);
 	}
 
-	protected boolean willRunOnGPU() {
-		return OpenCLDecider.useGPU(input.size(), input.size(),
+
+	public Map(LambdaMapper<I, O> mapFun, PList<I> list, String other,
+			GPUDevice dev, String outputType) {
+		this.device = dev;
+		this.input = list;
+		this.mapFun = mapFun;
+		
+		cpuOp = new CPUMap<I, O>(input, mapFun, outputType);
+		gpuOp = new GPUMap<I, O>(input, mapFun, outputType);
+		gpuOp.setOtherSources(other);
+		gpuOp.setDevice(dev);
+	}
+
+	protected int getParallelUnits() {
+		return input.size();
+	}
+	
+	@Override
+	protected int getBalanceSplitPoint() {
+		return OpenCLDecider.getSplitPoint(input.size(), input.size(), input.size(),
 				mapFun.getSource(), mapFun.getSourceComplexity());
 	}
+	
 
-	@SuppressWarnings("unchecked")
-	public void cpuExecution() {
-		output = (PList<O>) CollectionFactory.listFromType(getOutputType());
-		for (int i = 0; i < input.size(); i++) {
-			output.add(mapFun.map(input.get(i)));
+	@Override
+	public void cpuExecution(int start, int end) {
+		cpuOp.setLimits(start, end);
+		cpuOp.execute();
+	}
+
+	@Override
+	public void gpuExecution(int start, int end) {
+		gpuOp.setLimits(start, end);
+		gpuOp.execute();
+	}
+
+	@Override
+	protected void mergeResults(boolean hasGPU, boolean hasCPU) {
+		if (!hasGPU) {
+			cpuOp.waitForExecution();
+			output = cpuOp.getOutput();
+		} else if (!hasCPU) {
+			gpuOp.waitForExecution();
+			output = gpuOp.getOutput();
+		} else {
+			gpuOp.waitForExecution();
+			cpuOp.waitForExecution();
+			output = gpuOp.getOutput();
+			output.extend(cpuOp.getOutput());
 		}
-	}
-
-	// Pipeline
-
-	@Override
-	public String getSource() {
-		return gen.getMapKernelSource();
-	}
-
-	public String getMapOpenCLSource() {
-		return gen.getMapLambdaSource();
-	}
-
-	public String getMapOpenCLName() {
-		return gen.getMapLambdaName();
-	}
-
-	@Override
-	public void prepareBuffers(CLContext ctx) {
-		inbuffer = BufferHelper.createInputBufferFor(ctx, input);
-		outbuffer = BufferHelper.createOutputBufferFor(ctx, getOutputType(),
-				input.size());
-	}
-
-	@Override
-	public void execute(CLContext ctx, CLQueue q) {
-		synchronized (kernel) {
-			// setArgs will throw an exception at runtime if the types / sizes
-			// of the arguments are incorrect
-			kernel.setArgs(inbuffer, outbuffer);
-
-			// Ask for 1-dimensional execution of length dataSize, with auto
-			// choice of local workgroup size :
-			kernelCompletion = kernel.enqueueNDRange(q,
-					new int[] { input.size() }, new CLEvent[] {});
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void retrieveResults(CLContext ctx, CLQueue q) {
-		output = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q,
-				kernelCompletion, getOutputType(), input.size());
-	}
-
-	@Override
-	public void release() {
-		super.release();
-		this.inbuffer.release();
-		this.outbuffer.release();
 	}
 
 	// Output
@@ -129,7 +113,7 @@ public class Map<I, O> extends GenericProgram implements Program {
 
 			@Override
 			public Class<?> getType() {
-				return BufferHelper.getClassOf(getOutputType());
+				return BufferHelper.getClassOf(ExtractTypes.getMapOutputType(mapFun, input));
 			}
 
 			@Override
@@ -160,29 +144,6 @@ public class Map<I, O> extends GenericProgram implements Program {
 		return new LazyPList<O>(operation, input.size());
 	}
 
-	// Utils
-
-	public String getInputType() {
-		return input.getType().getSimpleName().toString();
-	}
-
-	public String getOutputType() {
-		Class<?> klass = mapFun.getClass();
-		try {
-			return klass.getMethod("map", input.getType()).getReturnType()
-					.getSimpleName().toString();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-			return null;
-		} catch (NoSuchMethodException e) {
-			// Java sucks
-			// TODO: Compiler can give us this information.
-			System.out
-					.println("AeminiumGPU Runtime does not support generic types on Lambdas.");
-			System.exit(0);
-			return null;
-		}
-	}
 
 	public int getOutputSize() {
 		return input.size();
@@ -202,8 +163,11 @@ public class Map<I, O> extends GenericProgram implements Program {
 		this.mapFun = mapFun;
 	}
 
-	@Override
-	public String getKernelName() {
-		return gen.getMapKernelName();
+	public GPUMap<I, O> getGPUMap() {
+		return gpuOp;
 	}
+	
+	
+
+
 }

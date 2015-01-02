@@ -32,7 +32,7 @@ public class TestMap extends TestCase {
 
 				});
 
-		for (int i = 0; i < size; i++) {
+		for (int i=0; i<size; i++) {
 			assertEquals(2 * i, output.get(i).intValue());
 		}
 	}

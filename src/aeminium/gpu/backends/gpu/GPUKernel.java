@@ -1,24 +1,16 @@
-package aeminium.gpu.executables;
+package aeminium.gpu.backends.gpu;
+
+import aeminium.gpu.operations.contracts.BackendProgram;
 
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLQueue;
 
-public interface Program {
-
-	/* GPU Pipeline */
+public interface GPUKernel extends BackendProgram {
+	
 	public void prepareSource(CLContext ctx);
-
 	public void prepareBuffers(CLContext ctx);
-
 	public void execute(CLContext ctx, CLQueue q);
-
 	public void waitExecution(CLContext context, CLQueue queue);
-
 	public void retrieveResults(CLContext ctx, CLQueue q);
-
 	public void release();
-
-	public void setLogger(ProgramLogger logger);
-
-	public ProgramLogger getLogger();
 }

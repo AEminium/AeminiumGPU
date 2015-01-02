@@ -1,4 +1,4 @@
-package aeminium.gpu.operations.random;
+package aeminium.gpu.backends.cpu;
 
 import java.io.*;
 import java.util.*;

@@ -27,8 +27,8 @@ public class MapToReduceMerger<I, O> {
 			@Override
 			public O evaluate() {
 				StringBuilder extraCode = new StringBuilder();
-				extraCode.append(first.getOtherSources());
-				extraCode.append(second.getOtherSources());
+				extraCode.append(first.getGPUMap().getOtherSources());
+				extraCode.append(second.getGPUReduce().getOtherSources());
 				MapReduce<I, O> op = new MapReduce<I, O>(first.getMapFun(),
 						second.getReduceFun(), current, extraCode.toString(),
 						first.getDevice());

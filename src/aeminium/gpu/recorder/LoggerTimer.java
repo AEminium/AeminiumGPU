@@ -1,6 +1,6 @@
 package aeminium.gpu.recorder;
 
-import aeminium.gpu.executables.ProgramLogger;
+import aeminium.gpu.operations.contracts.ProgramLogger;
 
 public class LoggerTimer implements ProgramLogger {
 	RecordTracker tracker;

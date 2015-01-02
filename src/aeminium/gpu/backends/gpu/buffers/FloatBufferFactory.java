@@ -1,4 +1,4 @@
-package aeminium.gpu.buffers;
+package aeminium.gpu.backends.gpu.buffers;
 
 import org.bridj.Pointer;
 

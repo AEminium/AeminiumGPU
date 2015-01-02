@@ -1,39 +1,26 @@
 package aeminium.gpu.operations;
 
-import aeminium.gpu.buffers.BufferHelper;
-import aeminium.gpu.collections.factories.CollectionFactory;
-import aeminium.gpu.collections.lazyness.Range;
+import aeminium.gpu.backends.cpu.CPUPartialReduce;
+import aeminium.gpu.backends.gpu.GPUPartialReduce;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
-import aeminium.gpu.executables.GenericProgram;
-import aeminium.gpu.executables.Program;
+import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.operations.generator.ReduceCodeGen;
-import aeminium.gpu.operations.generator.ReduceTemplateSource;
-import aeminium.gpu.operations.utils.ExtractTypes;
+import aeminium.gpu.utils.ExtractTypes;
 
-import com.nativelibs4java.opencl.CLBuffer;
-import com.nativelibs4java.opencl.CLContext;
-import com.nativelibs4java.opencl.CLEvent;
-import com.nativelibs4java.opencl.CLQueue;
+public class PartialReduce<O> extends GenericProgram {
 
-public class PartialReduce<O> extends GenericProgram implements Program,
-		ReduceTemplateSource<O> {
-
-	static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
 
 	protected PList<O> input;
 	protected PList<O> output;
 	protected int outputSize;
 	protected LambdaReducer<O> reduceFun;
-
-	protected CLBuffer<?> inbuffer;
-	private CLBuffer<?> outbuffer;
-
-	private ReduceCodeGen gen;
-
+	
+	protected GPUPartialReduce<O> gpuOp;
+	protected CPUPartialReduce<O> cpuOp;
+	
 	// Constructors
 
 	public PartialReduce(LambdaReducer<O> reduceFun2, PList<O> list,
@@ -47,102 +34,52 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 		this.input = list;
 		this.outputSize = outputSize;
 		this.reduceFun = reduceFun;
-		this.setOtherSources(other);
-		gen = new ReduceCodeGen(this);
-		if (list instanceof Range) {
-			gen.setRange(true);
-		}
-		if (reduceFun instanceof LambdaReducerWithSeed) {
-			gen.setHasSeed(true);
-		}
+		
+		cpuOp = new CPUPartialReduce<O>(input, reduceFun, outputSize);
+		gpuOp = new GPUPartialReduce<O>(input, reduceFun, outputSize);
+		gpuOp.setOtherSources(other);
+		gpuOp.setDevice(dev);
+	}
+	
+	@Override
+	public int getParallelUnits() {
+		return this.outputSize;
 	}
 
-	// only for subclasses
-	protected PartialReduce(LambdaReducer<O> reduceFun2, GPUDevice dev) {
-		this(reduceFun2, "", dev);
-	}
-
-	protected PartialReduce(LambdaReducer<O> reduceFun2, String other,
-			GPUDevice dev) {
-		this.device = dev;
-		this.reduceFun = reduceFun2;
-		this.setOtherSources(other);
-		gen = new ReduceCodeGen(this);
-	}
-
-	protected boolean willRunOnGPU() {
-		return OpenCLDecider.useGPU(input.size(), outputSize,
+	@Override
+	protected int getBalanceSplitPoint() {
+		return OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(), outputSize,
 				reduceFun.getSource(), reduceFun.getSourceComplexity());
 	}
+	
+	public void cpuExecution(int start, int end) {
+		cpuOp.setLimits(start, end);
+		cpuOp.execute();
+	}
 
-	@SuppressWarnings("unchecked")
-	public void cpuExecution() {
-		output = (PList<O>) CollectionFactory.listFromType(getOutputType());
-		if (reduceFun instanceof LambdaReducerWithSeed) {
-			LambdaReducerWithSeed<O> red = (LambdaReducerWithSeed<O>) reduceFun;
-			O acc = red.getSeed();
-			for (int i = 0; i < input.size(); i++) {
-				acc = reduceFun.combine(acc, input.get(i));
-				if ((i + 1) % outputSize == 0) {
-					output.add(acc);
-					acc = red.getSeed();
-				}
-			}
+	@Override
+	public void gpuExecution(int start, int end) {
+		gpuOp.setLimits(start, end);
+		gpuOp.execute();
+	}
+	
+	@Override
+	protected void mergeResults(boolean hasGPU, boolean hasCPU) {
+		if (!hasGPU) {
+			cpuOp.waitForExecution();
+			output = cpuOp.getOutput();
+		} else if (!hasCPU) {
+			gpuOp.waitForExecution();
+			output = gpuOp.getOutput();
 		} else {
-			O acc = input.get(0);
-			for (int i = 1; i < input.size(); i++) {
-				acc = reduceFun.combine(acc, input.get(i));
-				if ((i + 1) % outputSize == 0) {
-					output.add(acc);
-					acc = input.get(i++);
-				}
-			}
-		}
-
-	}
-
-	// Pipeline
-
-	@Override
-	public String getSource() {
-		return gen.getReduceKernelSource();
-	}
-
-	public String getReduceOpenCLSource() {
-		return gen.getReduceLambdaSource();
-	}
-
-	@Override
-	public void prepareBuffers(CLContext ctx) {
-		inbuffer = BufferHelper.createInputBufferFor(ctx, input);
-		outbuffer = BufferHelper.createInputOutputBufferFor(ctx,
-				getOutputType(), outputSize);
-	}
-
-	@Override
-	public void execute(CLContext ctx, CLQueue q) {
-		synchronized (kernel) {
-			kernel.setArgs(inbuffer, outbuffer, (long) input.size(),
-					(long) outputSize, (long) (input.size() / outputSize));
-			kernelCompletion = kernel.enqueueNDRange(q,
-					new int[] { outputSize }, null, new CLEvent[] {});
+			gpuOp.waitForExecution();
+			cpuOp.waitForExecution();
+			output = gpuOp.getOutput();
+			output.extend(cpuOp.getOutput());
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void retrieveResults(CLContext ctx, CLQueue q) {
-		output = (PList<O>) BufferHelper.extractFromBuffer(outbuffer, q,
-				kernelCompletion, getOutputType(), outputSize);
-	}
-
-	@Override
-	public void release() {
-		this.inbuffer.release();
-		this.outbuffer.release();
-		super.release();
-	}
-
+	
 	// Output
 
 	public PList<O> getOutput() {
@@ -185,11 +122,6 @@ public class PartialReduce<O> extends GenericProgram implements Program,
 
 	public void setReduceFun(LambdaReducer<O> reduceFun) {
 		this.reduceFun = reduceFun;
-	}
-
-	@Override
-	public String getKernelName() {
-		return gen.getReduceKernelName();
 	}
 
 }

@@ -6,7 +6,7 @@ import aeminium.gpu.collections.properties.Mappable;
 import aeminium.gpu.collections.properties.Reductionable;
 
 public interface PList<T> extends PCollection<T>, Mappable<T>,
-		Reductionable<T>, Groupable<T> {
+		Reductionable<T>, Groupable<T>, Iterable<T> {
 
 	/* Properties */
 	public int length();
@@ -33,5 +33,7 @@ public interface PList<T> extends PCollection<T>, Mappable<T>,
 
 	/* Lazyness */
 	public PList<T> evaluate();
+	
+	public PList<T> extend(PList<T> extra);
 
 }

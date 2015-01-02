@@ -100,5 +100,19 @@ public class FloatList extends AbstractList<Float> implements
 			box = Arrays.copyOf(box, box.length + INCREMENT_SIZE);
 		}
 	}
+	
+	@Override
+	public PList<Float> extend(PList<Float> extra) {
+		if (extra instanceof FloatList) {
+			FloatList other = (FloatList) extra;
+			ensureNMore(other.size());
+			System.arraycopy(other.box, 0, box, size, extra.size());
+		} else {
+			for (Float b : extra) {
+				this.add(b);
+			}
+		}
+		return null;
+	}
 
 }

@@ -1,20 +1,20 @@
-package aeminium.gpu.operations.generator;
+package aeminium.gpu.backends.gpu.generators;
 
 import java.util.HashMap;
 
-import aeminium.gpu.buffers.BufferHelper;
-import aeminium.gpu.operations.MapReduce;
+import aeminium.gpu.backends.gpu.GPUReduce;
+import aeminium.gpu.backends.gpu.buffers.BufferHelper;
 import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
 
 @SuppressWarnings("rawtypes")
-public class MapReduceCodeGen {
-	private MapReduce op;
+public class MapReduceCodeGen implements GenericReduceCodeGen {
+	private GPUReduce op;
 	private String id;
 	private String[] map_parameters;
 	private boolean isRange = false;
 
-	public MapReduceCodeGen(MapReduce op) {
+	public MapReduceCodeGen(GPUReduce op) {
 		this.op = op;
 		id = op.getMapFun().getId() + "_" + op.getReduceFun().getId();
 		map_parameters = op.getMapFun().getParameters();
@@ -91,6 +91,10 @@ public class MapReduceCodeGen {
 
 	public void setRange(boolean isRange) {
 		this.isRange = isRange;
+	}
+
+	@Override
+	public void setHasSeed(boolean b) {		
 	}
 
 }

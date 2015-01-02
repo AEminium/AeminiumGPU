@@ -100,5 +100,19 @@ public class DoubleList extends AbstractList<Double> implements
 			box = Arrays.copyOf(box, box.length + INCREMENT_SIZE);
 		}
 	}
+	
+	@Override
+	public PList<Double> extend(PList<Double> extra) {
+		if (extra instanceof DoubleList) {
+			DoubleList other = (DoubleList) extra;
+			ensureNMore(other.size());
+			System.arraycopy(other.box, 0, box, size, extra.size());
+		} else {
+			for (Double b : extra) {
+				this.add(b);
+			}
+		}
+		return null;
+	}
 
 }

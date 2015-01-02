@@ -121,4 +121,10 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 		this.lazynessLevel = lazynessLevel;
 	}
 
+	@Override
+	public PList<T> extend(PList<T> extra) {
+		evaluate();
+		return actual.extend(extra);
+	}
+
 }
