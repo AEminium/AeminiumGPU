@@ -10,34 +10,22 @@ public class MapToMapExample {
 
 		PList<Integer> input = new IntList();
 		for (int i=0; i<N; i++)
-			input.add(i);
-		input = input.map(new LambdaMapper<Integer, Integer>() {
-
-			@Override
-			public Integer map(Integer input) {
-				return input + 1;
-			}
-
-			@Override
-			public String getSource() {
-				return "return input + 1;";
-			}
-
-		});
+			input.add(i+1);
 		
-		input = input.map(new LambdaMapper<Integer, Integer>() {
+		for (int i = 0; i < 3; i++) {
+			input = input.map(new LambdaMapper<Integer, Integer>() {
 
-			@Override
-			public Integer map(Integer input) {
-				return input * 2;
-			}
+				@Override
+				public Integer map(Integer input) {
+					return 2 * input;
+				}
 
-			@Override
-			public String getSource() {
-				return "return input * 2;";
-			}
+				public String getSource() {
+					return "return 2 * input;";
+				}
 
-		});
+			});
+		}
 		
 		System.out.println("The first value is " + input.get(0));
 
