@@ -24,10 +24,11 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 	
 	private MapCodeGen gen;
 	
-	public GPUMap(PList<I> input, LambdaMapper<I, O> mapFun) {
+	public GPUMap(PList<I> input, LambdaMapper<I, O> mapFun, String otherSources) {
 		this.input = input;
 		this.mapFun = mapFun;
 		outputType = mapFun.getOutputType();
+		this.setOtherSources(otherSources);
 		
 		gen = new MapCodeGen(this);
 		if (input instanceof Range) {
