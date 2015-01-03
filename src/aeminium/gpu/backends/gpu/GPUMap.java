@@ -5,6 +5,7 @@ import aeminium.gpu.backends.gpu.generators.MapCodeGen;
 import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
+import aeminium.gpu.utils.ExtractTypes;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -27,7 +28,7 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 	public GPUMap(PList<I> input, LambdaMapper<I, O> mapFun, String otherSources) {
 		this.input = input;
 		this.mapFun = mapFun;
-		outputType = mapFun.getOutputType();
+		outputType = mapFun.getOutputType() != null ? mapFun.getOutputType() : ExtractTypes.getMapOutputType(mapFun, input);
 		this.setOtherSources(otherSources);
 		
 		gen = new MapCodeGen(this);

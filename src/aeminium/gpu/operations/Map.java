@@ -40,8 +40,7 @@ public class Map<I, O> extends GenericProgram implements Program {
 		this.mapFun = mapFun;
 		
 		cpuOp = new CPUMap<I, O>(input, mapFun);
-		gpuOp = new GPUMap<I, O>(input, mapFun);
-		gpuOp.setOtherSources(other);
+		gpuOp = new GPUMap<I, O>(input, mapFun, other);
 		gpuOp.setDevice(dev);
 	}
 
