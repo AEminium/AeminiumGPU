@@ -37,6 +37,10 @@ public class MapToMapMerger<I, M, O> {
 								second.getGPUMap().getMapOpenCLName(),
 								first.getGPUMap().getMapOpenCLName());
 					}
+					
+					public String getOutputType() {
+						return second.getMapFun().getOutputType();
+					}
 				};
 
 				StringBuilder extraCode = new StringBuilder();
@@ -45,7 +49,7 @@ public class MapToMapMerger<I, M, O> {
 				extraCode.append(first.getGPUMap().getMapOpenCLSource());
 				extraCode.append(second.getGPUMap().getMapOpenCLSource());
 				Map<I, O> op = new Map<I, O>(fakeLambda, current,
-						extraCode.toString(), first.getDevice(), second.getGPUMap().getOutputType());
+						extraCode.toString(), first.getDevice());
 				return op;
 			}
 

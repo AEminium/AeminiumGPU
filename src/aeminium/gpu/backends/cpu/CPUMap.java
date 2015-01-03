@@ -4,7 +4,6 @@ import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.CPUDevice;
 import aeminium.gpu.operations.functions.LambdaMapper;
-import aeminium.gpu.utils.ExtractTypes;
 import aeminium.runtime.Runtime;
 import aeminium.runtime.Task;
 import aeminium.runtime.helpers.loops.ForBody;
@@ -22,13 +21,9 @@ public class CPUMap<I,O> extends CPUGenericKernel {
 	
 	
 	public CPUMap(PList<I> input, LambdaMapper<I, O> mapFun) {
-		this(input, mapFun, ExtractTypes.getMapOutputType(mapFun, input));
-	}
-	
-	public CPUMap(PList<I> input, LambdaMapper<I, O> mapFun, String ot) {
 		this.input = input;
 		this.mapFun = mapFun;
-		this.outputType = ot;
+		outputType = mapFun.getOutputType();
 	}
 
 	@SuppressWarnings("unchecked")

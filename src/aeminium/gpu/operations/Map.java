@@ -45,19 +45,6 @@ public class Map<I, O> extends GenericProgram implements Program {
 		gpuOp.setDevice(dev);
 	}
 
-
-	public Map(LambdaMapper<I, O> mapFun, PList<I> list, String other,
-			GPUDevice dev, String outputType) {
-		this.device = dev;
-		this.input = list;
-		this.mapFun = mapFun;
-		
-		cpuOp = new CPUMap<I, O>(input, mapFun, outputType);
-		gpuOp = new GPUMap<I, O>(input, mapFun, outputType);
-		gpuOp.setOtherSources(other);
-		gpuOp.setDevice(dev);
-	}
-
 	protected int getParallelUnits() {
 		return input.size();
 	}

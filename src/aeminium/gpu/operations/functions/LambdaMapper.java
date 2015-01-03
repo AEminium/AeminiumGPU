@@ -1,6 +1,7 @@
 package aeminium.gpu.operations.functions;
 
 import aeminium.gpu.collections.properties.operations.Mapper;
+import aeminium.gpu.utils.ExtractTypes;
 import aeminium.gpu.utils.UniqCounter;
 
 public abstract class LambdaMapper<I, O> implements Mapper<I, O>, GPUFunction {
@@ -26,5 +27,10 @@ public abstract class LambdaMapper<I, O> implements Mapper<I, O>, GPUFunction {
 		if (id == null)
 			id = UniqCounter.getNewId();
 		return id;
+	}
+	
+	/* This method should be overridden by the Aeminium GPU Compiler */
+	public String getOutputType() {
+		return ExtractTypes.extractReturnTypeOutOf(this, "map");
 	}
 }
