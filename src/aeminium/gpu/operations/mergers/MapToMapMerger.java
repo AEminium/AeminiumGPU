@@ -7,6 +7,7 @@ import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
+import aeminium.gpu.utils.ExtractTypes;
 
 public class MapToMapMerger<I, M, O> {
 
@@ -39,7 +40,7 @@ public class MapToMapMerger<I, M, O> {
 					}
 					
 					public String getOutputType() {
-						return second.getMapFun().getOutputType();
+						return ExtractTypes.getMapOutputType(first.getMapFun(), second.getMapFun(), current);
 					}
 				};
 

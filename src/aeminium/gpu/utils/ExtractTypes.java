@@ -22,11 +22,11 @@ public class ExtractTypes {
 		return null;
 	}
 	
-	public static String getMapOutputType(LambdaMapper<?,?> mapFun, PList<?> input) {
+	
+	public static Class<?> getMapOutputClass(LambdaMapper<?,?> mapFun, Class<?> inputType) {
 		Class<?> klass = mapFun.getClass();
 		try {
-			return klass.getMethod("map", input.getType()).getReturnType()
-					.getSimpleName().toString();
+			return klass.getMethod("map", inputType).getReturnType();
 		} catch (SecurityException e) {
 			e.printStackTrace();
 			return null;
@@ -35,5 +35,18 @@ public class ExtractTypes {
 			System.out.println(mapFun.getSource());
 			return null;
 		}
+	}
+	
+	public static String getMapOutputType(LambdaMapper<?,?> mapFun, PList<?> input) {
+		Class<?> type = getMapOutputClass(mapFun, input.getType());
+		if (type == null) return null;
+		return type.getSimpleName().toString();
+	}
+	
+	public static String getMapOutputType(LambdaMapper<?,?> mapFun, LambdaMapper<?,?> mapFun2, PList<?> input) {
+		Class<?> ft = getMapOutputClass(mapFun, input.getType());
+		Class<?> st = getMapOutputClass(mapFun2, ft);
+		if (st == null) return null;
+		return st.getSimpleName().toString();
 	}
 }
