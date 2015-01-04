@@ -3,6 +3,7 @@ package aeminium.gpu.devices;
 import java.util.Arrays;
 
 import aeminium.runtime.Body;
+import aeminium.runtime.ErrorHandler;
 import aeminium.runtime.Hints;
 import aeminium.runtime.Runtime;
 import aeminium.runtime.Task;
@@ -13,8 +14,37 @@ public class CPUDevice {
 	public final static Runtime rt = Factory.getRuntime();
 	
 	public static void init() {
-		if (rtcalls++ == 0)
+		if (rtcalls++ == 0) {
+			rt.addErrorHandler(new ErrorHandler() {
+
+				@Override
+				public void handleTaskException(Task task, Throwable t) {
+					t.printStackTrace();
+				}
+
+				@Override
+				public void handleLockingDeadlock() {
+					// TODO Auto-generated method stub
+				}
+
+				@Override
+				public void handleDependencyCycle(Task task) {
+					// TODO Auto-generated method stub
+				}
+
+				@Override
+				public void handleTaskDuplicatedSchedule(Task task) {
+					// TODO Auto-generated method stub
+				}
+
+				@Override
+				public void handleInternalError(Error err) {
+					// TODO Auto-generated method stub
+				}
+				
+			});
 			rt.init();
+		}
 	}
 
 	public static void shutdown() {

@@ -49,8 +49,10 @@ public class FloatList extends AbstractList<Float> implements
 	@Override
 	public void set(int index, Float e) {
 		if (index >= size) {
-			ensureNMore(index + 1 - size);
 			size = index + 1;
+		}
+		if (index >= box.length) {
+			ensureNMore(index + 1 - box.length);
 		}
 		box[index] = e;
 	}

@@ -385,7 +385,7 @@ public strictfp class MersenneTwisterFast implements Serializable, Cloneable
 
 
 
-	public final short nextShort()
+	public synchronized final short nextShort()
 	{
 		int y;
 

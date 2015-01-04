@@ -3,7 +3,7 @@ package aeminium.gpu.collections.lazyness;
 import java.util.Iterator;
 import java.util.Random;
 
-import aeminium.gpu.backends.cpu.MersenneTwisterFast;
+import aeminium.gpu.backends.cpu.MersenneTwister;
 import aeminium.gpu.backends.gpu.MersenneTwisterGPU;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
@@ -37,7 +37,7 @@ public class RandomList implements PList<Float>, LazyCollection {
 	protected int max;
 	protected int seed;
 	protected GPUDevice device;
-	protected MersenneTwisterFast mt = null;
+	protected MersenneTwister mt = null;
 
 	public RandomList(int max) {
 		this(max, new Random().nextInt());
@@ -101,7 +101,7 @@ public class RandomList implements PList<Float>, LazyCollection {
 	@Override
 	public Float get(int index) {
 		if (mt == null)
-			mt = new MersenneTwisterFast(seed);
+			mt = new MersenneTwister(seed);
 		return mt.nextFloat();
 	}
 

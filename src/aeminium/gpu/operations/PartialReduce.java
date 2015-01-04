@@ -24,15 +24,15 @@ public class PartialReduce<O> extends GenericProgram {
 	// Constructors
 
 	public PartialReduce(LambdaReducer<O> reduceFun2, PList<O> list,
-			int outputSize, GPUDevice dev) {
-		this(reduceFun2, list, outputSize, "", dev);
+			int groupBy, GPUDevice dev) {
+		this(reduceFun2, list, groupBy, "", dev);
 	}
 
 	public PartialReduce(LambdaReducer<O> reduceFun, PList<O> list,
-			int outputSize, String other, GPUDevice dev) {
+			int groupBy, String other, GPUDevice dev) {
 		this.device = dev;
 		this.input = list;
-		this.outputSize = outputSize;
+		this.outputSize = list.size() / groupBy;
 		this.reduceFun = reduceFun;
 		
 		cpuOp = new CPUPartialReduce<O>(input, reduceFun, outputSize);

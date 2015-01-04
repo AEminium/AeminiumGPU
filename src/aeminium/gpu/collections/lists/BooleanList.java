@@ -66,8 +66,10 @@ public class BooleanList extends AbstractList<Boolean> implements
 	@Override
 	public void set(int index, Boolean e) {
 		if (index >= size) {
-			ensureNMore(index + 1 - size);
 			size = index + 1;
+		}
+		if (index >= box.length) {
+			ensureNMore(index + 1 - box.length);
 		}
 		box[index] = encode(e);
 	}

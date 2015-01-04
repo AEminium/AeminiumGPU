@@ -54,8 +54,10 @@ public class LongList extends AbstractList<Long> implements ConcreteCollection {
 	@Override
 	public void set(int index, Long e) {
 		if (index >= size) {
-			ensureNMore(index + 1 - size);
 			size = index + 1;
+		}
+		if (index >= box.length) {
+			ensureNMore(index + 1 - box.length);
 		}
 		box[index] = e;
 	}

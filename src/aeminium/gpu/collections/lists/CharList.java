@@ -49,8 +49,10 @@ public class CharList extends AbstractList<Character> implements
 	@Override
 	public void set(int index, Character e) {
 		if (index >= size) {
-			ensureNMore(index + 1 - size);
 			size = index + 1;
+		}
+		if (index >= box.length) {
+			ensureNMore(index + 1 - box.length);
 		}
 		box[index] = e;
 	}

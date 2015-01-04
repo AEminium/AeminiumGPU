@@ -31,26 +31,35 @@ public class CPUPartialReduce<O> extends CPUGenericKernel {
 	@Override
 	public void execute() {
 		output = (PList<O>) CollectionFactory.listFromType(getOutputType());
+		if (end > start) {
+			output.set(end-1, input.get(0));
+		}
 		cTask = ForTask.createFor(CPUDevice.rt, new aeminium.runtime.helpers.loops.Range(start, end), new ForBody<Integer>() {
 
 			@Override
 			public void iterate(Integer line, aeminium.runtime.Runtime rt,
 					Task current) {
-				int stride = input.size() / end;
 				O acc;
 				if (reduceFun instanceof LambdaReducerWithSeed) {
 					LambdaReducerWithSeed<O> red = (LambdaReducerWithSeed<O>) reduceFun;
 					acc = red.getSeed();
-					for (int i = line * stride; i < (line+1) * stride; i++) {
+					for (int i = line * outputSize; i < (line+1) * outputSize; i++) {
 						acc = reduceFun.combine(acc, input.get(i));
 					}
 				} else {
-					acc = input.get(line * stride);
-					for (int i = line * stride+1; i < (line+1) * stride; i++) {
+					acc = input.get(line * outputSize);
+					for (int i = line * outputSize + 1; i < (line+1) * outputSize; i++) {
 						acc = reduceFun.combine(acc, input.get(i));
 					}
 				}
-				output.set(line - start, acc);
+				//System.out.println("start" + start);
+				//System.out.println("end" + end);
+				//System.out.println("steps" + steps);
+				
+				if (line-start > output.length()) System.out.println("line" + (line-start) + ", " + output.length());
+				//System.out.println("output" + (line-start)/((float)outputSize));
+				//System.out.println("steps" + steps);
+				output.set(line-start, acc);
 			}
 			
 		}, Runtime.NO_HINTS);
