@@ -20,6 +20,11 @@ public class RandomExample {
 			public String getSource() {
 				return "return input;";
 			}
+			
+			@Override
+			public String getOutputType() {
+				return "Float";
+			}
 
 		});
 
