@@ -45,8 +45,8 @@ public class CPUPartialReduce<O> extends CPUGenericKernel {
 						acc = reduceFun.combine(acc, input.get(i));
 					}
 				} else {
-					acc = input.get(0);
-					for (int i = line * stride; i < (line+1) * stride; i++) {
+					acc = input.get(line * stride);
+					for (int i = line * stride+1; i < (line+1) * stride; i++) {
 						acc = reduceFun.combine(acc, input.get(i));
 					}
 				}
