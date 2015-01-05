@@ -1,4 +1,4 @@
-package aeminium.gpu.backends.cpu;
+package aeminium.gpu.backends.mcpu;
 
 import java.io.*;
 

@@ -1,7 +1,7 @@
 package aeminium.gpu.operations;
 
-import aeminium.gpu.backends.cpu.CPUReduce;
 import aeminium.gpu.backends.gpu.GPUReduce;
+import aeminium.gpu.backends.mcpu.MCPUReduce;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.contracts.GenericProgram;
@@ -18,7 +18,7 @@ public class MapReduce<I, O> extends GenericProgram {
 	protected LambdaReducerWithSeed<O> reduceFun;
 	
 	protected GPUReduce<I, O> gpuOp;
-	protected CPUReduce<I, O> cpuOp;
+	protected MCPUReduce<I, O> cpuOp;
 	
 
 	// Constructors
@@ -31,7 +31,7 @@ public class MapReduce<I, O> extends GenericProgram {
 		this.mapFun = mapper;
 		this.reduceFun = reducer;
 		
-		cpuOp = new CPUReduce<I, O>(input, mapFun, reduceFun);
+		cpuOp = new MCPUReduce<I, O>(input, mapFun, reduceFun);
 		gpuOp = new GPUReduce<I, O>(input, mapFun, reduceFun);
 		gpuOp.setOtherSources(other);
 		gpuOp.setDevice(dev);

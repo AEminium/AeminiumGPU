@@ -1,7 +1,7 @@
 package aeminium.gpu.operations;
 
-import aeminium.gpu.backends.cpu.CPUPartialReduce;
 import aeminium.gpu.backends.gpu.GPUPartialReduce;
+import aeminium.gpu.backends.mcpu.MCPUPartialReduce;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.contracts.GenericProgram;
@@ -19,7 +19,7 @@ public class PartialReduce<O> extends GenericProgram {
 	protected LambdaReducer<O> reduceFun;
 	
 	protected GPUPartialReduce<O> gpuOp;
-	protected CPUPartialReduce<O> cpuOp;
+	protected MCPUPartialReduce<O> cpuOp;
 	
 	// Constructors
 
@@ -35,7 +35,7 @@ public class PartialReduce<O> extends GenericProgram {
 		this.outputSize = list.size() / groupBy;
 		this.reduceFun = reduceFun;
 		
-		cpuOp = new CPUPartialReduce<O>(input, reduceFun, outputSize);
+		cpuOp = new MCPUPartialReduce<O>(input, reduceFun, outputSize);
 		gpuOp = new GPUPartialReduce<O>(input, reduceFun, outputSize);
 		gpuOp.setOtherSources(other);
 		gpuOp.setDevice(dev);

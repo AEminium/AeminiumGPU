@@ -3,13 +3,15 @@ package aeminium.gpu.collections.lazyness;
 import java.util.Iterator;
 import java.util.Random;
 
-import aeminium.gpu.backends.cpu.MersenneTwister;
+import aeminium.gpu.backends.cpu.MersenneTwisterFast;
 import aeminium.gpu.backends.gpu.MersenneTwisterGPU;
+import aeminium.gpu.backends.mcpu.MersenneTwister;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.matrices.PMatrix;
 import aeminium.gpu.collections.properties.evaluation.LazyCollection;
 import aeminium.gpu.collections.properties.evaluation.LazyGPUHelper;
+import aeminium.gpu.devices.CPUDevice;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.Map;
@@ -38,6 +40,7 @@ public class RandomList implements PList<Float>, LazyCollection {
 	protected int seed;
 	protected GPUDevice device;
 	protected MersenneTwister mt = null;
+	protected MersenneTwisterFast mtf = null;
 
 	public RandomList(int max) {
 		this(max, new Random().nextInt());
@@ -100,9 +103,15 @@ public class RandomList implements PList<Float>, LazyCollection {
 
 	@Override
 	public Float get(int index) {
-		if (mt == null)
-			mt = new MersenneTwister(seed);
-		return mt.nextFloat();
+		if (CPUDevice.isMulticore()) {
+			if (mt == null)
+				mt = new MersenneTwister(seed);
+			return mt.nextFloat();
+		} else {
+			if (mtf == null)
+				mtf = new MersenneTwisterFast(seed);
+			return mtf.nextFloat();
+		}
 	}
 
 	@Override

@@ -1,10 +1,17 @@
-package aeminium.gpu.backends.cpu;
+package aeminium.gpu.backends.mcpu;
 
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.devices.CPUDevice;
 import aeminium.gpu.operations.functions.LambdaMapper;
+import aeminium.runtime.Runtime;
+import aeminium.runtime.Task;
+import aeminium.runtime.helpers.loops.ForBody;
+import aeminium.runtime.helpers.loops.ForTask;
 
-public class CPUMap<I,O> extends CPUGenericKernel {
+public class MCPUMap<I,O> extends MCPUGenericKernel {
+
+	protected Task task;
 	
 	protected PList<I> input;
 	protected PList<O> output;
@@ -13,7 +20,7 @@ public class CPUMap<I,O> extends CPUGenericKernel {
 	protected String outputType;
 	
 	
-	public CPUMap(PList<I> input, LambdaMapper<I, O> mapFun) {
+	public MCPUMap(PList<I> input, LambdaMapper<I, O> mapFun) {
 		this.input = input;
 		this.mapFun = mapFun;
 		outputType = mapFun.getOutputType();
@@ -23,13 +30,22 @@ public class CPUMap<I,O> extends CPUGenericKernel {
 	@Override
 	public void execute() {
 		output = (PList<O>) CollectionFactory.listFromType(outputType);
-		for (int i=start; i<end; i++) {
-			output.add(mapFun.map(input.get(i)));
-		}
+		final int start = this.start;
+		task = ForTask.createFor(CPUDevice.rt, new aeminium.runtime.helpers.loops.Range(start, input.size()), new ForBody<Integer>() {
+
+			@Override
+			public void iterate(Integer i, aeminium.runtime.Runtime rt,
+					Task current) {
+				output.set(i - start, mapFun.map(input.get(i)));
+			}
+			
+		}, Runtime.NO_HINTS);
+		CPUDevice.submit(task);
 	}
 
 	@Override
 	public void waitForExecution() {
+		CPUDevice.waitFor(task);
 	}
 	
 	public PList<O> getOutput() {

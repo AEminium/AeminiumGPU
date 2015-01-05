@@ -89,4 +89,8 @@ public class CPUDevice {
 		rt.waitToEmpty();
 		shutdown();
 	}
+
+	public static boolean isMulticore() {
+		return rtcalls > 0;
+	}
 }

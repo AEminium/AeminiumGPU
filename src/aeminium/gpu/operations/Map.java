@@ -1,8 +1,8 @@
 package aeminium.gpu.operations;
 
-import aeminium.gpu.backends.cpu.CPUMap;
 import aeminium.gpu.backends.gpu.GPUMap;
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
+import aeminium.gpu.backends.mcpu.MCPUMap;
 import aeminium.gpu.collections.lazyness.LazyEvaluator;
 import aeminium.gpu.collections.lazyness.LazyPList;
 import aeminium.gpu.collections.lists.PList;
@@ -24,7 +24,7 @@ public class Map<I, O> extends GenericProgram implements Program {
 	
 	
 	protected GPUMap<I, O> gpuOp;
-	protected CPUMap<I, O> cpuOp;
+	protected MCPUMap<I, O> cpuOp;
 	
 
 	// Constructors
@@ -39,7 +39,7 @@ public class Map<I, O> extends GenericProgram implements Program {
 		this.input = list;
 		this.mapFun = mapFun;
 		
-		cpuOp = new CPUMap<I, O>(input, mapFun);
+		cpuOp = new MCPUMap<I, O>(input, mapFun);
 		gpuOp = new GPUMap<I, O>(input, mapFun, other);
 		gpuOp.setDevice(dev);
 	}
