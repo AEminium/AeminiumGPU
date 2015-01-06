@@ -92,6 +92,6 @@ public abstract class AbstractList<T> implements PList<T>, Mappable<T>,
 	
 	public abstract Class<?> getContainingType();
 	public String getCLType() {
-		return BufferHelper.getCLTypeOf(getContainingType()) + "[]";
+		return BufferHelper.getCLTypeOf(getContainingType()) + "*";
 	}
 }

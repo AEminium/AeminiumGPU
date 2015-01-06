@@ -68,7 +68,7 @@ public abstract class AbstractMatrix<T> implements PMatrix<T> {
 
 	public abstract Class<?> getContainingType();
 	public String getCLType() {
-		return BufferHelper.getCLTypeOf(getContainingType()) + "[]";
+		return BufferHelper.getCLTypeOf(getContainingType()) + "*";
 	}
 	
 }
