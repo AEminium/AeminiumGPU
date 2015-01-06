@@ -13,7 +13,7 @@ public class ExtraDataExample {
 		final PList<Integer> input2 = new IntList();
 		for (int i=0; i<N; i++) {
 			input.add(i);
-			input2.add(-i);
+			input2.add(10);
 		}
 		input = input.map(new LambdaMapper<Integer, Integer>() {
 
