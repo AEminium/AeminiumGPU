@@ -135,6 +135,7 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 						(long) blocksInCurrentDepth,
 						(long) DEFAULT_MAX_REDUCTION_SIZE);
 				}
+				setExtraDataArgs(kernel);
 				int workgroupSize = blocksInCurrentDepth;
 				if (workgroupSize == 1)
 					workgroupSize = 2;
