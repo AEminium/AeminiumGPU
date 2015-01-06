@@ -1,11 +1,8 @@
 package aeminium.gpu.backends.gpu;
 
-import java.lang.reflect.Field;
-
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
 import aeminium.gpu.backends.gpu.buffers.OtherData;
 import aeminium.gpu.backends.gpu.generators.MapCodeGen;
-import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
@@ -39,26 +36,8 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 		if (input instanceof Range) {
 			gen.setRange(true);
 		}
-		extractOtherData();
+		otherData = OtherData.extractOtherData(mapFun);
 		gen.setOtherData(otherData);
-	}
-	
-	private void extractOtherData() {
-		Field[] fs = mapFun.getClass().getFields();
-		otherData = new OtherData[fs.length];
-		int i = 0;
-		for (Field f : fs) {
-			f.setAccessible(true);
-			try {
-				otherData[i++] = new OtherData(f.getName(), (PObject) f.get(mapFun));
-			} catch (IllegalArgumentException e) {
-				// Avoided
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// Avoided
-				e.printStackTrace();
-			}
-		}
 	}
 
 	@Override

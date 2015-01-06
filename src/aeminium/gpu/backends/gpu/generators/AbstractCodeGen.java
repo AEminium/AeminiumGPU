@@ -21,7 +21,7 @@ public abstract class AbstractCodeGen {
 	}
 	
 	public String getExtraArgs() {
-		if (otherData.length == 0) {
+		if (otherData == null || otherData.length == 0) {
 			return "";
 		} else {
 			StringBuilder b = new StringBuilder();

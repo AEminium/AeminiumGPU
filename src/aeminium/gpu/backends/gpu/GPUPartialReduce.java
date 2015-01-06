@@ -1,6 +1,7 @@
 package aeminium.gpu.backends.gpu;
 
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
+import aeminium.gpu.backends.gpu.buffers.OtherData;
 import aeminium.gpu.backends.gpu.generators.ReduceCodeGen;
 import aeminium.gpu.backends.gpu.generators.ReduceTemplateSource;
 import aeminium.gpu.collections.lazyness.Range;
@@ -39,6 +40,8 @@ public class GPUPartialReduce<O> extends GPUGenericKernel implements ReduceTempl
 		if (input instanceof Range) {
 			gen.setRange(true);
 		}
+		otherData = OtherData.extractOtherData(reduceFun);
+		gen.setOtherData(otherData);
 	}
 	@Override
 	public String getKernelName() {
