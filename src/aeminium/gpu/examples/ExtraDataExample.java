@@ -41,12 +41,12 @@ public class ExtraDataExample {
 			
 			@Override
 			public Integer combine(Integer input, Integer other) {
-				return input + other + m3.get(0);
+				return input + other + m3.get(3);
 			}
 
 			@Override
 			public String getSource() {
-				return "return reduce_input_first + reduce_input_second + m3[0];";
+				return "return reduce_input_first + reduce_input_second + m3[3];";
 			}
 
 			@Override
@@ -78,12 +78,12 @@ public class ExtraDataExample {
 			
 			@Override
 			public Integer combine(Integer input, Integer other) {
-				return input + other + m5.get(0);
+				return input + other + m5.get(2);
 			}
 
 			@Override
 			public String getSource() {
-				return "return reduce_input_first + reduce_input_second + m5[0];";
+				return "return reduce_input_first + reduce_input_second + m5[2];";
 			}
 
 			@Override
