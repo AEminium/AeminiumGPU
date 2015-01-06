@@ -3,6 +3,7 @@ package aeminium.gpu.backends.gpu;
 import org.bridj.Pointer;
 
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
+import aeminium.gpu.backends.gpu.buffers.OtherData;
 import aeminium.gpu.backends.gpu.generators.AbstractReduceCodeGen;
 import aeminium.gpu.backends.gpu.generators.MapReduceCodeGen;
 import aeminium.gpu.backends.gpu.generators.ReduceCodeGen;
@@ -61,6 +62,8 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 		if (input instanceof Range) {
 			gen.setRange(true);
 		}
+		otherData = OtherData.extractOtherData(mapFun, reduceFun);
+		gen.setOtherData(otherData);
 	}
 
 	@Override

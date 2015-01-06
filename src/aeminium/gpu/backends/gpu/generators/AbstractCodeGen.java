@@ -33,7 +33,7 @@ public abstract class AbstractCodeGen {
 	}
 	
 	public String getExtraArgsCall() {
-		if (otherData.length == 0) {
+		if (otherData == null || otherData.length == 0) {
 			return "";
 		} else {
 			StringBuilder b = new StringBuilder();
