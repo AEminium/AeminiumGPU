@@ -35,10 +35,10 @@ __kernel void {{reduce_kernel_name}}(
 	{{output_type}} total = ({{output_type}}) get_accumulator();
 	if (first) {
 		for (int inputOffset = inputStart; inputOffset < inputEnd; inputOffset++)
-			MERGE(total, {{map_lambda_name}}({{get_input}} {{extra_args_call}}));
+			MERGE(total, {{map_lambda_name}}({{get_input}} {{extra_args_call}}) {{extra_args_call}});
 	} else {
 		for (int inputOffset = inputStart; inputOffset < inputEnd; inputOffset++)
-			MERGE(total, reduce_input[inputOffset]);
+			MERGE(total, reduce_input[inputOffset] {{extra_args_call}});
 	}
         
 	reduce_output[block] = total;
