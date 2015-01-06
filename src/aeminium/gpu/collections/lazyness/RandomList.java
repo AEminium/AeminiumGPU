@@ -131,7 +131,7 @@ public class RandomList implements PList<Float>, LazyCollection {
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Float.class;
 	}
 
@@ -187,5 +187,10 @@ public class RandomList implements PList<Float>, LazyCollection {
 	@Override
 	public PList<Float> extend(PList<Float> extra) {
 		throw new ReadOnlyListException();
+	}
+
+	@Override
+	public String getCLType() {
+		return "float[]";
 	}
 }

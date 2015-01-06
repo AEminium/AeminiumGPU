@@ -97,7 +97,7 @@ public class MapReduce<I, O> extends GenericProgram {
 	// Utils
 
 	public String getInputType() {
-		return input.getType().getSimpleName().toString();
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public String getOutputType() {

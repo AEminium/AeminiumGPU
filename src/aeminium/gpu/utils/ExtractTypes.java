@@ -38,13 +38,13 @@ public class ExtractTypes {
 	}
 	
 	public static String getMapOutputType(LambdaMapper<?,?> mapFun, PList<?> input) {
-		Class<?> type = getMapOutputClass(mapFun, input.getType());
+		Class<?> type = getMapOutputClass(mapFun, input.getContainingType());
 		if (type == null) return null;
 		return type.getSimpleName().toString();
 	}
 	
 	public static String getMapOutputType(LambdaMapper<?,?> mapFun, LambdaMapper<?,?> mapFun2, PList<?> input) {
-		Class<?> ft = getMapOutputClass(mapFun, input.getType());
+		Class<?> ft = getMapOutputClass(mapFun, input.getContainingType());
 		Class<?> st = getMapOutputClass(mapFun2, ft);
 		if (st == null) return null;
 		return st.getSimpleName().toString();

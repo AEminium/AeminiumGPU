@@ -29,7 +29,7 @@ public class LongMatrix extends AbstractMatrix<Long> implements
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Long.class;
 	}
 

@@ -2,6 +2,7 @@ package aeminium.gpu.collections.lists;
 
 import java.util.Iterator;
 
+import aeminium.gpu.backends.gpu.buffers.BufferHelper;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.matrices.PMatrix;
 import aeminium.gpu.collections.properties.Mappable;
@@ -88,5 +89,9 @@ public abstract class AbstractList<T> implements PList<T>, Mappable<T>,
 			
 		};
 	}
-
+	
+	public abstract Class<?> getContainingType();
+	public String getCLType() {
+		return BufferHelper.getCLTypeOf(getContainingType()) + "[]";
+	}
 }

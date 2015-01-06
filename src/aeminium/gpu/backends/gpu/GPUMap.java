@@ -122,7 +122,7 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 	// Utils
 	
 	public String getInputType() {
-		return input.getType().getSimpleName().toString();
+		return input.getContainingType().getSimpleName().toString();
 	}
 	
 	public void setOutputType(String ot) {

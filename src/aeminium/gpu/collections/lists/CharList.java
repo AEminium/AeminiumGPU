@@ -80,7 +80,7 @@ public class CharList extends AbstractList<Character> implements
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Character.class;
 	}
 

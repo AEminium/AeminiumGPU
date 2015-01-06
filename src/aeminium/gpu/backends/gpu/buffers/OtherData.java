@@ -14,7 +14,7 @@ public class OtherData {
 	public OtherData(String n, PObject o) {
 		this.name = n;
 		this.obj = o;
-		this.type = BufferHelper.getCLTypeOfObject(obj);
+		this.type = obj.getCLType();
 	}
 	
 	public void createBuffer(CLContext ctx) {

@@ -98,7 +98,7 @@ public class IntList extends AbstractList<Integer> implements
 		}
 	}
 
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Integer.class;
 	}
 

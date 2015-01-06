@@ -74,7 +74,7 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 	public void clear() {
 		size = 0;
 		evaluated = true;
-		actual = (PList<T>) CollectionFactory.listFromType(getType()
+		actual = (PList<T>) CollectionFactory.listFromType(getContainingType()
 				.getSimpleName().toString());
 	}
 
@@ -85,7 +85,7 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return evaluator.getType();
 	}
 

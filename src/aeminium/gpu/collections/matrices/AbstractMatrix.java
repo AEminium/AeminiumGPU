@@ -1,5 +1,6 @@
 package aeminium.gpu.collections.matrices;
 
+import aeminium.gpu.backends.gpu.buffers.BufferHelper;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.DefaultDeviceFactory;
@@ -65,4 +66,9 @@ public abstract class AbstractMatrix<T> implements PMatrix<T> {
 		return reduceOperation.getOutput();
 	}
 
+	public abstract Class<?> getContainingType();
+	public String getCLType() {
+		return BufferHelper.getCLTypeOf(getContainingType()) + "[]";
+	}
+	
 }

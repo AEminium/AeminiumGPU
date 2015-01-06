@@ -80,7 +80,7 @@ public class FloatList extends AbstractList<Float> implements
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Float.class;
 	}
 

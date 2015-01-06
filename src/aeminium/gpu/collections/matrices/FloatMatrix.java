@@ -29,7 +29,7 @@ public class FloatMatrix extends AbstractMatrix<Float> implements
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Float.class;
 	}
 

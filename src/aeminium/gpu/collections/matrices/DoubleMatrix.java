@@ -29,7 +29,7 @@ public class DoubleMatrix extends AbstractMatrix<Double> implements
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Double.class;
 	}
 
