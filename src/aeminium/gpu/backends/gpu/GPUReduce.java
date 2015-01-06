@@ -84,6 +84,7 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 
 	@Override
 	public void prepareBuffers(CLContext ctx) {
+		super.prepareBuffers(ctx);
 		inferBestValues();
 		if (gen instanceof MapReduceCodeGen) {
 			if (input instanceof Range) {

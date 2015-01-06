@@ -59,6 +59,7 @@ public class GPUPartialReduce<O> extends GPUGenericKernel implements ReduceTempl
 
 	@Override
 	public void prepareBuffers(CLContext ctx) {
+		super.prepareBuffers(ctx);
 		inbuffer = BufferHelper.createInputBufferFor(ctx, input, input.size());
 		outbuffer = BufferHelper.createInputOutputBufferFor(ctx,
 				getOutputType(), outputSize);
