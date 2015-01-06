@@ -1,6 +1,6 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 
-#define MERGE(acc,other) acc = {{reduce_lambda_name}}(acc,other {{extra_args_call}})
+#define MERGE(acc,other {{extra_args_call}}) acc = {{reduce_lambda_name}}(acc,other {{extra_args_call}})
 
 // Other Sources Required
 {{other_sources}}
