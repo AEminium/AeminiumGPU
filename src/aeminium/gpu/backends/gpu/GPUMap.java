@@ -35,12 +35,12 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 		outputType = mapFun.getOutputType() != null ? mapFun.getOutputType() : ExtractTypes.getMapOutputType(mapFun, input);
 		this.setOtherSources(otherSources);
 		
-		extractOtherData();
-		
 		gen = new MapCodeGen(this);
 		if (input instanceof Range) {
 			gen.setRange(true);
 		}
+		extractOtherData();
+		gen.setOtherData(otherData);
 	}
 	
 	private void extractOtherData() {
