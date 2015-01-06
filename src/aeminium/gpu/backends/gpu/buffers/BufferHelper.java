@@ -2,6 +2,7 @@ package aeminium.gpu.backends.gpu.buffers;
 
 import java.util.HashMap;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.lists.BooleanList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.LazyCollection;
@@ -49,7 +50,7 @@ public class BufferHelper {
 	}
 
 	private static <T> IBufferFactory getFactory(PList<T> list) {
-		return getFactory(list.getType().getSimpleName());
+		return getFactory(list.getContainingType().getSimpleName());
 	}
 
 	private static <T> IBufferFactory getFactory(String type) {
@@ -121,7 +122,7 @@ public class BufferHelper {
 
 	public static PList<?> extractFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
 			CLEvent ev, int size, PList<?> list) {
-		return extractFromBuffer(outbuffer, q, ev, list.getType()
+		return extractFromBuffer(outbuffer, q, ev, list.getContainingType()
 				.getSimpleName(), size);
 	}
 
@@ -150,6 +151,30 @@ public class BufferHelper {
 			return BooleanList.decode((Character) in);
 		}
 		return in;
+	}
+
+	public static CLBuffer<?> createInputOutputBufferFor(CLContext ctx,
+			PObject o) {
+		if (o instanceof PList) {
+			PList<?> l = (PList<?>) o;
+			return createInputOutputBufferFor(ctx, l);
+		}
+		return null;
+	}
+
+	public static String getCLTypeOfObject(PObject o) {
+		if (o instanceof PList) {
+			PList<?> l = (PList<?>) o;
+			return getCLTypeOf(l.getContainingType().toString()) + "[]";
+		} else {
+			System.out.println("o not a PLIST");
+			return null; // TODO
+		}
+	}
+
+	public static String getCLTypeOf(Class<?> containingType) {
+		String k = containingType.getSimpleName();
+		return clTypes.get(k);
 	}
 
 }

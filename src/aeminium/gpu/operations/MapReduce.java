@@ -8,7 +8,6 @@ import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.utils.ExtractTypes;
 
 public class MapReduce<I, O> extends GenericProgram {
 
@@ -52,11 +51,13 @@ public class MapReduce<I, O> extends GenericProgram {
 
 	@Override
 	protected int getBalanceSplitPoint() {
-		return OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(),
+		int s = OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(),
 				1,
 				mapFun.getSource() + reduceFun.getSource(),
 				mergeComplexities(mapFun.getSourceComplexity(),
 						reduceFun.getSourceComplexity()));
+		if (s < GPUReduce.DEFAULT_MAX_REDUCTION_SIZE) return 0;
+		return s;
 	}
 
 	public void cpuExecution(int start, int end) {
@@ -97,11 +98,11 @@ public class MapReduce<I, O> extends GenericProgram {
 	// Utils
 
 	public String getInputType() {
-		return input.getType().getSimpleName().toString();
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public String getOutputType() {
-		return ExtractTypes.extractReturnTypeOutOf(reduceFun, "combine");
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public int getOutputSize() {

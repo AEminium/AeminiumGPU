@@ -4,7 +4,6 @@ import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.utils.ExtractTypes;
 
 public class CPUPartialReduce<O> extends CPUGenericKernel {
 	protected PList<O> input;
@@ -47,7 +46,7 @@ public class CPUPartialReduce<O> extends CPUGenericKernel {
 	}
 
 	public String getOutputType() {
-		return ExtractTypes.extractReturnTypeOutOf(reduceFun, "combine");
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public PList<O> getOutput() {

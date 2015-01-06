@@ -1,6 +1,6 @@
 package aeminium.gpu.examples;
 
-import aeminium.gpu.collections.lists.IntList;
+import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
@@ -8,9 +8,7 @@ public class ReduceExample {
 	public static void main(String[] args) {
 		int N = 1034;
 
-		PList<Integer> input = new IntList();
-		for (int i=0; i<N; i++)
-			input.add(i+1);
+		PList<Integer> input = new Range(N);
 		
 		int sum = input.reduce(new LambdaReducerWithSeed<Integer>() {
 
@@ -30,7 +28,7 @@ public class ReduceExample {
 			}
 
 		});
-		System.out.println("The max value is " + sum + ", and should be " + N);
+		System.out.println("The max value is " + sum + ", and should be " + (N-1));
 
 	}
 }

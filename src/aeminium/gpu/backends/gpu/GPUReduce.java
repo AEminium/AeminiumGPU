@@ -3,7 +3,8 @@ package aeminium.gpu.backends.gpu;
 import org.bridj.Pointer;
 
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
-import aeminium.gpu.backends.gpu.generators.GenericReduceCodeGen;
+import aeminium.gpu.backends.gpu.buffers.OtherData;
+import aeminium.gpu.backends.gpu.generators.AbstractReduceCodeGen;
 import aeminium.gpu.backends.gpu.generators.MapReduceCodeGen;
 import aeminium.gpu.backends.gpu.generators.ReduceCodeGen;
 import aeminium.gpu.backends.gpu.generators.ReduceTemplateSource;
@@ -11,7 +12,6 @@ import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.utils.ExtractTypes;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -21,7 +21,7 @@ import com.nativelibs4java.opencl.CLQueue;
 
 public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateSource<O> {
 	
-	static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
+	public static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
 	
 	protected PList<I> input;
 	protected O output;
@@ -31,7 +31,7 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 	protected CLBuffer<?> inbuffer;
 	protected CLBuffer<?> outbuffer;
 
-	private GenericReduceCodeGen gen;
+	private AbstractReduceCodeGen gen;
 
 	private int blocks;
 	private int threads;
@@ -47,6 +47,8 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 		if (reduceFun instanceof LambdaReducerWithSeed) {
 			gen.setHasSeed(true);
 		}
+		otherData = OtherData.extractOtherData(reduceFun);
+		gen.setOtherData(otherData);
 	}
 	
 	public GPUReduce(PList<I> input,  LambdaMapper<I, O> mapFun, LambdaReducerWithSeed<O> reduceFun) {
@@ -61,6 +63,8 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 		if (input instanceof Range) {
 			gen.setRange(true);
 		}
+		otherData = OtherData.extractOtherData(mapFun, reduceFun);
+		gen.setOtherData(otherData);
 	}
 
 	@Override
@@ -79,8 +83,9 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 
 	@Override
 	public void prepareBuffers(CLContext ctx) {
+		super.prepareBuffers(ctx);
 		inferBestValues();
-		if (gen instanceof MapReduceCodeGen) {
+		if (mapFun == null) {
 			if (input instanceof Range) {
 				// Fake 1 byte data.
 				Pointer<Integer> ptr = Pointer.allocateInts(1).order(
@@ -103,7 +108,6 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 		CLEvent[] eventsArr = new CLEvent[1];
 		int[] blockCountArr = new int[1];
 		current_size = end;
-
 		while (current_size > 1) {
 			int blocksInCurrentDepth = current_size
 					/ DEFAULT_MAX_REDUCTION_SIZE;
@@ -130,6 +134,7 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 						(long) blocksInCurrentDepth,
 						(long) DEFAULT_MAX_REDUCTION_SIZE);
 				}
+				setExtraDataArgs(kernel);
 				int workgroupSize = blocksInCurrentDepth;
 				if (workgroupSize == 1)
 					workgroupSize = 2;
@@ -137,9 +142,10 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 				eventsArr[0] = kernel.enqueueNDRange(q, blockCountArr, null,
 						eventsArr);
 			}
-			
-			// debugBuffers(ctx, q, "in", currentInput, current_size);
-			// debugBuffers(ctx, q, "out", outbuffer, blocksInCurrentDepth);
+			//if (current_size < end) {
+			//	debugBuffers(ctx, q, "in", currentInput, current_size);
+			//	debugBuffers(ctx, q, "out", outbuffer, blocksInCurrentDepth);
+			//}
 			
 			current_size = blocksInCurrentDepth;
 			depth++;
@@ -229,11 +235,11 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 	}
 
 	public String getInputType() {
-		return input.getType().getSimpleName().toString();
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public String getOutputType() {
-		return ExtractTypes.extractReturnTypeOutOf(reduceFun, "combine");
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public int getOutputSize() {

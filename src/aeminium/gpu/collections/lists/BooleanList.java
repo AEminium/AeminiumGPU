@@ -91,7 +91,7 @@ public class BooleanList extends AbstractList<Boolean> implements
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Boolean.class;
 	}
 

@@ -1,5 +1,6 @@
 package aeminium.gpu.backends.gpu;
 
+import aeminium.gpu.backends.gpu.buffers.OtherData;
 import aeminium.gpu.devices.GPUDevice;
 
 import com.nativelibs4java.opencl.CLBuildException;
@@ -15,8 +16,9 @@ public abstract class GPUGenericKernel implements GPUKernel {
 	protected CLKernel kernel;
 	protected CLEvent kernelCompletion;
 	
+	protected OtherData[] otherData;
+	
 	protected String otherSources;
-
 
 	protected long startTime;
 	
@@ -45,7 +47,20 @@ public abstract class GPUGenericKernel implements GPUKernel {
 	public void prepareSource(CLContext ctx) {
 		kernel = getOrCreateKernel(ctx);
 	}
-	abstract public void prepareBuffers(CLContext ctx);
+	public void prepareBuffers(CLContext ctx) {
+		for (OtherData o : otherData) {
+			o.createBuffer(ctx);
+		}
+	}
+	
+	protected void setExtraDataArgs(CLKernel kernel) {
+		if (kernel == null) return;
+		int i = kernel.getNumArgs() - otherData.length;
+		for (OtherData o : otherData) {
+			if (o == null) continue;
+			kernel.setArg(i++, o.getBuffer());
+		}
+	}
 
 	abstract public void execute(CLContext ctx, CLQueue q);
 

@@ -8,11 +8,9 @@ import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
 
 @SuppressWarnings("rawtypes")
-public class MapReduceCodeGen implements GenericReduceCodeGen {
+public class MapReduceCodeGen extends AbstractReduceCodeGen {
 	private GPUReduce op;
-	private String id;
 	private String[] map_parameters;
-	private boolean isRange = false;
 
 	public MapReduceCodeGen(GPUReduce op) {
 		this.op = op;
@@ -27,6 +25,7 @@ public class MapReduceCodeGen implements GenericReduceCodeGen {
 		mapping.put("map_lambda_name", getMapLambdaName());
 		mapping.put("map_lambda_par", map_parameters[0]);
 		mapping.put("source", op.getMapFun().getSource());
+		mapping.put("extra_args", getExtraArgs());
 		Template t = new Template(
 				new TemplateWrapper("opencl/MapLambdaDef.clt"));
 		return t.apply(mapping);
@@ -40,6 +39,8 @@ public class MapReduceCodeGen implements GenericReduceCodeGen {
 		mapping.put("reduce_lambda_par1", op.getReduceFun().getParameters()[0]);
 		mapping.put("reduce_lambda_par2", op.getReduceFun().getParameters()[1]);
 		mapping.put("source", op.getReduceFun().getSource());
+		mapping.put("extra_args", getExtraArgs());
+		mapping.put("extra_args_call", getExtraArgsCall());
 		Template t = new Template(new TemplateWrapper(
 				"opencl/ReduceLambdaDef.clt"));
 		return t.apply(mapping);
@@ -60,6 +61,9 @@ public class MapReduceCodeGen implements GenericReduceCodeGen {
 		mapping.put("reduce_kernel_name", getReduceKernelName());
 		mapping.put("other_sources", op.getOtherSources());
 
+		mapping.put("extra_args", getExtraArgs());
+		mapping.put("extra_args_call", getExtraArgsCall());
+		
 		if (isRange) {
 			mapping.put("get_input", "inputOffset");
 		} else {
@@ -83,18 +87,6 @@ public class MapReduceCodeGen implements GenericReduceCodeGen {
 
 	public String getReduceKernelName() {
 		return "reduce_kernel_" + id;
-	}
-
-	public boolean isRange() {
-		return isRange;
-	}
-
-	public void setRange(boolean isRange) {
-		this.isRange = isRange;
-	}
-
-	@Override
-	public void setHasSeed(boolean b) {		
 	}
 
 }

@@ -37,7 +37,7 @@ public class MapToReduceMerger<I, O> {
 
 			@Override
 			public Class<?> getType() {
-				return current.getType();
+				return current.getContainingType();
 			}
 
 			@Override

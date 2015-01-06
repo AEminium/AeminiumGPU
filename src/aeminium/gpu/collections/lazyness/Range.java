@@ -50,11 +50,7 @@ public class Range implements PList<Integer>, LazyCollection {
 
 	@Override
 	public Integer reduce(LambdaReducerWithSeed<Integer> reducer) {
-		PList<Integer> result = map(new IntegerIdentityMapper());
-		return result.reduce(reducer);
-		/*Reduce<Integer> reduceOperation = new MapReduce<Integer>(reducer, this,
-				device);
-		return reduceOperation.getOutput();*/
+		return this.map(new IntegerIdentityMapper()).reduce(reducer);
 	}
 
 	@Override
@@ -113,7 +109,7 @@ public class Range implements PList<Integer>, LazyCollection {
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Integer.class;
 	}
 
@@ -162,5 +158,10 @@ public class Range implements PList<Integer>, LazyCollection {
 	@Override
 	public PList<Integer> extend(PList<Integer> extra) {
 		throw new ReadOnlyListException();
+	}
+
+	@Override
+	public String getCLType() {
+		return "int[]";
 	}
 }

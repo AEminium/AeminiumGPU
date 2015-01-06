@@ -62,7 +62,7 @@ public class MapToMapMerger<I, M, O> {
 
 			@Override
 			public Class<?> getType() {
-				return current.getType();
+				return current.getContainingType();
 			}
 
 			@Override

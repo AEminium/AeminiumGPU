@@ -1,6 +1,7 @@
 package aeminium.gpu.backends.gpu;
 
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
+import aeminium.gpu.backends.gpu.buffers.OtherData;
 import aeminium.gpu.backends.gpu.generators.MapCodeGen;
 import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
@@ -35,8 +36,10 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 		if (input instanceof Range) {
 			gen.setRange(true);
 		}
+		otherData = OtherData.extractOtherData(mapFun);
+		gen.setOtherData(otherData);
 	}
-	
+
 	@Override
 	public String getKernelName() {
 		return gen.getMapKernelName();
@@ -49,9 +52,12 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 
 	@Override
 	public void prepareBuffers(CLContext ctx) {
+		super.prepareBuffers(ctx);
 		inbuffer = BufferHelper.createInputBufferFor(ctx, input, end);
 		outbuffer = BufferHelper.createOutputBufferFor(ctx, outputType,
 				end);
+		
+		
 	}
 
 	@Override
@@ -60,6 +66,7 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 			// setArgs will throw an exception at runtime if the types / sizes
 			// of the arguments are incorrect
 			kernel.setArgs(inbuffer, outbuffer);
+			setExtraDataArgs(kernel);
 
 			// Ask for 1-dimensional execution of length dataSize, with auto
 			// choice of local workgroup size :
@@ -94,7 +101,7 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 	// Utils
 	
 	public String getInputType() {
-		return input.getType().getSimpleName().toString();
+		return input.getContainingType().getSimpleName().toString();
 	}
 	
 	public void setOutputType(String ot) {

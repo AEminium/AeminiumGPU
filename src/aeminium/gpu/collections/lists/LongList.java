@@ -79,7 +79,7 @@ public class LongList extends AbstractList<Long> implements ConcreteCollection {
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Long.class;
 	}
 

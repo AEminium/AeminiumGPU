@@ -7,17 +7,13 @@ import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
 
 @SuppressWarnings("rawtypes")
-public class ReduceCodeGen implements GenericReduceCodeGen {
+public class ReduceCodeGen extends AbstractReduceCodeGen {
 
 	private String inputType;
 	private String outputType;
 	private String clSource;
 	private String seedSource;
-	private String otherSources = "";
-	private String id;
 	private String[] parameters;
-	private boolean isRange = false;
-	private boolean hasSeed = false;
 
 	public ReduceCodeGen(String inputType, String outputType, String clSource,
 			String seedSource, String[] pars, String id) {
@@ -53,6 +49,7 @@ public class ReduceCodeGen implements GenericReduceCodeGen {
 		mapping.put("reduce_lambda_par1", parameters[0]);
 		mapping.put("reduce_lambda_par2", parameters[1]);
 		mapping.put("source", clSource);
+		mapping.put("extra_args", getExtraArgs());
 		Template t = new Template(new TemplateWrapper(
 				"opencl/ReduceLambdaDef.clt"));
 		return t.apply(mapping);
@@ -69,7 +66,9 @@ public class ReduceCodeGen implements GenericReduceCodeGen {
 		mapping.put("reduce_kernel_name", getReduceKernelName());
 		mapping.put("reduce_lambda_def", getReduceLambdaSource());
 		mapping.put("other_sources", otherSources);
-
+		mapping.put("extra_args", getExtraArgs());
+		mapping.put("extra_args_call", getExtraArgsCall());
+		
 		if (isRange) {
 			mapping.put("get_input", "inputOffset");
 		} else {
@@ -93,18 +92,6 @@ public class ReduceCodeGen implements GenericReduceCodeGen {
 
 	public String getReduceKernelName() {
 		return "reduce_kernel_" + id;
-	}
-
-	public boolean isRange() {
-		return isRange;
-	}
-
-	public void setRange(boolean isRange) {
-		this.isRange = isRange;
-	}
-
-	public void setHasSeed(boolean b) {
-		hasSeed = b;
 	}
 
 	@Override

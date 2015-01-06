@@ -28,7 +28,7 @@ public class LazyPMatrix<T> extends AbstractMatrix<T> {
 	}
 
 	@Override
-	public Class<?> getType() {
-		return source.getType();
+	public Class<?> getContainingType() {
+		return source.getContainingType();
 	}
 }

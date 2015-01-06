@@ -29,7 +29,7 @@ public class IntMatrix extends AbstractMatrix<Integer> implements
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Integer.class;
 	}
 

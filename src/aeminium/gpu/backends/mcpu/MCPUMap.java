@@ -4,6 +4,7 @@ import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.CPUDevice;
 import aeminium.gpu.operations.functions.LambdaMapper;
+import aeminium.gpu.utils.ExtractTypes;
 import aeminium.runtime.Runtime;
 import aeminium.runtime.Task;
 import aeminium.runtime.helpers.loops.ForBody;
@@ -24,6 +25,9 @@ public class MCPUMap<I,O> extends MCPUGenericKernel {
 		this.input = input;
 		this.mapFun = mapFun;
 		outputType = mapFun.getOutputType();
+		if (outputType == null) {
+			outputType = ExtractTypes.getMapOutputType(mapFun, input);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

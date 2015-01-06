@@ -1,6 +1,7 @@
 package aeminium.gpu.operations;
 
 import aeminium.gpu.backends.gpu.GPUPartialReduce;
+import aeminium.gpu.backends.gpu.GPUReduce;
 import aeminium.gpu.backends.mcpu.MCPUPartialReduce;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
@@ -8,7 +9,6 @@ import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.utils.ExtractTypes;
 
 public class PartialReduce<O> extends GenericProgram {
 
@@ -48,8 +48,10 @@ public class PartialReduce<O> extends GenericProgram {
 
 	@Override
 	protected int getBalanceSplitPoint() {
-		return OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(), outputSize,
+		int s = OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(), outputSize,
 				reduceFun.getSource(), reduceFun.getSourceComplexity());
+		if (s < GPUReduce.DEFAULT_MAX_REDUCTION_SIZE) return 0;
+		return s;
 	}
 	
 	public void cpuExecution(int start, int end) {
@@ -99,11 +101,11 @@ public class PartialReduce<O> extends GenericProgram {
 	}
 
 	public String getInputType() {
-		return input.getType().getSimpleName().toString();
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public String getOutputType() {
-		return ExtractTypes.extractReturnTypeOutOf(reduceFun, "combine");
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public int getOutputSize() {

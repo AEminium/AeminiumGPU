@@ -80,7 +80,7 @@ public class DoubleList extends AbstractList<Double> implements
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Double.class;
 	}
 

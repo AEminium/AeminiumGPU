@@ -1,8 +1,5 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 
-#define MERGE(acc,other) acc = {{reduce_lambda_name}}(acc,other)
-
-
 // Other Sources Required
 {{other_sources}}
 
@@ -23,7 +20,7 @@ __kernel void {{reduce_kernel_name}}(
 			long dataLength, 
    			long blocks,
    			long blockLength,
-			const int first) {
+			const int first {{extra_args}}) {
 			
 	long block = get_global_id(0);
 	if (block >= blocks)
@@ -35,10 +32,10 @@ __kernel void {{reduce_kernel_name}}(
 	{{output_type}} total = ({{output_type}}) get_accumulator();
 	if (first) {
 		for (int inputOffset = inputStart; inputOffset < inputEnd; inputOffset++)
-			MERGE(total, {{map_lambda_name}}({{get_input}}));
+			total = {{reduce_lambda_name}}(total, {{map_lambda_name}}({{get_input}} {{extra_args_call}}) {{extra_args_call}});
 	} else {
 		for (int inputOffset = inputStart; inputOffset < inputEnd; inputOffset++)
-			MERGE(total, reduce_input[inputOffset]);
+			total = {{reduce_lambda_name}}(total, reduce_input[inputOffset] {{extra_args_call}});
 	}
         
 	reduce_output[block] = total;

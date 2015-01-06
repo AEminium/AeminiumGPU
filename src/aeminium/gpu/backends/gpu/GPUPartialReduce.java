@@ -1,13 +1,13 @@
 package aeminium.gpu.backends.gpu;
 
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
+import aeminium.gpu.backends.gpu.buffers.OtherData;
 import aeminium.gpu.backends.gpu.generators.ReduceCodeGen;
 import aeminium.gpu.backends.gpu.generators.ReduceTemplateSource;
 import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.utils.ExtractTypes;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -39,6 +39,8 @@ public class GPUPartialReduce<O> extends GPUGenericKernel implements ReduceTempl
 		if (input instanceof Range) {
 			gen.setRange(true);
 		}
+		otherData = OtherData.extractOtherData(reduceFun);
+		gen.setOtherData(otherData);
 	}
 	@Override
 	public String getKernelName() {
@@ -56,6 +58,7 @@ public class GPUPartialReduce<O> extends GPUGenericKernel implements ReduceTempl
 
 	@Override
 	public void prepareBuffers(CLContext ctx) {
+		super.prepareBuffers(ctx);
 		inbuffer = BufferHelper.createInputBufferFor(ctx, input, input.size());
 		outbuffer = BufferHelper.createInputOutputBufferFor(ctx,
 				getOutputType(), outputSize);
@@ -66,6 +69,7 @@ public class GPUPartialReduce<O> extends GPUGenericKernel implements ReduceTempl
 		synchronized (kernel) {
 			kernel.setArgs(inbuffer, outbuffer, (long) input.size(),
 					(long) end, (long) (input.size() / outputSize));
+			setExtraDataArgs(kernel);
 			kernelCompletion = kernel.enqueueNDRange(q,
 					new int[] { end }, null, new CLEvent[] {});
 		}
@@ -129,11 +133,11 @@ public class GPUPartialReduce<O> extends GPUGenericKernel implements ReduceTempl
 	}
 
 	public String getInputType() {
-		return input.getType().getSimpleName().toString();
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public String getOutputType() {
-		return ExtractTypes.extractReturnTypeOutOf(reduceFun, "combine");
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public int getOutputSize() {

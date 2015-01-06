@@ -29,7 +29,7 @@ public class CharMatrix extends AbstractMatrix<Character> implements
 	}
 
 	@Override
-	public Class<?> getType() {
+	public Class<?> getContainingType() {
 		return Character.class;
 	}
 
