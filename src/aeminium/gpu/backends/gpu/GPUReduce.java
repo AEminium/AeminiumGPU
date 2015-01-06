@@ -170,8 +170,7 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 	@SuppressWarnings("unchecked")
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
-		if (outbuffer != null)
-			output = (O) BufferHelper.extractElementFromBuffer(outbuffer, q,
+		output = (O) BufferHelper.extractElementFromBuffer(outbuffer, q,
 				kernelCompletion, getOutputType());
 	}
 

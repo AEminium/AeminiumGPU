@@ -16,7 +16,7 @@ public class TestPartialReduce extends TestCase {
 			example.add(1);
 		}
 
-		Integer output = example.groupBy(512).reduceLines(new LambdaReducer<Integer>(){
+		Integer output = example.groupBy(24).reduceLines(new LambdaReducer<Integer>(){
 			@Override
 			public Integer combine(Integer input, Integer other) {
 				return input + other;
