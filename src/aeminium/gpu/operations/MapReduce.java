@@ -51,11 +51,13 @@ public class MapReduce<I, O> extends GenericProgram {
 
 	@Override
 	protected int getBalanceSplitPoint() {
-		return OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(),
+		int s = OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(),
 				1,
 				mapFun.getSource() + reduceFun.getSource(),
 				mergeComplexities(mapFun.getSourceComplexity(),
 						reduceFun.getSourceComplexity()));
+		if (s < GPUReduce.DEFAULT_MAX_REDUCTION_SIZE) return 0;
+		return s;
 	}
 
 	public void cpuExecution(int start, int end) {

@@ -21,7 +21,7 @@ import com.nativelibs4java.opencl.CLQueue;
 
 public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateSource<O> {
 	
-	static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
+	public static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
 	
 	protected PList<I> input;
 	protected O output;
@@ -104,6 +104,7 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 	public void execute(CLContext ctx, CLQueue q) {
 
 		CLBuffer<?>[] tempBuffers = new CLBuffer<?>[2];
+		
 		tempBuffers[0] = BufferHelper.createInputOutputBufferFor(
 				ctx, getOutputType(), current_size / DEFAULT_MAX_REDUCTION_SIZE);
 		tempBuffers[1] = BufferHelper.createInputOutputBufferFor(

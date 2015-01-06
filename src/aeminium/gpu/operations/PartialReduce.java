@@ -1,6 +1,7 @@
 package aeminium.gpu.operations;
 
 import aeminium.gpu.backends.gpu.GPUPartialReduce;
+import aeminium.gpu.backends.gpu.GPUReduce;
 import aeminium.gpu.backends.mcpu.MCPUPartialReduce;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.GPUDevice;
@@ -47,8 +48,10 @@ public class PartialReduce<O> extends GenericProgram {
 
 	@Override
 	protected int getBalanceSplitPoint() {
-		return OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(), outputSize,
+		int s = OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(), outputSize,
 				reduceFun.getSource(), reduceFun.getSourceComplexity());
+		if (s < GPUReduce.DEFAULT_MAX_REDUCTION_SIZE) return 0;
+		return s;
 	}
 	
 	public void cpuExecution(int start, int end) {
