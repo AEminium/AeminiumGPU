@@ -45,6 +45,7 @@ public class MapCodeGen extends AbstractCodeGen {
 		mapping.put("output_type", outputType);
 		mapping.put("map_lambda_name", getMapLambdaName());
 		mapping.put("map_lambda_par", parameters[0]);
+		mapping.put("extra_args", getExtraArgs());
 		mapping.put("source", clSource);
 		Template t = new Template(
 				new TemplateWrapper("opencl/MapLambdaDef.clt"));
@@ -62,6 +63,7 @@ public class MapCodeGen extends AbstractCodeGen {
 		mapping.put("map_lambda_def", getMapLambdaSource());
 		mapping.put("other_sources", otherSources);
 		mapping.put("extra_args", getExtraArgs());
+		mapping.put("extra_args_call", getExtraArgsCall());
 
 		if (isRange) {
 			mapping.put("get_input", "map_global_id");

@@ -31,4 +31,16 @@ public abstract class AbstractCodeGen {
 			return b.toString();
 		}
 	}
+	
+	public String getExtraArgsCall() {
+		if (otherData.length == 0) {
+			return "";
+		} else {
+			StringBuilder b = new StringBuilder();
+			for (OtherData o : otherData) {
+				b.append(", " + o.name);
+			}
+			return b.toString();
+		}
+	}
 }
