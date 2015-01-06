@@ -26,7 +26,7 @@ __kernel void {{reduce_kernel_name}}(
         
         {{output_type}} total = ({{output_type}}) get_accumulator();
         for (int inputOffset = inputStart; inputOffset < inputEnd; inputOffset++)
-                {{reduce_lambda_name}}(total, {{get_input}} {{extra_args_call}});
+                total = {{reduce_lambda_name}}(total, {{get_input}} {{extra_args_call}});
         
         reduce_output[block] = total;
 }
