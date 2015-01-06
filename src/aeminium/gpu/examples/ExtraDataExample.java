@@ -74,7 +74,7 @@ public class ExtraDataExample {
 
 		}).reduce(new LambdaReducerWithSeed<Integer>() {
 
-			public PList<Integer> m5 = input2;
+			public PList<Integer> m5 = input;
 			
 			@Override
 			public Integer combine(Integer input, Integer other) {
