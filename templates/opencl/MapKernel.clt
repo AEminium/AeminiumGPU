@@ -6,7 +6,7 @@
 // Specific Map Lambda Function
 {{map_lambda_def}}
 
-__kernel void {{map_kernel_name}}(__global const {{input_type}}* map_input, __global {{output_type}}* map_output) {
+__kernel void {{map_kernel_name}}(__global const {{input_type}}* map_input, __global {{output_type}}* map_output {{extra_args}}) {
 	int map_global_id = get_global_id(0);
 	map_output[map_global_id] = {{map_lambda_name}}({{get_input}});
 }

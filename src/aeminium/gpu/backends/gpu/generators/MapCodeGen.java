@@ -8,15 +8,12 @@ import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
 
 @SuppressWarnings("rawtypes")
-public class MapCodeGen {
+public class MapCodeGen extends AbstractCodeGen {
 
 	private String inputType;
 	private String outputType;
 	private String clSource;
-	private String otherSources = "";
-	private String id;
 	private String[] parameters;
-	private boolean isRange = false;
 
 	public MapCodeGen(GPUMap mapOp) {
 		inputType = BufferHelper.getCLTypeOf(mapOp.getInputType());
@@ -64,6 +61,7 @@ public class MapCodeGen {
 
 		mapping.put("map_lambda_def", getMapLambdaSource());
 		mapping.put("other_sources", otherSources);
+		mapping.put("extra_args", getExtraArgs());
 
 		if (isRange) {
 			mapping.put("get_input", "map_global_id");

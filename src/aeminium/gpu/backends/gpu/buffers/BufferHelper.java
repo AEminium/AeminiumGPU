@@ -162,4 +162,13 @@ public class BufferHelper {
 		return null;
 	}
 
+	public static String getCLTypeOfObject(PObject o) {
+		if (o instanceof PList) {
+			PList<?> l = (PList<?>) o;
+			return getCLTypeOf(l.getType().toString()) + "[]";
+		} else {
+			return null; // TODO
+		}
+	}
+
 }

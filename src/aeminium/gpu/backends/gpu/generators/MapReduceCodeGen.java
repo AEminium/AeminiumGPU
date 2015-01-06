@@ -8,9 +8,8 @@ import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
 
 @SuppressWarnings("rawtypes")
-public class MapReduceCodeGen implements GenericReduceCodeGen {
+public class MapReduceCodeGen extends AbstractReduceCodeGen {
 	private GPUReduce op;
-	private String id;
 	private String[] map_parameters;
 	private boolean isRange = false;
 
@@ -83,18 +82,6 @@ public class MapReduceCodeGen implements GenericReduceCodeGen {
 
 	public String getReduceKernelName() {
 		return "reduce_kernel_" + id;
-	}
-
-	public boolean isRange() {
-		return isRange;
-	}
-
-	public void setRange(boolean isRange) {
-		this.isRange = isRange;
-	}
-
-	@Override
-	public void setHasSeed(boolean b) {		
 	}
 
 }

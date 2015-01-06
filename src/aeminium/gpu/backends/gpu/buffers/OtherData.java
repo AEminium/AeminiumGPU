@@ -9,6 +9,7 @@ public class OtherData {
 	public String name;
 	public PObject obj;
 	public CLBuffer<?> buffer;
+	public String type;
 	
 	public OtherData(String n, PObject o) {
 		this.name = n;
@@ -17,6 +18,7 @@ public class OtherData {
 	
 	public void createBuffer(CLContext ctx) {
 		buffer = BufferHelper.createInputOutputBufferFor(ctx, obj);
+		type = BufferHelper.getCLTypeOfObject(obj);
 	}
 	
 	public CLBuffer<?> getBuffer() {

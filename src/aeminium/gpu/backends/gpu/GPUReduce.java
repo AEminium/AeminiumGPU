@@ -3,7 +3,7 @@ package aeminium.gpu.backends.gpu;
 import org.bridj.Pointer;
 
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
-import aeminium.gpu.backends.gpu.generators.GenericReduceCodeGen;
+import aeminium.gpu.backends.gpu.generators.AbstractReduceCodeGen;
 import aeminium.gpu.backends.gpu.generators.MapReduceCodeGen;
 import aeminium.gpu.backends.gpu.generators.ReduceCodeGen;
 import aeminium.gpu.backends.gpu.generators.ReduceTemplateSource;
@@ -31,7 +31,7 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 	protected CLBuffer<?> inbuffer;
 	protected CLBuffer<?> outbuffer;
 
-	private GenericReduceCodeGen gen;
+	private AbstractReduceCodeGen gen;
 
 	private int blocks;
 	private int threads;

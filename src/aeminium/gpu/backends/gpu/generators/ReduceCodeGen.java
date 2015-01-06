@@ -7,17 +7,13 @@ import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
 
 @SuppressWarnings("rawtypes")
-public class ReduceCodeGen implements GenericReduceCodeGen {
+public class ReduceCodeGen extends AbstractReduceCodeGen {
 
 	private String inputType;
 	private String outputType;
 	private String clSource;
 	private String seedSource;
-	private String otherSources = "";
-	private String id;
 	private String[] parameters;
-	private boolean isRange = false;
-	private boolean hasSeed = false;
 
 	public ReduceCodeGen(String inputType, String outputType, String clSource,
 			String seedSource, String[] pars, String id) {
@@ -93,18 +89,6 @@ public class ReduceCodeGen implements GenericReduceCodeGen {
 
 	public String getReduceKernelName() {
 		return "reduce_kernel_" + id;
-	}
-
-	public boolean isRange() {
-		return isRange;
-	}
-
-	public void setRange(boolean isRange) {
-		this.isRange = isRange;
-	}
-
-	public void setHasSeed(boolean b) {
-		hasSeed = b;
 	}
 
 	@Override
