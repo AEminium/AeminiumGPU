@@ -35,7 +35,7 @@ public class RecursiveOp<R, T> extends GenericProgram implements Program {
 
 	@Override
 	protected int getBalanceSplitPoint() {
-		return 1024;
+		return 0;
 	}
 
 	@Override
