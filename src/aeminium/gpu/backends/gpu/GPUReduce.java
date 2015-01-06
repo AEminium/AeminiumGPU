@@ -108,9 +108,6 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 		CLEvent[] eventsArr = new CLEvent[1];
 		int[] blockCountArr = new int[1];
 		current_size = end;
-		outbuffer = BufferHelper.createInputOutputBufferFor(
-					ctx, getOutputType(), current_size
-					/ DEFAULT_MAX_REDUCTION_SIZE);
 		while (current_size > 1) {
 			int blocksInCurrentDepth = current_size
 					/ DEFAULT_MAX_REDUCTION_SIZE;
@@ -173,7 +170,8 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 	@SuppressWarnings("unchecked")
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
-		output = (O) BufferHelper.extractElementFromBuffer(outbuffer, q,
+		if (outbuffer != null)
+			output = (O) BufferHelper.extractElementFromBuffer(outbuffer, q,
 				kernelCompletion, getOutputType());
 	}
 
