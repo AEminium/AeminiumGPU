@@ -167,6 +167,7 @@ public class BufferHelper {
 			PList<?> l = (PList<?>) o;
 			return getCLTypeOf(l.getType().toString()) + "[]";
 		} else {
+			System.out.println("o not a PLIST");
 			return null; // TODO
 		}
 	}

@@ -14,11 +14,11 @@ public class OtherData {
 	public OtherData(String n, PObject o) {
 		this.name = n;
 		this.obj = o;
+		this.type = BufferHelper.getCLTypeOfObject(obj);
 	}
 	
 	public void createBuffer(CLContext ctx) {
 		buffer = BufferHelper.createInputOutputBufferFor(ctx, obj);
-		type = BufferHelper.getCLTypeOfObject(obj);
 	}
 	
 	public CLBuffer<?> getBuffer() {
