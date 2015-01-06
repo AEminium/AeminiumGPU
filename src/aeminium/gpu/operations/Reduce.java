@@ -56,8 +56,10 @@ public class Reduce<O> extends GenericProgram implements Program {
 	
 	@Override
 	protected int getBalanceSplitPoint() {
-		return OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(), 1,
+		int s = OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(), 1,
 				reduceFun.getSource(), reduceFun.getSourceComplexity());
+		if (s < GPUReduce.DEFAULT_MAX_REDUCTION_SIZE) return 0;
+		return s;
 	}
 
 	public void cpuExecution(int start, int end) {
