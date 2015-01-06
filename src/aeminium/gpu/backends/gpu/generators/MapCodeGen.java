@@ -62,8 +62,8 @@ public class MapCodeGen extends AbstractCodeGen {
 
 		mapping.put("map_lambda_def", getMapLambdaSource());
 		mapping.put("other_sources", otherSources);
-		mapping.put("map_extra_args", getExtraArgs());
-		mapping.put("map_extra_args_call", getExtraArgsCall());
+		mapping.put("extra_args", getExtraArgs());
+		mapping.put("extra_args_call", getExtraArgsCall());
 
 		if (isRange) {
 			mapping.put("get_input", "map_global_id");

@@ -62,6 +62,9 @@ public class MapReduceCodeGen extends AbstractReduceCodeGen {
 		mapping.put("reduce_kernel_name", getReduceKernelName());
 		mapping.put("other_sources", op.getOtherSources());
 
+		mapping.put("extra_args", getExtraArgs());
+		mapping.put("extra_args_call", getExtraArgsCall());
+		
 		if (isRange) {
 			mapping.put("get_input", "inputOffset");
 		} else {
