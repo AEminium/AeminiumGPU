@@ -49,7 +49,6 @@ public class IntBufferFactory implements IBufferFactory {
 	@Override
 	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
 			CLEvent ev) {
-		System.out.println("out: " +outbuffer);
 		return outbuffer.read(q, ev).getInts(1)[0];
 	}
 

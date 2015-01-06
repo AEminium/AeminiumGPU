@@ -108,7 +108,9 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 		CLEvent[] eventsArr = new CLEvent[1];
 		int[] blockCountArr = new int[1];
 		current_size = end;
-
+		outbuffer = BufferHelper.createInputOutputBufferFor(
+					ctx, getOutputType(), current_size
+					/ DEFAULT_MAX_REDUCTION_SIZE);
 		while (current_size > 1) {
 			int blocksInCurrentDepth = current_size
 					/ DEFAULT_MAX_REDUCTION_SIZE;

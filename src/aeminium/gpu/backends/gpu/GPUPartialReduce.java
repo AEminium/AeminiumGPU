@@ -8,7 +8,6 @@ import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.utils.ExtractTypes;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
