@@ -48,6 +48,8 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 		if (reduceFun instanceof LambdaReducerWithSeed) {
 			gen.setHasSeed(true);
 		}
+		otherData = OtherData.extractOtherData(reduceFun);
+		gen.setOtherData(otherData);
 	}
 	
 	public GPUReduce(PList<I> input,  LambdaMapper<I, O> mapFun, LambdaReducerWithSeed<O> reduceFun) {
