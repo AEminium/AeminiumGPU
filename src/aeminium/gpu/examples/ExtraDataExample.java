@@ -46,7 +46,7 @@ public class ExtraDataExample {
 
 			@Override
 			public String getSource() {
-				return "return reduce_input_first + reduce_input_second + m[0];";
+				return "return reduce_input_first + reduce_input_second + m3[0];";
 			}
 
 			@Override
@@ -74,16 +74,16 @@ public class ExtraDataExample {
 
 		}).reduce(new LambdaReducerWithSeed<Integer>() {
 
-			public PList<Integer> m = input2;
+			public PList<Integer> m5 = input2;
 			
 			@Override
 			public Integer combine(Integer input, Integer other) {
-				return input + other + m.get(0);
+				return input + other + m5.get(0);
 			}
 
 			@Override
 			public String getSource() {
-				return "return reduce_input_first + reduce_input_second + m[0];";
+				return "return reduce_input_first + reduce_input_second + m5[0];";
 			}
 
 			@Override
