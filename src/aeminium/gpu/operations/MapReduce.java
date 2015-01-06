@@ -101,7 +101,7 @@ public class MapReduce<I, O> extends GenericProgram {
 	}
 
 	public String getOutputType() {
-		return ExtractTypes.extractReturnTypeOutOf(reduceFun, "combine");
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public int getOutputSize() {

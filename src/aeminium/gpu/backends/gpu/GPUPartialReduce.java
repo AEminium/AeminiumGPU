@@ -138,7 +138,7 @@ public class GPUPartialReduce<O> extends GPUGenericKernel implements ReduceTempl
 	}
 
 	public String getOutputType() {
-		return ExtractTypes.extractReturnTypeOutOf(reduceFun, "combine");
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public int getOutputSize() {

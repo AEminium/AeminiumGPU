@@ -1,27 +1,10 @@
 package aeminium.gpu.utils;
 
-import java.lang.reflect.Method;
-
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
 
 public class ExtractTypes {
-	public static String extractReturnTypeOutOf(Object target, String methodName) {
-		Class<?> klass = target.getClass();
-		for (Method m : klass.getMethods()) {
-			if (m.getName().equals(methodName)) {
-				String pname = m.getReturnType().getSimpleName().toString();
 
-				// Ignore Object types.
-				if (!pname.equals("Object")) {
-					return pname;
-				}
-			}
-		}
-		System.out.println("AeminiumGPU doesn't support Generic Lambdas.");
-		return null;
-	}
-	
 	
 	public static Class<?> getMapOutputClass(LambdaMapper<?,?> mapFun, Class<?> inputType) {
 		Class<?> klass = mapFun.getClass();

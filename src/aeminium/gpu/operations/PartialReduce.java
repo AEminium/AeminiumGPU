@@ -8,7 +8,6 @@ import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.utils.ExtractTypes;
 
 public class PartialReduce<O> extends GenericProgram {
 
@@ -103,7 +102,7 @@ public class PartialReduce<O> extends GenericProgram {
 	}
 
 	public String getOutputType() {
-		return ExtractTypes.extractReturnTypeOutOf(reduceFun, "combine");
+		return input.getContainingType().getSimpleName().toString();
 	}
 
 	public int getOutputSize() {
