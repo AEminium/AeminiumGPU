@@ -1,6 +1,6 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 
-#define MERGE(acc,other) acc = {{reduce_lambda_name}}(acc,other)
+#define MERGE(acc,other) acc = {{reduce_lambda_name}}(acc,other {{extra_args_call}})
 
 // Other Sources Required
 {{other_sources}}
@@ -13,7 +13,7 @@ __kernel void {{reduce_kernel_name}}(
    __global {{output_type}}* reduce_output,
    long dataLength, 
    long blocks,
-   long blockLength)  {
+   long blockLength {{extra_args}})  {
         long block = get_global_id(0);
         if (block >= blocks)
                 return;

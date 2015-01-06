@@ -26,6 +26,7 @@ public class MapReduceCodeGen extends AbstractReduceCodeGen {
 		mapping.put("map_lambda_name", getMapLambdaName());
 		mapping.put("map_lambda_par", map_parameters[0]);
 		mapping.put("source", op.getMapFun().getSource());
+		mapping.put("extra_args", getExtraArgs());
 		Template t = new Template(
 				new TemplateWrapper("opencl/MapLambdaDef.clt"));
 		return t.apply(mapping);
@@ -39,6 +40,8 @@ public class MapReduceCodeGen extends AbstractReduceCodeGen {
 		mapping.put("reduce_lambda_par1", op.getReduceFun().getParameters()[0]);
 		mapping.put("reduce_lambda_par2", op.getReduceFun().getParameters()[1]);
 		mapping.put("source", op.getReduceFun().getSource());
+		mapping.put("extra_args", getExtraArgs());
+		mapping.put("extra_args_call", getExtraArgsCall());
 		Template t = new Template(new TemplateWrapper(
 				"opencl/ReduceLambdaDef.clt"));
 		return t.apply(mapping);
