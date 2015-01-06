@@ -104,11 +104,6 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 	public void execute(CLContext ctx, CLQueue q) {
 
 		CLBuffer<?>[] tempBuffers = new CLBuffer<?>[2];
-		
-		tempBuffers[0] = BufferHelper.createInputOutputBufferFor(
-				ctx, getOutputType(), current_size / DEFAULT_MAX_REDUCTION_SIZE);
-		tempBuffers[1] = BufferHelper.createInputOutputBufferFor(
-				ctx, getOutputType(), current_size / DEFAULT_MAX_REDUCTION_SIZE);
 		int depth = 0;
 		CLEvent[] eventsArr = new CLEvent[1];
 		int[] blockCountArr = new int[1];
