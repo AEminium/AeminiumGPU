@@ -83,12 +83,4 @@ public class MapCodeGen extends AbstractCodeGen {
 		return "map_kernel_" + id;
 	}
 
-	public boolean isRange() {
-		return isRange;
-	}
-
-	public void setRange(boolean isRange) {
-		this.isRange = isRange;
-	}
-
 }

@@ -142,10 +142,10 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 				eventsArr[0] = kernel.enqueueNDRange(q, blockCountArr, null,
 						eventsArr);
 			}
-			if (current_size < end) {
-				debugBuffers(ctx, q, "in", currentInput, current_size);
-				debugBuffers(ctx, q, "out", outbuffer, blocksInCurrentDepth);
-			}
+			//if (current_size < end) {
+			//	debugBuffers(ctx, q, "in", currentInput, current_size);
+			//	debugBuffers(ctx, q, "out", outbuffer, blocksInCurrentDepth);
+			//}
 			
 			current_size = blocksInCurrentDepth;
 			depth++;

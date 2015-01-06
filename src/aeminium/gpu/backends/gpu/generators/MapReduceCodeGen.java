@@ -11,7 +11,6 @@ import aeminium.gpu.templates.TemplateWrapper;
 public class MapReduceCodeGen extends AbstractReduceCodeGen {
 	private GPUReduce op;
 	private String[] map_parameters;
-	private boolean isRange = false;
 
 	public MapReduceCodeGen(GPUReduce op) {
 		this.op = op;
