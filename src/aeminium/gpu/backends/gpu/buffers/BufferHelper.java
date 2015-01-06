@@ -2,6 +2,7 @@ package aeminium.gpu.backends.gpu.buffers;
 
 import java.util.HashMap;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.lists.BooleanList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.LazyCollection;
@@ -150,6 +151,15 @@ public class BufferHelper {
 			return BooleanList.decode((Character) in);
 		}
 		return in;
+	}
+
+	public static CLBuffer<?> createInputOutputBufferFor(CLContext ctx,
+			PObject o) {
+		if (o instanceof PList) {
+			PList<?> l = (PList<?>) o;
+			return createInputOutputBufferFor(ctx, l);
+		}
+		return null;
 	}
 
 }

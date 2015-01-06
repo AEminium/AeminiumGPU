@@ -44,7 +44,7 @@ public class Map<I, O> extends GenericProgram implements Program {
 		gpuOp.setDevice(dev);
 	}
 
-	protected int getParallelUnits() {
+	protected int getParallelUnits() {	
 		return input.size();
 	}
 	

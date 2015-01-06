@@ -1,7 +1,11 @@
 package aeminium.gpu.backends.gpu;
 
+import java.lang.reflect.Field;
+
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
+import aeminium.gpu.backends.gpu.buffers.OtherData;
 import aeminium.gpu.backends.gpu.generators.MapCodeGen;
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
@@ -31,12 +35,32 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 		outputType = mapFun.getOutputType() != null ? mapFun.getOutputType() : ExtractTypes.getMapOutputType(mapFun, input);
 		this.setOtherSources(otherSources);
 		
+		extractOtherData();
+		
 		gen = new MapCodeGen(this);
 		if (input instanceof Range) {
 			gen.setRange(true);
 		}
 	}
 	
+	private void extractOtherData() {
+		Field[] fs = mapFun.getClass().getFields();
+		otherData = new OtherData[fs.length];
+		int i = 0;
+		for (Field f : fs) {
+			f.setAccessible(true);
+			try {
+				otherData[i++] = new OtherData(f.getName(), (PObject) f.get(mapFun));
+			} catch (IllegalArgumentException e) {
+				// Avoided
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// Avoided
+				e.printStackTrace();
+			}
+		}
+	}
+
 	@Override
 	public String getKernelName() {
 		return gen.getMapKernelName();
@@ -49,9 +73,12 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 
 	@Override
 	public void prepareBuffers(CLContext ctx) {
+		super.prepareBuffers(ctx);
 		inbuffer = BufferHelper.createInputBufferFor(ctx, input, end);
 		outbuffer = BufferHelper.createOutputBufferFor(ctx, outputType,
 				end);
+		
+		
 	}
 
 	@Override
@@ -60,6 +87,7 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 			// setArgs will throw an exception at runtime if the types / sizes
 			// of the arguments are incorrect
 			kernel.setArgs(inbuffer, outbuffer);
+			setExtraDataArgs(kernel);
 
 			// Ask for 1-dimensional execution of length dataSize, with auto
 			// choice of local workgroup size :
