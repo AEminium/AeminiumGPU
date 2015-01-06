@@ -8,7 +8,6 @@ import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-import aeminium.gpu.utils.ExtractTypes;
 
 public class MapReduce<I, O> extends GenericProgram {
 
