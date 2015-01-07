@@ -2,7 +2,6 @@ package aeminium.gpu.operations;
 
 import aeminium.gpu.backends.gpu.GPURecursive;
 import aeminium.gpu.backends.mcpu.MCPURecursive;
-import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.contracts.Program;
 import aeminium.gpu.operations.functions.RecursiveStrategy;
@@ -20,7 +19,7 @@ public class RecursiveOp<R, T> extends GenericProgram implements Program {
 		
 		cpuOp = new MCPURecursive<R, T>(recursiveStrategy);
 		gpuOp = new GPURecursive<R, T>(recursiveStrategy);
-		gpuOp.setDevice((new DefaultDeviceFactory()).getDevice());
+		//gpuOp.setDevice((new DefaultDeviceFactory()).getDevice());
 	}
 
 	public T getOutput() {
