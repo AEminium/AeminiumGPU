@@ -1,7 +1,6 @@
 package aeminium.gpu.backends.gpu;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Stack;
 
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
 import aeminium.gpu.backends.gpu.buffers.OtherData;
@@ -27,7 +26,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 	PList<R> starts;
 	PList<R> ends;
 	PList<Boolean> results;
-	Queue<Pair> queue = new LinkedList<Pair>();
+	Stack<Pair> stack = new Stack<Pair>();
 	boolean isDone;
 	
 	protected CLBuffer<?> sbuffer;
@@ -94,14 +93,14 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 					output = strategy.combine(output, accs.get(i));
 					done++;
 				} else {
-					queue.add(new Pair(starts.get(i), ends.get(i)));
+					stack.push(new Pair(starts.get(i), ends.get(i)));
 				}
 			}
-			System.out.println(done + ", q: " + queue.size());
-			if (queue.isEmpty()) {
+			System.out.println(done + ", q: " + stack.size());
+			if (stack.isEmpty()) {
 				isDone = true;
 			} else {
-				Pair p = queue.poll();
+				Pair p = stack.pop();
 				workUnits = prepareReadBuffers(p.s, p.e);
 			}
 		}
