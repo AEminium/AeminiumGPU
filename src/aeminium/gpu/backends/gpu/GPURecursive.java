@@ -39,6 +39,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 	public GPURecursive(RecursiveStrategy<R, T> recursiveStrategy) {
 		strategy = recursiveStrategy;
 		gen = new RecursiveCodeGen(this);
+		output = strategy.getSeed();
 		
 		otherData = OtherData.extractOtherData(recursiveStrategy);
 		gen.setOtherData(otherData);
