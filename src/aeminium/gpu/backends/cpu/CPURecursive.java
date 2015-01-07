@@ -5,7 +5,7 @@ import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.RecursiveCallback;
 import aeminium.gpu.operations.functions.RecursiveStrategy;
 
-public class CPURecursive<R,T> extends CPUGenericKernel implements RecursiveCallback {
+public class CPURecursive<R extends Number,T> extends CPUGenericKernel implements RecursiveCallback {
 
 	public T output;
 	public final RecursiveStrategy<R, T> strategy;

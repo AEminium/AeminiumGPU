@@ -10,7 +10,7 @@ import aeminium.runtime.Hints;
 import aeminium.runtime.Runtime;
 import aeminium.runtime.Task;
 
-public class MCPURecursive<R, T> extends MCPUGenericKernel {
+public class MCPURecursive<R extends Number, T> extends MCPUGenericKernel {
 
 	public T output;
 	public final RecursiveStrategy<R, T> strategy;
@@ -38,7 +38,7 @@ public class MCPURecursive<R, T> extends MCPUGenericKernel {
 		return cBody.acc;
 	}
 	
-	public static class RecursiveBody<R, T> implements Body, RecursiveCallback {
+	public static class RecursiveBody<R extends Number, T> implements Body, RecursiveCallback {
 
 		public T acc;
 		R st;

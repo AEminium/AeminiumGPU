@@ -6,7 +6,7 @@ import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.contracts.Program;
 import aeminium.gpu.operations.functions.RecursiveStrategy;
 
-public class RecursiveOp<R, T> extends GenericProgram implements Program {
+public class RecursiveOp<R extends Number, T> extends GenericProgram implements Program {
 	
 	public RecursiveStrategy<R, T> strategy;
 	private T output;

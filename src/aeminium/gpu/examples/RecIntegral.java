@@ -31,6 +31,16 @@ public class RecIntegral {
 			}
 			
 			@Override
+			public String getSource() {
+				return "double h = (r - l) * 0.5; double c = l + h; double fr = (r * r + 1.0) * r; double fl = (l * l + 1.0) * l; double fc = (c * c + 1.0) * c; double hh = h * 0.5; double al = (fl + fc) * hh; double ar = (fr + fc) * hh; double alr = al + ar; double prev = (fl+fr) * hh; if (abs(alr - prev) <= 1.0e-2) { result[0] = 1 }} return alr;"; 
+			}
+			
+			public String[] getParameters() {
+				return new String[] { "r", "l", "result" };
+			}
+			
+			
+			@Override
 			public Double combine(Double input, Double other) {
 				return input+other;
 			}

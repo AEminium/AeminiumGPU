@@ -1,0 +1,11 @@
+// Other Sources Required
+{{other_sources}}
+
+// Specific Map Lambda Function
+{{iter_lambda_def}}
+
+__kernel void {{recursive_kernel_name}}(__global const {{r_type}}* starts, __global const {{r_type}}* ends, __global {{t_type}}* accs, __global int* results, {{extra_args}}) {
+	int iter_global_id = get_global_id(0);
+	results[iter_global_id] = 0;
+	accs[iter_global_id] = {{iter_lambda_name}}(starts[iter_global_id], ends[iter_global_id], &results[iter_global_id] {{extra_args_call}});
+}
