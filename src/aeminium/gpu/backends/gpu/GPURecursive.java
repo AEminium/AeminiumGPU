@@ -88,13 +88,16 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 			PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q, eventsArr[0], strategy.getSeed().getClass().getSimpleName(), workUnits);
 			sbuffer.release();
 			ebuffer.release();
+			int done=0;
 			for (int i=0; i<workUnits; i++) {
 				if (rs.get(i) == 1) {
 					output = strategy.combine(output, accs.get(i));
+					done++;
 				} else {
 					queue.add(new Pair(starts.get(i), ends.get(i)));
 				}
 			}
+			System.out.println(done + ", q: " + queue.size());
 			if (queue.isEmpty()) {
 				isDone = true;
 			} else {
