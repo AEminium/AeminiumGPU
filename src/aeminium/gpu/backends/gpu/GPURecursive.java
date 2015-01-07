@@ -102,7 +102,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 				workUnits = prepareReadBuffers(p.s, p.e);
 			}
 		}
-		sbuffer.release();
+		rbuffer.release();
 		abuffer.release();
 	}
 
