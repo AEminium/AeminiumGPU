@@ -19,7 +19,7 @@ public class RecursiveOp<R, T> extends GenericProgram implements Program {
 		
 		cpuOp = new MCPURecursive<R, T>(recursiveStrategy);
 		gpuOp = new GPURecursive<R, T>(recursiveStrategy);
-		//gpuOp.setDevice((new DefaultDeviceFactory()).getDevice());
+		gpuOp.setDevice(recursiveStrategy.getDevice());
 	}
 
 	public T getOutput() {
@@ -34,7 +34,7 @@ public class RecursiveOp<R, T> extends GenericProgram implements Program {
 
 	@Override
 	protected int getBalanceSplitPoint() {
-		return 0;
+		return 1024;
 	}
 
 	@Override

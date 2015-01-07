@@ -8,7 +8,7 @@ import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
-public abstract class AbstractMatrix<T> extends AbstractCollection implements PMatrix<T> {
+public abstract class AbstractMatrix<T> extends AbstractCollection<T> implements PMatrix<T> {
 
 	protected int cols;
 	protected int rows;

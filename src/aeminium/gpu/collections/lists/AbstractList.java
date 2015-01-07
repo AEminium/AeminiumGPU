@@ -12,7 +12,7 @@ import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
-public abstract class AbstractList<T> extends AbstractCollection implements PList<T>, Mappable<T>,
+public abstract class AbstractList<T> extends AbstractCollection<T> implements PList<T>, Mappable<T>,
 		Reductionable<T>, Iterable<T> {
 
 	protected static final int DEFAULT_SIZE = 10000;

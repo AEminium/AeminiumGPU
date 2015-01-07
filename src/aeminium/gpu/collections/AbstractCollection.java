@@ -1,26 +1,15 @@
 package aeminium.gpu.collections;
 
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
-import aeminium.gpu.devices.DefaultDeviceFactory;
-import aeminium.gpu.devices.GPUDevice;
 
-public abstract class AbstractCollection {
+public abstract class AbstractCollection<T> extends AbstractPObject implements PCollection<T> {
 	protected int size;
-	
-	protected GPUDevice device;
 	
 	public int size() {
 		return size;
 	}
 	
-	public GPUDevice getDevice() {
-		if (device == null) device = (new DefaultDeviceFactory()).getDevice();
-		return device;
-	}
 
-	public void setDevice(GPUDevice device) {
-		this.device = device;
-	}
 	
 	public abstract Class<?> getContainingType();
 	public String getCLType() {
