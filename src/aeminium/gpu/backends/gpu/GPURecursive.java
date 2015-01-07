@@ -65,7 +65,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 		// initial data;
 		int workUnits = prepareReadBuffers(strategy.getStart(), strategy.getEnd());
 		
-		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "int", workUnits);
+		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", workUnits);
 		abuffer = BufferHelper.createOutputBufferFor(ctx, getTType(), workUnits);
 		CLEvent[] eventsArr = new CLEvent[1];
 		
