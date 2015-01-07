@@ -2,34 +2,21 @@ package aeminium.gpu.collections.lists;
 
 import java.util.Iterator;
 
-import aeminium.gpu.backends.gpu.buffers.BufferHelper;
+import aeminium.gpu.collections.AbstractCollection;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.matrices.PMatrix;
 import aeminium.gpu.collections.properties.Mappable;
 import aeminium.gpu.collections.properties.Reductionable;
-import aeminium.gpu.devices.DefaultDeviceFactory;
-import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
-public abstract class AbstractList<T> implements PList<T>, Mappable<T>,
+public abstract class AbstractList<T> extends AbstractCollection implements PList<T>, Mappable<T>,
 		Reductionable<T>, Iterable<T> {
 
 	protected static final int DEFAULT_SIZE = 10000;
 	protected static final int INCREMENT_SIZE = 1000;
-
-	protected int size;
-	protected GPUDevice device;
-
-	public AbstractList() {
-		device = (new DefaultDeviceFactory()).getDevice();
-	}
-
-	public int size() {
-		return size;
-	}
 
 	public int length() {
 		return size;
@@ -47,23 +34,15 @@ public abstract class AbstractList<T> implements PList<T>, Mappable<T>,
 		return this;
 	}
 
-	public GPUDevice getDevice() {
-		return device;
-	}
-
-	public void setDevice(GPUDevice device) {
-		this.device = device;
-	}
-
 	@Override
 	public <O> PList<O> map(LambdaMapper<T, O> mapper) {
-		Map<T, O> mapOperation = new Map<T, O>(mapper, this, device);
+		Map<T, O> mapOperation = new Map<T, O>(mapper, this, getDevice());
 		return mapOperation.getOutput();
 	}
 
 	@Override
 	public T reduce(LambdaReducerWithSeed<T> reducer) {
-		Reduce<T> reduceOperation = new Reduce<T>(reducer, this, device);
+		Reduce<T> reduceOperation = new Reduce<T>(reducer, this, getDevice());
 		return reduceOperation.getOutput();
 	}
 
@@ -88,10 +67,5 @@ public abstract class AbstractList<T> implements PList<T>, Mappable<T>,
 			}
 			
 		};
-	}
-	
-	public abstract Class<?> getContainingType();
-	public String getCLType() {
-		return BufferHelper.getCLTypeOf(getContainingType()) + "*";
 	}
 }
