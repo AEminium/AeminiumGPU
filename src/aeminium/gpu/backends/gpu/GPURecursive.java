@@ -1,5 +1,6 @@
 package aeminium.gpu.backends.gpu;
 
+import java.util.LinkedList;
 import java.util.Queue;
 
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
@@ -26,7 +27,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 	PList<R> starts;
 	PList<R> ends;
 	PList<Boolean> results;
-	Queue<Pair> queue;
+	Queue<Pair> queue = new LinkedList<Pair>();
 	boolean isDone;
 	
 	protected CLBuffer<?> sbuffer;
