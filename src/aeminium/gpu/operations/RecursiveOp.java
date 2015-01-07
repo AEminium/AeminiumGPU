@@ -16,10 +16,11 @@ public class RecursiveOp<R extends Number, T> extends GenericProgram implements 
 
 	public RecursiveOp(RecursiveStrategy<R, T> recursiveStrategy) {
 		this.strategy = recursiveStrategy;
+		this.device = recursiveStrategy.getDevice();
 		
 		cpuOp = new MCPURecursive<R, T>(recursiveStrategy);
 		gpuOp = new GPURecursive<R, T>(recursiveStrategy);
-		gpuOp.setDevice(recursiveStrategy.getDevice());
+		gpuOp.setDevice(device);
 	}
 
 	public T getOutput() {
