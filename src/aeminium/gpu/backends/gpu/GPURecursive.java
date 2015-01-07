@@ -3,6 +3,7 @@ package aeminium.gpu.backends.gpu;
 import java.util.Queue;
 
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
+import aeminium.gpu.backends.gpu.buffers.OtherData;
 import aeminium.gpu.backends.gpu.generators.RecursiveCodeGen;
 import aeminium.gpu.backends.gpu.generators.RecursiveTemplateSource;
 import aeminium.gpu.collections.factories.CollectionFactory;
@@ -38,6 +39,9 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 	public GPURecursive(RecursiveStrategy<R, T> recursiveStrategy) {
 		strategy = recursiveStrategy;
 		gen = new RecursiveCodeGen(this);
+		
+		otherData = OtherData.extractOtherData(recursiveStrategy);
+		gen.setOtherData(otherData);
 	}
 
 	@Override
