@@ -5,11 +5,16 @@ import com.nativelibs4java.opencl.JavaCL;
 
 public class BestContextDeviceFactory implements DeviceFactory {
 
+	
+	static GPUDevice d;
+	
 	@Override
 	public GPUDevice getDevice() {
+		if (d != null) return d;
 		if (JavaCL.listGPUPoweredPlatforms().length > 0) {
 			try {
-				return new GPUDevice(JavaCL.createBestContext());
+				d = new GPUDevice(JavaCL.createBestContext());
+				return d;
 			} catch (CLException e) {
 				return null;
 			}
