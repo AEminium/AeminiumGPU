@@ -9,8 +9,8 @@ public class RecIntegral {
 		
 		RecursiveStrategy<Double, Double> integral = new RecursiveStrategy<Double, Double>() {
 
-			public Double getStart() { return -2101.0; }
-			public Double getEnd() { return 1036.0; }
+			public Double getStart() { return 0.0; }
+			public Double getEnd() { return 10.0; }
 			
 			@Override
 			public Double iterative(Double r, Double l, RecursiveCallback result) {
@@ -24,7 +24,7 @@ public class RecIntegral {
 				double ar = (fr + fc) * hh;
 				double alr = al + ar;
 				double prev = (fl+fr) * hh;
-				if (Math.abs(alr - prev) <= 1.0e-2) {
+				if (Math.abs(alr - prev) <= 1.0e-8) {
 					result.markDone();
 				}
 				return alr;
@@ -32,7 +32,7 @@ public class RecIntegral {
 			
 			@Override
 			public String getSource() {
-				return "double h = (r - l) * 0.5;\n double c = l + h;\n double fr = (r * r + 1.0) * r;\n double fl = (l * l + 1.0) * l;\n double fc = (c * c + 1.0) * c;\n double hh = h * 0.5;\n double al = (fl + fc) * hh;\n double ar = (fr + fc) * hh;\n double alr = al + ar;\n double prev = (fl+fr) * hh;\n if (fabs(alr - prev) <= 1.0e-2) { result[0] = 1; }\n return alr;"; 
+				return "double h = (r - l) * 0.5;\n double c = l + h;\n double fr = (r * r + 1.0) * r;\n double fl = (l * l + 1.0) * l;\n double fc = (c * c + 1.0) * c;\n double hh = h * 0.5;\n double al = (fl + fc) * hh;\n double ar = (fr + fc) * hh;\n double alr = al + ar;\n double prev = (fl+fr) * hh;\n if (fabs(alr - prev) <= 1.0e-8) { result[0] = 1; }\n return alr;"; 
 			}
 			
 			public String[] getParameters() {
