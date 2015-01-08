@@ -114,6 +114,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 				Pair p = stack.pop();
 				workUnits = 0;
 				int steps = DEFAULT_SPLIT_VALUE / processNext;
+				System.out.println("n: " + processNext + " steps:" + steps);
 				for (int k=0; k<processNext; k++) {
 					workUnits += prepareReadBuffers(p.s, p.e, steps, k * steps);
 				}
