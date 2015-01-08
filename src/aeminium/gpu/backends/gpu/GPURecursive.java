@@ -100,7 +100,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 			}
 			if (System.getenv("DEBUG") != null) {
 				if (iter % 1000 == 0) {
-					System.out.println(done + ", q: " + stack.size());
+					System.out.println(done + ", q: " + stack.size() + ", rec: " + processNext);
 				}
 			}
 			if (stack.isEmpty()) {
