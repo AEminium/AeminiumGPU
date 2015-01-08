@@ -51,9 +51,9 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 	}
 
 	
-	public int prepareReadBuffers(R st, R end) {
+	public int prepareReadBuffers(R st, R end, int splits, int index) {
 		starts = createEmptyList();
-		strategy.split(starts, 0, st, end, DEFAULT_SPLIT_VALUE);
+		strategy.split(starts, index, st, end, splits);
 		ends = starts.subList(1, starts.size());
 		ends.set(starts.size() - 1, end);
 		return starts.size();
@@ -64,13 +64,14 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 	public void execute(CLContext ctx, CLQueue q) {
 		
 		// initial data;
-		int workUnits = prepareReadBuffers(strategy.getStart(), strategy.getEnd());
+		int workUnits = prepareReadBuffers(strategy.getStart(), strategy.getEnd(), DEFAULT_SPLIT_VALUE, 0);
 		
 		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", workUnits);
 		abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), workUnits);
 		CLEvent[] eventsArr = new CLEvent[1];
 		
 		int iter = 0;
+		int processNext = 1;
 		while (!isDone) {
 			sbuffer = BufferHelper.createInputBufferFor(ctx, starts, starts.size());
 			ebuffer = BufferHelper.createInputBufferFor(ctx, ends, ends.size());
@@ -105,8 +106,18 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 			if (stack.isEmpty()) {
 				isDone = true;
 			} else {
+				if (done == workUnits) {
+					processNext += 1;
+				} else {
+					processNext -= 1;
+					if (processNext < 1) processNext = 1;
+				}
 				Pair p = stack.pop();
-				workUnits = prepareReadBuffers(p.s, p.e);
+				workUnits = 0;
+				int steps = DEFAULT_SPLIT_VALUE / processNext;
+				for (int k=0; k<processNext; k++) {
+					workUnits += prepareReadBuffers(p.s, p.e, steps, k * steps);
+				}
 			}
 			iter ++;
 		}

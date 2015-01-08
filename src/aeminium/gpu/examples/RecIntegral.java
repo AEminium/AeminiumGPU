@@ -10,7 +10,7 @@ public class RecIntegral {
 		RecursiveStrategy<Double, Double> integral = new RecursiveStrategy<Double, Double>() {
 
 			public Double getStart() { return 0.0; }
-			public Double getEnd() { return 10.0; }
+			public Double getEnd() { return 1.0; }
 			
 			@Override
 			public Double iterative(Double r, Double l, RecursiveCallback result) {
