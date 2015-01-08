@@ -99,16 +99,16 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 					stack.push(new Pair(starts.get(i), ends.get(i)));
 				}
 			}
-			if (System.getenv("DEBUG") != null) {
-				if (iter % 1000 == 0) {
-					System.out.println(done + ", q: " + stack.size() + ", rec: " + processNext);
-				}
-			}
 			if (stack.isEmpty()) {
 				isDone = true;
 			} else {
 				if (done == workUnits) {
 					processNext += 1;
+					if (System.getenv("DEBUG") != null) {
+						if (iter % 1000 == 0) {
+							System.out.println(done + ", q: " + stack.size() + ", rec: " + processNext);
+						}
+					}
 				} else {
 					processNext -= 1;
 					if (processNext < 1) processNext = 1;
