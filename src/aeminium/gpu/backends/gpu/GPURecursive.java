@@ -17,19 +17,17 @@ import com.nativelibs4java.opencl.CLQueue;
 
 public class GPURecursive<R extends Number, T> extends GPUGenericKernel implements RecursiveTemplateSource<R,T> {
 
-	public static final int DEFAULT_SPLIT_VALUE = 1024;
+	public static final int DEFAULT_SPLIT_VALUE = 512;
 
 	
 	public T output;
 	public RecursiveStrategy<R, T> strategy;
 	PList<R> starts;
-	PList<R> ends;
 	PList<Boolean> results;
 	Stack<Pair> stack = new Stack<Pair>();
 	boolean isDone;
 	
 	protected CLBuffer<?> sbuffer;
-	protected CLBuffer<?> ebuffer;
 	protected CLBuffer<?> abuffer;
 	protected CLBuffer<Integer> rbuffer;
 	
@@ -51,13 +49,10 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 
 	
 	public int prepareReadBuffers(R st, R end, int splits, int index) {
-		if (starts == null) {
-			starts = createEmptyList();
-		}
+		starts = createEmptyList();
 		strategy.split(starts, index, st, end, splits);
-		ends = starts.subList(1, starts.size());
-		ends.set(starts.size() - 1, end);
-		return starts.size();
+		starts.set(starts.size(), end);
+		return starts.size() - 1;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -71,56 +66,57 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 		abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), workUnits);
 		CLEvent[] eventsArr = new CLEvent[1];
 		
-		int iter = 0;
-		int processNext = 1;
+		int processNext = -1;
 		while (!isDone) {
 			sbuffer = BufferHelper.createInputBufferFor(ctx, starts, starts.size());
-			ebuffer = BufferHelper.createInputBufferFor(ctx, ends, ends.size());
 			
 			synchronized (kernel) {
-				kernel.setArgs(sbuffer, ebuffer, abuffer, rbuffer);
+				kernel.setArgs(sbuffer, abuffer, rbuffer);
 				setExtraDataArgs(kernel);
 				
 				eventsArr[0] = kernel.enqueueNDRange(q,
 						new int[] { workUnits }, eventsArr);
+			}
+			if (System.getenv("DEBUG") != null) {
+				BufferHelper.debugBuffers(ctx, q, "results", rbuffer, 10, eventsArr[0], "Integer");
+				BufferHelper.debugBuffers(ctx, q, "acc", abuffer, 10, eventsArr[0], "Double");
 			}
 			
 			PList<Integer> rs = (PList<Integer>) BufferHelper.extractFromBuffer(rbuffer, q,
 					eventsArr[0], "Integer", workUnits);
 			PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q, eventsArr[0], strategy.getSeed().getClass().getSimpleName(), workUnits);
 			sbuffer.release();
-			ebuffer.release();
 			int done=0;
 			for (int i=0; i<workUnits; i++) {
 				if (rs.get(i) == 1) {
 					output = strategy.combine(output, accs.get(i));
 					done++;
 				} else {
-					stack.push(new Pair(starts.get(i), ends.get(i)));
+					stack.push(new Pair(starts.get(i), starts.get(i+1)));
 				}
 			}
+			if (System.getenv("DEBUG") != null) {
+				System.out.println(done + ", q: " + stack.size() + ", rec: " + processNext);
+			}
+			
 			if (stack.isEmpty()) {
 				isDone = true;
 			} else {
-				if (done == workUnits) {
-					processNext += 1;
-					if (System.getenv("DEBUG") != null) {
-						if (iter % 1000 == 0) {
-							System.out.println(done + ", q: " + stack.size() + ", rec: " + processNext);
-						}
-					}
+				if (processNext == -1) {
+					processNext = stack.size() / 2;
+				} else if (done == workUnits) {
+					processNext *= 2;
 				} else {
-					processNext -= 1;
+					processNext /= 2;
 					if (processNext < 1) processNext = 1;
 				}
-				if (iter == 0) processNext = 128;
-				Pair p = stack.pop();
-				int steps = DEFAULT_SPLIT_VALUE / processNext;
-				for (int k=0; k<processNext; k++) {
+				int pNext = (processNext > stack.size()) ? stack.size() : processNext;
+				int steps = DEFAULT_SPLIT_VALUE / pNext;
+				for (int k=0; k<pNext; k++) {
+					Pair p = stack.pop();	
 					workUnits = prepareReadBuffers(p.s, p.e, steps, k * steps);
 				}
 			}
-			iter ++;
 		}
 		rbuffer.release();
 		abuffer.release();

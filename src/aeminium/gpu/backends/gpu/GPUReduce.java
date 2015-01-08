@@ -156,19 +156,6 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 	}
 
 	@SuppressWarnings("unchecked")
-	public void debugBuffers(CLContext ctx, CLQueue q, String bufname, CLBuffer<?> buf, int size) {
-		PList<O> li;
-
-		System.out.println("buf:" + bufname);
-		li = (PList<O>) BufferHelper.extractFromBuffer(buf, q,
-				kernelCompletion, getOutputType(), end);
-		for (int i = 0; i < size; i++) {
-			System.out.print(li.get(i) + ",");
-		}
-		System.out.println("___");
-	}
-
-	@SuppressWarnings("unchecked")
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
 		output = (O) BufferHelper.extractElementFromBuffer(outbuffer, q,
