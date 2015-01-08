@@ -113,6 +113,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 					processNext -= 1;
 					if (processNext < 1) processNext = 1;
 				}
+				if (iter == 0) processNext = 128;
 				Pair p = stack.pop();
 				int steps = DEFAULT_SPLIT_VALUE / processNext;
 				for (int k=0; k<processNext; k++) {
