@@ -17,7 +17,7 @@ import com.nativelibs4java.opencl.CLQueue;
 
 public class GPURecursive<R extends Number, T> extends GPUGenericKernel implements RecursiveTemplateSource<R,T> {
 
-	public static final int DEFAULT_SPLIT_VALUE = 1024;
+	public static final int DEFAULT_SPLIT_VALUE = 2048;
 	public static final int MAX_SPLITS = 4;
 
 	
@@ -70,6 +70,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 		abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), workUnits);
 		CLEvent[] eventsArr = new CLEvent[1];
 		
+		int iter = 0;
 		while (!isDone) {
 			sbuffer = BufferHelper.createInputBufferFor(ctx, starts, starts.size());
 			ebuffer = BufferHelper.createInputBufferFor(ctx, ends, ends.size());
@@ -97,7 +98,9 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 				}
 			}
 			if (System.getenv("DEBUG") != null) {
-				System.out.println(done + ", q: " + stack.size());
+				if (iter % 1000 == 0) {
+					System.out.println(done + ", q: " + stack.size());
+				}
 			}
 			if (stack.isEmpty()) {
 				isDone = true;
@@ -105,6 +108,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 				Pair p = stack.pop();
 				workUnits = prepareReadBuffers(p.s, p.e);
 			}
+			iter ++;
 		}
 		rbuffer.release();
 		abuffer.release();
