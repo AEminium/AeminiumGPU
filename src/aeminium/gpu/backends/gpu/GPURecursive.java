@@ -17,8 +17,7 @@ import com.nativelibs4java.opencl.CLQueue;
 
 public class GPURecursive<R extends Number, T> extends GPUGenericKernel implements RecursiveTemplateSource<R,T> {
 
-	public static final int DEFAULT_SPLIT_VALUE = 2048;
-	public static final int MAX_SPLITS = 4;
+	public static final int DEFAULT_SPLIT_VALUE = 1024;
 
 	
 	public T output;
