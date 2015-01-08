@@ -96,7 +96,9 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 					stack.push(new Pair(starts.get(i), ends.get(i)));
 				}
 			}
-			System.out.println(done + ", q: " + stack.size());
+			if (System.getenv("DEBUG") != null) {
+				System.out.println(done + ", q: " + stack.size());
+			}
 			if (stack.isEmpty()) {
 				isDone = true;
 			} else {
