@@ -51,7 +51,9 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 
 	
 	public int prepareReadBuffers(R st, R end, int splits, int index) {
-		starts = createEmptyList();
+		if (starts == null) {
+			starts = createEmptyList();
+		}
 		strategy.split(starts, index, st, end, splits);
 		ends = starts.subList(1, starts.size());
 		ends.set(starts.size() - 1, end);
@@ -112,11 +114,10 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 					if (processNext < 1) processNext = 1;
 				}
 				Pair p = stack.pop();
-				workUnits = 0;
 				int steps = DEFAULT_SPLIT_VALUE / processNext;
 				System.out.println("n: " + processNext + " steps:" + steps);
 				for (int k=0; k<processNext; k++) {
-					workUnits += prepareReadBuffers(p.s, p.e, steps, k * steps);
+					workUnits = prepareReadBuffers(p.s, p.e, steps, k * steps);
 				}
 			}
 			iter ++;
