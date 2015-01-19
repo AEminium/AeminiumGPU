@@ -116,5 +116,19 @@ public class FloatList extends AbstractList<Float> implements
 		}
 		return null;
 	}
+	
+	@Override
+	public PList<Float> extendAt(int i, PList<Float> extra) {
+		if (extra instanceof FloatList) {
+			FloatList other = (FloatList) extra;
+			ensureNMore(other.size() - (size() - i));
+			System.arraycopy(other.box, 0, box, i, extra.size());
+		} else {
+			for (Float b : extra) {
+				this.set(i, b);
+			}
+		}
+		return null;
+	}
 
 }

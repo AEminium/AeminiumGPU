@@ -190,6 +190,11 @@ public class RandomList implements PList<Float>, LazyCollection {
 	}
 
 	@Override
+	public PList<Float> extendAt(int i, PList<Float> extra) {
+		throw new ReadOnlyListException();
+	}
+	
+	@Override
 	public String getCLType() {
 		return "float[]";
 	}

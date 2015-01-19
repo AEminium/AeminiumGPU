@@ -86,13 +86,13 @@ public class BufferHelper {
 	}
 	
 	public static <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
-			PList<T> list, int size) {
+			PList<T> list, long size) {
 		if (list instanceof LazyCollection) {
 			LazyCollection linput = (LazyCollection) list;
 			return linput.getGPUHelper().getInputBuffer(context);
 		} else {
 			IBufferFactory f = getFactory(list);
-			return f.createInputBufferFor(context, list);
+			return f.createInputOutputBufferFor(context, list);
 		}
 	}
 

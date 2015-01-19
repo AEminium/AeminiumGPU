@@ -116,4 +116,18 @@ public class IntList extends AbstractList<Integer> implements
 		return null;
 	}
 	
+	@Override
+	public PList<Integer> extendAt(int i, PList<Integer> extra) {
+		if (extra instanceof IntList) {
+			IntList other = (IntList) extra;
+			ensureNMore(other.size() - (size() - i));
+			System.arraycopy(other.box, 0, box, i, extra.size());
+		} else {
+			for (Integer b : extra) {
+				this.set(i, b);
+			}
+		}
+		return null;
+	}
+	
 }

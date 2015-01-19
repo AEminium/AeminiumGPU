@@ -1,10 +1,11 @@
 package aeminium.gpu.backends.gpu.generators;
 
-import aeminium.gpu.operations.functions.RecursiveStrategy;
+import aeminium.gpu.operations.functions.AbstractRecursiveStrategy;
 
-public interface RecursiveTemplateSource<R extends Number,T> {
+public interface RecursiveTemplateSource<R extends Number,R2, T> {
 	String getRType();
+	String getR2Type();
 	String getTType();
 	
-	RecursiveStrategy<R, T> getRecursiveStrategy();
+	AbstractRecursiveStrategy<R, R2, T> getRecursiveStrategy();
 }

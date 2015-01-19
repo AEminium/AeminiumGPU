@@ -114,4 +114,18 @@ public class LongList extends AbstractList<Long> implements ConcreteCollection {
 		}
 		return this;
 	}
+	
+	@Override
+	public PList<Long> extendAt(int i, PList<Long> extra) {
+		if (extra instanceof LongList) {
+			LongList other = (LongList) extra;
+			ensureNMore(other.size() - (size() - i));
+			System.arraycopy(other.box, 0, box, i, extra.size());
+		} else {
+			for (Long b : extra) {
+				this.set(i, b);
+			}
+		}
+		return null;
+	}
 }

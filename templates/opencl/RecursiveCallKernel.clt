@@ -1,0 +1,60 @@
+#pragma OPENCL EXTENSION cl_khr_fp64: enable
+
+// Other Sources Required
+{{other_sources}}
+
+// Specific Map Lambda Function
+{{iter_lambda_def}}
+
+inline int spawn({{a_type}} {{spawn_arg}}, __global {{a_type}}* current, __global {{a_type}}* next {{extra_args}}) {
+	{{spawn}}
+}
+
+
+__kernel void {{recursive_kernel_name}}(int workers, __global int* results, __global {{r_type}}* accs, __global {{a_type}}* args  {{extra_args}}) {
+	int iter_global_id = get_global_id(0);
+	results[iter_global_id] = 0;
+	for (int i=1; i<={{max_spawn}};i++) {
+		results[iter_global_id + workers * i] = -1;
+	}
+	accs[iter_global_id] = 0;
+	
+	__local int rs;
+	rs = 0;
+	
+	__local int counter;
+	counter = 0;
+	__local int nextSpawn;
+	nextSpawn = 1;
+	
+	__local {{r_type}} acc;
+	acc = 0;
+	__local {{r_type}} tacc;
+	
+	__local {{a_type}} current, next;
+	
+	while (nextSpawn != counter) {
+		if (results[iter_global_id + workers * counter] == -1 || results[iter_global_id + workers * counter] == 1) {
+			counter = (counter + 1) % {{max_spawn}};
+			continue;
+		}
+		tacc = {{iter_lambda_name}}(args[iter_global_id + workers * counter], &rs {{extra_args_call}});
+		if (rs == 1) {
+			rs = 0;
+			results[iter_global_id + workers * counter] = 1;
+			accs[iter_global_id + workers * counter] = tacc;
+			counter = (counter + 1) % {{max_spawn}};
+		} else {
+			if (spawn(args[iter_global_id + workers * counter], &args[iter_global_id + workers * counter], &args[iter_global_id + workers * nextSpawn] {{extra_args_call}})) {
+				results[iter_global_id + workers * counter] = 0;
+				results[iter_global_id + workers * nextSpawn] = 0;
+				nextSpawn = (nextSpawn + 1) % {{max_spawn}};
+				if (results[iter_global_id + workers * nextSpawn] > -1) break; 
+			} else {
+				results[iter_global_id + workers * counter] = -2;
+				counter = (counter + 1) % {{max_spawn}};
+			}
+			
+		}
+	}
+}

@@ -116,5 +116,19 @@ public class DoubleList extends AbstractList<Double> implements
 		}
 		return null;
 	}
+	
+	@Override
+	public PList<Double> extendAt(int i, PList<Double> extra) {
+		if (extra instanceof DoubleList) {
+			DoubleList other = (DoubleList) extra;
+			ensureNMore(other.size() - (size() - i));
+			System.arraycopy(other.box, 0, box, i, extra.size());
+		} else {
+			for (Double b : extra) {
+				this.set(i, b);
+			}
+		}
+		return null;
+	}
 
 }

@@ -159,6 +159,11 @@ public class Range implements PList<Integer>, LazyCollection {
 	public PList<Integer> extend(PList<Integer> extra) {
 		throw new ReadOnlyListException();
 	}
+	
+	@Override
+	public PList<Integer> extendAt(int i, PList<Integer> extra) {
+		throw new ReadOnlyListException();
+	}
 
 	@Override
 	public String getCLType() {

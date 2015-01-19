@@ -8,32 +8,40 @@ import aeminium.gpu.backends.gpu.generators.RecursiveCodeGen;
 import aeminium.gpu.backends.gpu.generators.RecursiveTemplateSource;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
-import aeminium.gpu.operations.functions.RecursiveStrategy;
+import aeminium.gpu.operations.functions.AbstractRecursiveStrategy;
+import aeminium.gpu.operations.functions.Range2D;
+import aeminium.gpu.utils.Quad;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
 import com.nativelibs4java.opencl.CLQueue;
 
-public class GPURecursive<R extends Number, T> extends GPUGenericKernel implements RecursiveTemplateSource<R,T> {
+public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel implements RecursiveTemplateSource<R, R2, T> {
 
 	public static final int DEFAULT_SPLIT_VALUE = 512;
 
 	
 	public T output;
-	public RecursiveStrategy<R, T> strategy;
+	public AbstractRecursiveStrategy<R, R2, T> strategy;
 	PList<R> starts;
+	PList<R> ends;
+	PList<R2> tops;
+	PList<R2> bottoms;
 	PList<Boolean> results;
-	Stack<Pair> stack = new Stack<Pair>();
+	Stack<Quad<R, R2>> stack = new Stack<Quad<R, R2>>();
 	boolean isDone;
 	
 	protected CLBuffer<?> sbuffer;
+	protected CLBuffer<?> ebuffer;
+	protected CLBuffer<?> tbuffer = null;
+	protected CLBuffer<?> bbuffer = null;
 	protected CLBuffer<?> abuffer;
 	protected CLBuffer<Integer> rbuffer;
 	
 	private RecursiveCodeGen gen;
 	
-	public GPURecursive(RecursiveStrategy<R, T> recursiveStrategy) {
+	public GPURecursive(AbstractRecursiveStrategy<R, R2, T> recursiveStrategy) {
 		strategy = recursiveStrategy;
 		gen = new RecursiveCodeGen(this);
 		output = strategy.getSeed();
@@ -48,10 +56,13 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 	}
 
 	
-	public int prepareReadBuffers(R st, R end, int splits, int index) {
-		starts = createEmptyList();
-		strategy.split(starts, index, st, end, splits);
-		starts.set(starts.size(), end);
+	public int prepareReadBuffers(R st, R end, R2 top, R2 bottom, int splits, int index) {
+		Range2D<R, R2> ranges = strategy.split(st, end, top, bottom, splits);
+		
+		starts.extendAt(index, ranges.starts);
+		ends.extendAt(index, ranges.ends);
+		if (ranges.tops != null) tops.extendAt(index, ranges.tops);
+		if (ranges.bottoms != null) bottoms.extendAt(index, ranges.bottoms);
 		return starts.size() - 1;
 	}
 	
@@ -60,7 +71,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 	public void execute(CLContext ctx, CLQueue q) {
 		
 		// initial data;
-		int workUnits = prepareReadBuffers(strategy.getStart(), strategy.getEnd(), DEFAULT_SPLIT_VALUE, 0);
+		int workUnits = prepareReadBuffers(strategy.getStart(), strategy.getEnd(), strategy.getTop(), strategy.getBottom(), DEFAULT_SPLIT_VALUE, 0);
 		
 		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", workUnits);
 		abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), workUnits);
@@ -69,9 +80,12 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 		int processNext = -1;
 		while (!isDone) {
 			sbuffer = BufferHelper.createInputBufferFor(ctx, starts, starts.size());
+			ebuffer = BufferHelper.createInputBufferFor(ctx, ends, ends.size());
+			if (tops != null) tbuffer = BufferHelper.createInputBufferFor(ctx, tops, tops.size());
+			if (bottoms != null) bbuffer = BufferHelper.createInputBufferFor(ctx, bottoms, bottoms.size());
 			
 			synchronized (kernel) {
-				kernel.setArgs(sbuffer, abuffer, rbuffer);
+				kernel.setArgs(sbuffer, ebuffer, tbuffer, bbuffer, abuffer, rbuffer);
 				setExtraDataArgs(kernel);
 				
 				eventsArr[0] = kernel.enqueueNDRange(q,
@@ -92,7 +106,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 					output = strategy.combine(output, accs.get(i));
 					done++;
 				} else {
-					stack.push(new Pair(starts.get(i), starts.get(i+1)));
+					stack.push(new Quad<R, R2>(starts.get(i), ends.get(i), tops.get(i), bottoms.get(i)));
 				}
 			}
 			if (System.getenv("DEBUG") != null) {
@@ -113,8 +127,8 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 				int pNext = (processNext > stack.size()) ? stack.size() : processNext;
 				int steps = DEFAULT_SPLIT_VALUE / pNext;
 				for (int k=0; k<pNext; k++) {
-					Pair p = stack.pop();	
-					workUnits = prepareReadBuffers(p.s, p.e, steps, k * steps);
+					Quad<R, R2> p = stack.pop();	
+					workUnits = prepareReadBuffers(p.s, p.e, p.t, p.b, steps, k * steps);
 				}
 			}
 		}
@@ -160,6 +174,11 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 	public String getRType() {
 		return BufferHelper.getCLTypeOf(strategy.getStart().getClass().getSimpleName());
 	}
+	
+	@Override
+	public String getR2Type() {
+		return BufferHelper.getCLTypeOf(strategy.getTop().getClass().getSimpleName());
+	}
 
 	@Override
 	public String getTType() {
@@ -167,7 +186,7 @@ public class GPURecursive<R extends Number, T> extends GPUGenericKernel implemen
 	}
 
 	@Override
-	public RecursiveStrategy<R, T> getRecursiveStrategy() {
+	public AbstractRecursiveStrategy<R, R2, T> getRecursiveStrategy() {
 		return strategy;
 	}
 	

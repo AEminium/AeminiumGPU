@@ -1,6 +1,7 @@
 package aeminium.gpu.examples;
 
-import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.operations.functions.Range1D;
+import aeminium.gpu.operations.functions.Range2D;
 import aeminium.gpu.operations.functions.RecursiveCallback;
 import aeminium.gpu.operations.functions.RecursiveStrategy;
 
@@ -48,7 +49,7 @@ public class RecIntegral {
 			}
 			
 			public String[] getParameters() {
-				return new String[] { "r", "l", "result" };
+				return new String[] { "r", "l", "__t", "__b", "result" };
 			}
 			
 			
@@ -57,12 +58,20 @@ public class RecIntegral {
 				return input+other;
 			}
 			@Override
-			public void split(PList<Double> indices, int index, Double start, Double end, int n) {
+			public Range2D<Double, Void> split(Double start, Double end, int n) {
 				double step = (end-start)/((double)n);
-				for (int i=0; i<n; i++) {
-					indices.set(index+i, start + i*step); 
+				Range1D<Double> r = new Range1D<Double>("Double");
+				while (start < end) {
+					r.add(start, start+step);
+					start = start+step;
 				}
+				return r;
 			}
+			@Override
+			public String getSplitSource() {
+				return "nextEnd = end/2; nextStart = end/2;";
+			}
+			
 			@Override
 			public Double getSeed() {
 				return 0.0;

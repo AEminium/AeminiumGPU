@@ -127,4 +127,18 @@ public class BooleanList extends AbstractList<Boolean> implements
 		}
 		return null;
 	}
+	
+	@Override
+	public PList<Boolean> extendAt(int i, PList<Boolean> extra) {
+		if (extra instanceof BooleanList) {
+			BooleanList other = (BooleanList) extra;
+			ensureNMore(other.size() - (size() - i));
+			System.arraycopy(other.box, 0, box, i, extra.size());
+		} else {
+			for (Boolean b : extra) {
+				this.set(i, b);
+			}
+		}
+		return null;
+	}
 }

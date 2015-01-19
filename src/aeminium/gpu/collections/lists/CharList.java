@@ -121,5 +121,19 @@ public class CharList extends AbstractList<Character> implements
 		}
 		return null;
 	}
+	
+	@Override
+	public PList<Character> extendAt(int i, PList<Character> extra) {
+		if (extra instanceof CharList) {
+			CharList other = (CharList) extra;
+			ensureNMore(other.size() - (size() - i));
+			System.arraycopy(other.box, 0, box, i, extra.size());
+		} else {
+			for (Character b : extra) {
+				this.set(i, b);
+			}
+		}
+		return null;
+	}
 
 }

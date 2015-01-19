@@ -35,5 +35,6 @@ public interface PList<T> extends PCollection<T>, Mappable<T>,
 	public PList<T> evaluate();
 	
 	public PList<T> extend(PList<T> extra);
+	public PList<T> extendAt(int i, PList<T> extra);
 
 }

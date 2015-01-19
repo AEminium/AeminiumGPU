@@ -1,0 +1,3 @@
+inline {{r_type}} {{iter_lambda_name}}({{a_type}} {{iter_lambda_par1}}, __local int* {{iter_lambda_par2}} {{extra_args}}) {
+	{{source}}
+}
