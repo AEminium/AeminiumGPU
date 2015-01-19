@@ -4,17 +4,17 @@ import aeminium.gpu.backends.gpu.GPURecursive;
 import aeminium.gpu.backends.mcpu.MCPURecursive;
 import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.contracts.Program;
-import aeminium.gpu.operations.functions.AbstractRecursiveStrategy;
+import aeminium.gpu.operations.functions.Recursive2DStrategy;
 
 public class RecursiveOp<R extends Number, R2, T> extends GenericProgram implements Program {
 	
-	public AbstractRecursiveStrategy<R, R2, T> strategy;
+	public Recursive2DStrategy<R, R2, T> strategy;
 	private T output;
 	
 	protected GPURecursive<R, R2, T> gpuOp;
 	protected MCPURecursive<R, R2, T> cpuOp;
 
-	public RecursiveOp(AbstractRecursiveStrategy<R, R2, T> recursiveStrategy) {
+	public RecursiveOp(Recursive2DStrategy<R, R2, T> recursiveStrategy) {
 		this.strategy = recursiveStrategy;
 		this.device = recursiveStrategy.getDevice();
 		

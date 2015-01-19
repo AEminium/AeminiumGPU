@@ -120,6 +120,7 @@ public class BooleanList extends AbstractList<Boolean> implements
 			BooleanList other = (BooleanList) extra;
 			ensureNMore(other.size());
 			System.arraycopy(other.box, 0, box, size, extra.size());
+			size += other.size;
 		} else {
 			for (Boolean b : extra) {
 				this.add(b);
@@ -132,8 +133,9 @@ public class BooleanList extends AbstractList<Boolean> implements
 	public PList<Boolean> extendAt(int i, PList<Boolean> extra) {
 		if (extra instanceof BooleanList) {
 			BooleanList other = (BooleanList) extra;
-			ensureNMore(other.size() - (size() - i));
+			ensureNMore((other.size() + i) - this.size());
 			System.arraycopy(other.box, 0, box, i, extra.size());
+			if (i + other.size > size) size = i + other.size;
 		} else {
 			for (Boolean b : extra) {
 				this.set(i, b);

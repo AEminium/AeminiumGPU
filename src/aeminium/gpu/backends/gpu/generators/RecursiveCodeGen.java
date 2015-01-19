@@ -5,17 +5,21 @@ import java.util.HashMap;
 import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
 
-@SuppressWarnings("rawtypes")
-public class RecursiveCodeGen extends AbstractCodeGen {
+
+public class RecursiveCodeGen<R extends Number, R2, T> extends AbstractCodeGen {
 	private String rType;
+	private String r2Type;
 	private String tType;
 	private String clSource;
+	private String splitSource;
 	private String[] parameters;
 	
 	
-	public RecursiveCodeGen(RecursiveTemplateSource r) {
+	public RecursiveCodeGen(RecursiveTemplateSource<R, R2, T> r) {
 		this.rType = r.getRType();
+		this.r2Type = r.getR2Type();
 		this.tType = r.getTType();
+		this.splitSource = r.getRecursiveStrategy().getSplitSource();
 		this.clSource = r.getRecursiveStrategy().getSource();
 		this.parameters = r.getRecursiveStrategy().getParameters();
 		this.id = r.getRecursiveStrategy().getId();
@@ -32,15 +36,22 @@ public class RecursiveCodeGen extends AbstractCodeGen {
 	public String getRecursiveLambdaSource() {
 		HashMap<String, String> mapping = new HashMap<String, String>();
 		mapping.put("r_type", rType);
+		mapping.put("r2_type", r2Type);
 		mapping.put("t_type", tType);
 		mapping.put("iter_lambda_name", getIterativeLambdaName());
 		mapping.put("iter_lambda_par1", parameters[0]);
 		mapping.put("iter_lambda_par2", parameters[1]);
 		mapping.put("iter_lambda_par3", parameters[2]);
+		mapping.put("iter_lambda_par4", parameters[3]);
+		mapping.put("iter_lambda_par5", parameters[4]);
 		mapping.put("source", clSource);
 		mapping.put("extra_args", getExtraArgs());
-		Template t = new Template(new TemplateWrapper(
-				"opencl/RecursiveIterativeLambda.clt"));
+		Template t;
+		if (r2Type.equals("void*")) {
+			t = new Template(new TemplateWrapper("opencl/Recursive1DLambda.clt"));
+		} else {
+			t = new Template(new TemplateWrapper("opencl/Recursive2DLambda.clt"));
+		}
 		return t.apply(mapping);
 	}
 	
@@ -49,14 +60,22 @@ public class RecursiveCodeGen extends AbstractCodeGen {
 		Template t;
 
 		mapping.put("r_type", rType);
+		mapping.put("r2_type", r2Type);
 		mapping.put("t_type", tType);
+		
+		mapping.put("limit", "4096");
 
 		mapping.put("recursive_kernel_name", getRecursiveKernelName());
 		mapping.put("iter_lambda_name", getIterativeLambdaName());
 		mapping.put("iter_lambda_def", getRecursiveLambdaSource());
+		mapping.put("split", splitSource);
 		mapping.put("other_sources", otherSources);
 		mapping.put("extra_args", getExtraArgs());
 		mapping.put("extra_args_call", getExtraArgsCall());
-		t = new Template(new TemplateWrapper("opencl/RecursiveKernel.clt"));
+		if (r2Type.equals("void*")) {
+			t = new Template(new TemplateWrapper("opencl/Recursive1DKernel.clt"));
+		} else {
+			t = new Template(new TemplateWrapper("opencl/Recursive2DKernel.clt"));
+		}
 		return t.apply(mapping);}
 	}

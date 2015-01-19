@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import aeminium.gpu.devices.CPUDevice;
-import aeminium.gpu.operations.functions.AbstractRecursiveStrategy;
+import aeminium.gpu.operations.functions.Recursive2DStrategy;
 import aeminium.gpu.operations.functions.Range2D;
 import aeminium.gpu.operations.functions.RecursiveCallback;
 import aeminium.runtime.Body;
@@ -15,12 +15,12 @@ import aeminium.runtime.Task;
 public class MCPURecursive<R extends Number, R2, T> extends MCPUGenericKernel {
 
 	public T output;
-	public final AbstractRecursiveStrategy<R, R2, T> strategy;
+	public final Recursive2DStrategy<R, R2, T> strategy;
 	public Task cTask;
 	public RecursiveBody<R, R2, T> cBody;
 	
 	
-	public MCPURecursive(AbstractRecursiveStrategy<R, R2, T> recursiveStrategy) {
+	public MCPURecursive(Recursive2DStrategy<R, R2, T> recursiveStrategy) {
 		strategy = recursiveStrategy;
 	}
 

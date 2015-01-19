@@ -5,7 +5,7 @@ import aeminium.gpu.collections.properties.operations.ReducerWithSeed;
 import aeminium.gpu.operations.RecursiveOp;
 import aeminium.gpu.utils.UniqCounter;
 
-public abstract class AbstractRecursiveStrategy<R extends Number, R2, T> extends AbstractPObject implements ReducerWithSeed<T> {
+public abstract class Recursive2DStrategy<R extends Number, R2, T> extends AbstractPObject implements ReducerWithSeed<T> {
 	protected String id = null;
 
 	public abstract T iterative(R r, R l, R2 t, R2 b, RecursiveCallback result);
@@ -38,7 +38,7 @@ public abstract class AbstractRecursiveStrategy<R extends Number, R2, T> extends
 
 	/* This method should be overridden by the Aeminium GPU Compiler */
 	public String[] getParameters() {
-		return new String[] { "start", "end", "result" };
+		return new String[] { "start", "end", "top", "bottom", "result" };
 	}
 
 	/* This method should be overridden by the Aeminium GPU Compiler */

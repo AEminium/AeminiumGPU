@@ -1,25 +1,25 @@
 package aeminium.gpu.backends.cpu;
 
 import aeminium.gpu.operations.functions.RecursiveCallback;
-import aeminium.gpu.operations.functions.RecursiveStrategy;
+import aeminium.gpu.operations.functions.Recursive1DStrategy;
 
 public class CPURecursive<R extends Number,T> extends CPUGenericKernel implements RecursiveCallback {
 
 	public T output;
-	public final RecursiveStrategy<R, T> strategy;
+	public final Recursive1DStrategy<R, T> strategy;
 	public R start;
 	public R end;
 	public boolean isDone = false;
 	
 	
-	public CPURecursive(RecursiveStrategy<R, T> recursiveStrategy) {
+	public CPURecursive(Recursive1DStrategy<R, T> recursiveStrategy) {
 		strategy = recursiveStrategy;
 		output = strategy.getSeed();
 		start = strategy.getStart();
 		end = strategy.getEnd();
 	}
 	
-	public CPURecursive(RecursiveStrategy<R, T> recursiveStrategy, R start, R end, T acc) {
+	public CPURecursive(Recursive1DStrategy<R, T> recursiveStrategy, R start, R end, T acc) {
 		strategy = recursiveStrategy;
 		this.start = start;
 		this.end = end;

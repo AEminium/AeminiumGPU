@@ -108,6 +108,7 @@ public class IntList extends AbstractList<Integer> implements
 			IntList other = (IntList) extra;
 			ensureNMore(other.size());
 			System.arraycopy(other.box, 0, box, size, extra.size());
+			size += other.size;
 		} else {
 			for (Integer b : extra) {
 				this.add(b);
@@ -120,8 +121,9 @@ public class IntList extends AbstractList<Integer> implements
 	public PList<Integer> extendAt(int i, PList<Integer> extra) {
 		if (extra instanceof IntList) {
 			IntList other = (IntList) extra;
-			ensureNMore(other.size() - (size() - i));
+			ensureNMore((other.size() + i) - this.size());
 			System.arraycopy(other.box, 0, box, i, extra.size());
+			if (i + other.size > size) size = i + other.size;
 		} else {
 			for (Integer b : extra) {
 				this.set(i, b);

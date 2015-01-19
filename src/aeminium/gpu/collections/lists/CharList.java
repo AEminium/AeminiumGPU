@@ -114,6 +114,7 @@ public class CharList extends AbstractList<Character> implements
 			CharList other = (CharList) extra;
 			ensureNMore(other.size());
 			System.arraycopy(other.box, 0, box, size, extra.size());
+			size += other.size;
 		} else {
 			for (Character b : extra) {
 				this.add(b);
@@ -126,8 +127,9 @@ public class CharList extends AbstractList<Character> implements
 	public PList<Character> extendAt(int i, PList<Character> extra) {
 		if (extra instanceof CharList) {
 			CharList other = (CharList) extra;
-			ensureNMore(other.size() - (size() - i));
+			ensureNMore((other.size() + i) - this.size());
 			System.arraycopy(other.box, 0, box, i, extra.size());
+			if (i + other.size > size) size = i + other.size;
 		} else {
 			for (Character b : extra) {
 				this.set(i, b);

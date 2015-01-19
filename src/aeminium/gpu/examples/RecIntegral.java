@@ -3,7 +3,7 @@ package aeminium.gpu.examples;
 import aeminium.gpu.operations.functions.Range1D;
 import aeminium.gpu.operations.functions.Range2D;
 import aeminium.gpu.operations.functions.RecursiveCallback;
-import aeminium.gpu.operations.functions.RecursiveStrategy;
+import aeminium.gpu.operations.functions.Recursive1DStrategy;
 
 public class RecIntegral {
 	
@@ -20,7 +20,7 @@ public class RecIntegral {
 		
 		long startTime = System.nanoTime();
 		
-		RecursiveStrategy<Double, Double> integral = new RecursiveStrategy<Double, Double>() {
+		Recursive1DStrategy<Double, Double> integral = new Recursive1DStrategy<Double, Double>() {
 
 			public Double getStart() { return 0.0; }
 			public Double getEnd() { return widthi; }
@@ -59,7 +59,7 @@ public class RecIntegral {
 			}
 			@Override
 			public Range2D<Double, Void> split(Double start, Double end, int n) {
-				double step = (end-start)/((double)n);
+				double step = (end-start)/((double) n);
 				Range1D<Double> r = new Range1D<Double>("Double");
 				while (start < end) {
 					r.add(start, start+step);
@@ -69,7 +69,7 @@ public class RecIntegral {
 			}
 			@Override
 			public String getSplitSource() {
-				return "nextEnd = end/2; nextStart = end/2;";
+				return "stepX = (end-start)/2;";
 			}
 			
 			@Override

@@ -108,7 +108,7 @@ public class LongList extends AbstractList<Long> implements ConcreteCollection {
 			LongList other = (LongList) extra;
 			ensureNMore(extra.size());
 			System.arraycopy(other.box, 0, box, size, other.size());
-			size += extra.size();
+			size += other.size;
 		} else {
 			for (int i=0; i<extra.size(); i++) this.add(extra.get(i));
 		}
@@ -119,8 +119,9 @@ public class LongList extends AbstractList<Long> implements ConcreteCollection {
 	public PList<Long> extendAt(int i, PList<Long> extra) {
 		if (extra instanceof LongList) {
 			LongList other = (LongList) extra;
-			ensureNMore(other.size() - (size() - i));
+			ensureNMore((other.size() + i) - this.size());
 			System.arraycopy(other.box, 0, box, i, extra.size());
+			if (i + other.size > size) size = i + other.size;
 		} else {
 			for (Long b : extra) {
 				this.set(i, b);

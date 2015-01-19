@@ -1,0 +1,54 @@
+#pragma OPENCL EXTENSION cl_khr_fp64: enable
+
+// Other Sources Required
+{{other_sources}}
+
+// Specific Map Lambda Function
+{{iter_lambda_def}}
+
+__kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global const {{r_type}}* ends, __global {{t_type}}* accs, __global int* results, const int use_same_acc {{extra_args}}) {
+	int iter_global_id = get_global_id(0);
+	results[iter_global_id] = 0;
+	accs[iter_global_id] = 0;
+	
+	__local int rs;
+	rs = 0;
+	
+	__local int counter;
+	counter = 0;
+	
+	__local {{r_type}} start, end, stepX;
+	start = starts[iter_global_id];
+	end = ends[iter_global_id];
+	stepX = end - start;
+	
+	__local {{t_type}} acc, tacc;
+	if (use_same_acc) {
+		acc = accs[iter_global_id];
+	} else {
+		acc = 0;
+	}
+	__local int avoid_partial_save;
+	avoid_partial_save = 0;
+	while (start < end) {
+		tacc = {{iter_lambda_name}}(start, start + stepX, &rs {{extra_args_call}});
+		if (rs == 1) {
+			if (!avoid_partial_save) {
+				results[iter_global_id] = 1;
+				avoid_partial_save = 1;
+			}
+			rs = 0;
+			start = start + stepX;
+			starts[iter_global_id] = start;
+			acc = acc + tacc;
+			accs[iter_global_id] = acc;
+		} else {
+			{{split}}
+		}
+		counter++;
+		if (counter > {{limit}}) return;
+	}
+	if (results[iter_global_id] > 0) {
+		results[iter_global_id] = 2;
+	}
+}

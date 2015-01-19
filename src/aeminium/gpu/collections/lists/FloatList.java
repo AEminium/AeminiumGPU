@@ -109,6 +109,7 @@ public class FloatList extends AbstractList<Float> implements
 			FloatList other = (FloatList) extra;
 			ensureNMore(other.size());
 			System.arraycopy(other.box, 0, box, size, extra.size());
+			size += other.size;
 		} else {
 			for (Float b : extra) {
 				this.add(b);
@@ -121,8 +122,9 @@ public class FloatList extends AbstractList<Float> implements
 	public PList<Float> extendAt(int i, PList<Float> extra) {
 		if (extra instanceof FloatList) {
 			FloatList other = (FloatList) extra;
-			ensureNMore(other.size() - (size() - i));
+			ensureNMore((other.size() + i) - this.size());
 			System.arraycopy(other.box, 0, box, i, extra.size());
+			if (i + other.size > size) size = i + other.size;
 		} else {
 			for (Float b : extra) {
 				this.set(i, b);

@@ -109,6 +109,7 @@ public class DoubleList extends AbstractList<Double> implements
 			DoubleList other = (DoubleList) extra;
 			ensureNMore(other.size());
 			System.arraycopy(other.box, 0, box, size, extra.size());
+			size += other.size;
 		} else {
 			for (Double b : extra) {
 				this.add(b);
@@ -121,8 +122,9 @@ public class DoubleList extends AbstractList<Double> implements
 	public PList<Double> extendAt(int i, PList<Double> extra) {
 		if (extra instanceof DoubleList) {
 			DoubleList other = (DoubleList) extra;
-			ensureNMore(other.size() - (size() - i));
+			ensureNMore((other.size() + i) - this.size());
 			System.arraycopy(other.box, 0, box, i, extra.size());
+			if (i + other.size > size) size = i + other.size;
 		} else {
 			for (Double b : extra) {
 				this.set(i, b);
