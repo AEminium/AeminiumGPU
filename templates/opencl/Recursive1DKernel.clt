@@ -6,11 +6,10 @@
 // Specific Map Lambda Function
 {{iter_lambda_def}}
 
-__kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global const {{r_type}}* ends, __global {{t_type}}* accs, __global int* results, const int use_same_acc {{extra_args}}) {
+__kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global const {{r_type}}* ends, __global {{t_type}}* accs, __global int* results, const int use_same_acc, __global {{r_type}}* steps {{extra_args}}) {
 	int iter_global_id = get_global_id(0);
-	results[iter_global_id] = 0;
-	accs[iter_global_id] = 0;
 	
+	results[iter_global_id] = 0;
 	__local int rs;
 	rs = 0;
 	
@@ -20,13 +19,15 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 	__local {{r_type}} start, end, stepX;
 	start = starts[iter_global_id];
 	end = ends[iter_global_id];
-	stepX = end - start;
 	
 	__local {{t_type}} acc, tacc;
 	if (use_same_acc) {
 		acc = accs[iter_global_id];
+		stepX = steps[iter_global_id];
 	} else {
 		acc = 0;
+		accs[iter_global_id] = 0;
+		stepX = end - start;
 	}
 	__local int avoid_partial_save;
 	avoid_partial_save = 0;
@@ -46,8 +47,12 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 			{{split}}
 		}
 		counter++;
-		if (counter > {{limit}}) return;
+		if (counter > {{limit}}) {
+			steps[iter_global_id] = stepX;
+			return;
+		}
 	}
+	steps[iter_global_id] = stepX;
 	if (results[iter_global_id] > 0) {
 		results[iter_global_id] = 2;
 	}

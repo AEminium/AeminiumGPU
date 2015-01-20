@@ -20,7 +20,8 @@ import com.nativelibs4java.opencl.CLQueue;
 public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 		implements RecursiveTemplateSource<R, R2, T> {
 
-	public static final int DEFAULT_SPLIT_VALUE = 512;
+	public static final int NUM_WORKERS = 512;
+	private static final int RECURSION_LIMIT = 512;
 
 	public T output;
 	public Recursive2DStrategy<R, R2, T> strategy;
@@ -30,9 +31,12 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 	PList<R2> bottoms;
 	PList<Boolean> results;
 	Stack<Quad<R, R2>> stack = new Stack<Quad<R, R2>>();
+	
 	boolean isDone;
+	boolean is2D = true;
 
 	protected CLBuffer<?> sbuffer;
+	protected CLBuffer<?> pbuffer;
 	protected CLBuffer<?> ebuffer;
 	protected CLBuffer<?> tbuffer = null;
 	protected CLBuffer<?> bbuffer = null;
@@ -45,6 +49,8 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 		strategy = recursiveStrategy;
 		gen = new RecursiveCodeGen<R, R2, T>(this);
 		output = strategy.getSeed();
+		
+		if (strategy.getTop() == null) is2D = false;
 
 		otherData = OtherData.extractOtherData(recursiveStrategy);
 		gen.setOtherData(otherData);
@@ -61,134 +67,165 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 		Range2D<R, R2> ranges = strategy.split(st, end, top, bottom, splits);
 		starts.extendAt(index, ranges.starts);
 		ends.extendAt(index, ranges.ends);
-		if (ranges.tops != null)
+		if (is2D) {
 			tops.extendAt(index, ranges.tops);
-		if (ranges.bottoms != null)
 			bottoms.extendAt(index, ranges.bottoms);
-		return starts.size();
+		}
+		return ranges.size();
 	}
 
+	
+	public void copyRangeBuffers(CLContext ctx) {
+		sbuffer = BufferHelper.createInputOutputBufferFor(ctx, starts,
+				starts.size());
+		ebuffer = BufferHelper.createInputBufferFor(ctx, ends, ends.size());
+		if (is2D) {
+			tbuffer = BufferHelper.createInputOutputBufferFor(ctx, tops,
+					tops.size());
+			bbuffer = BufferHelper.createInputBufferFor(ctx, bottoms,
+					bottoms.size());
+		}
+	}
+	
+	public int extendFromTo(int from, int to, int size) {
+		Range2D<R, R2> ranges;
+		if (is2D) {
+			ranges = strategy.split(starts.get(from), ends.get(from), tops.get(from), bottoms.get(from), size);
+		} else {
+			ranges = strategy.split(starts.get(from), ends.get(from), null, null, size);
+		}
+		starts.extendAt(to, ranges.starts);
+		ends.extendAt(to, ranges.ends);
+		if (is2D) {
+			tops.extendAt(to, ranges.tops);
+			bottoms.extendAt(to, ranges.bottoms);
+		}
+		return ranges.size();
+	}
+	
+	public int extendFirst(int size) {
+		Range2D<R, R2> ranges;
+		if (is2D) {
+			ranges = strategy.split(starts.remove(0), ends.remove(0), tops.remove(0), bottoms.remove(0), size);
+		} else {
+			ranges = strategy.split(starts.remove(0), ends.remove(0), null, null, size);
+		} 
+		starts.extend(ranges.starts);
+		ends.extend(ranges.ends);
+		if (is2D) {
+			tops.extend(ranges.tops);
+			bottoms.extend(ranges.bottoms);
+		}
+		return ranges.size();
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(CLContext ctx, CLQueue q) {
-
-		// initial data;
+		CLEvent[] eventsArr = new CLEvent[1];
+		int[] rs;
+		boolean reuseControlBuffers = false;
+		
 		int workUnits = prepareReadBuffers(strategy.getStart(),
 				strategy.getEnd(), strategy.getTop(), strategy.getBottom(),
-				DEFAULT_SPLIT_VALUE, 0);
-
-		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx,
-				"Integer", DEFAULT_SPLIT_VALUE);
-		abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed()
-				.getClass().getSimpleName(), DEFAULT_SPLIT_VALUE);
-		CLEvent[] eventsArr = new CLEvent[1];
-
-		int processNext = -1;
-		while (!isDone) {
-			sbuffer = BufferHelper.createInputOutputBufferFor(ctx, starts,
-					starts.size());
-			ebuffer = BufferHelper.createInputBufferFor(ctx, ends, ends.size());
-			if (tops != null)
-				tbuffer = BufferHelper.createInputOutputBufferFor(ctx, tops,
-						tops.size());
-			if (bottoms != null)
-				bbuffer = BufferHelper.createInputBufferFor(ctx, bottoms,
-						bottoms.size());
-
-			int[] rs;
-
-			PList<T> accs;
-			PList<R> startsToRepeat = null;
-			PList<R2> topsToRepeat = null;
+				NUM_WORKERS, 0);
+		
+		pbuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getStart().getClass().getSimpleName(), NUM_WORKERS);
+		
+		do {
+			if (!reuseControlBuffers) {
+				rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", workUnits);
+				abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), workUnits);
+				copyRangeBuffers(ctx);
+			}
 			
-			int use_same_acc = 0;
-			while (true) {
-				synchronized (kernel) {
-					if (strategy.getTop() == null) {
-						kernel.setArgs(sbuffer, ebuffer, abuffer, rbuffer, use_same_acc);
-					} else {
-						kernel.setArgs(sbuffer, ebuffer, tbuffer, bbuffer,
-								abuffer, rbuffer, use_same_acc);
-					}
-					setExtraDataArgs(kernel);
-
-					eventsArr[0] = kernel.enqueueNDRange(q,
-							new int[] { workUnits }, eventsArr);
+			synchronized(kernel) {
+				int isRepeat = reuseControlBuffers ? 1 : 0;
+				if (is2D) {
+					kernel.setArgs(sbuffer, ebuffer, tbuffer, bbuffer,
+							abuffer, rbuffer, isRepeat);
+				} else {
+					kernel.setArgs(sbuffer, ebuffer, abuffer, rbuffer, isRepeat, pbuffer);
 				}
-				rs = rbuffer.read(q, eventsArr[0]).getInts();
-				accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
-						eventsArr[0], strategy.getSeed().getClass()
-								.getSimpleName(), workUnits);
-
-				startsToRepeat = (PList<R>) BufferHelper.extractFromBuffer(
-						sbuffer, q, eventsArr[0], strategy.getStart()
-								.getClass().getSimpleName(), workUnits);
-				if (strategy.getTop() != null)
-					topsToRepeat = (PList<R2>) BufferHelper.extractFromBuffer(
-							tbuffer, q, eventsArr[0], strategy.getTop()
-									.getClass().getSimpleName(), workUnits);
-
-				boolean flag = false;
-				for (int i = 0; i < workUnits; i++) {
-					if (rs[i] > 0) {
-						flag = true;
-						break;
-					}
-				}
-				if (flag) {
-					use_same_acc = 0;
+				setExtraDataArgs(kernel);
+				eventsArr[0] = kernel.enqueueNDRange(q, new int[] { workUnits }, eventsArr);
+			}
+			
+			reuseControlBuffers = true;
+			rs = rbuffer.read(q, eventsArr[0]).getInts();
+			for (int i=0; i<workUnits; i++) {
+				if (rs[i] > 0) {
+					reuseControlBuffers = false;
 					break;
-				}  else {
-					use_same_acc = 1;
 				}
 			}
+			if (reuseControlBuffers) {
+				if (System.getenv("DEBUG") != null) {
+					System.out.println("Repeating with more granularity");
+				}
+				continue;
+			}
+			
+			PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
+					eventsArr[0], strategy.getSeed().getClass()
+							.getSimpleName(), workUnits);
+			
+			int freePos = -1;
+			int freeLen = -1;
 			int done = 0;
-			for (int i = 0; i < workUnits; i++) {
+			int partial = 0;
+			int zero = 0;
+			int removed = 0;
+			
+			for (int i=0; i<workUnits; i++) {
 				if (rs[i] == 2) {
 					done++;
-				}
-				if (rs[i] >= 1) {
 					output = strategy.combine(output, accs.get(i));
-				}
-				if (rs[i] <= 1) {
-					if (strategy.getTop() == null) {
-						stack.push(new Quad<R, R2>(startsToRepeat.get(i), ends
-								.get(i), null, null));
-					} else {
-						stack.push(new Quad<R, R2>(startsToRepeat.get(i), ends
-								.get(i), topsToRepeat.get(i), bottoms.get(i)));
+					starts.remove(i - removed);
+					ends.remove(i - removed);
+					removed++;
+					/*if (freePos == -1) {
+						freePos = i;
+						freeLen = 1;
+						ends.set(i, starts.get(i)); // Stupid
 					}
+					else freeLen++;*/
+				} else if (rs[i] == 1) {
+					partial++;
+					output = strategy.combine(output, accs.get(i));
+				}else {
+					zero++;
 				}
+				/*if (rs[i] < 2 && freePos != -1) {
+					freeLen++; // Include current position
+					int filled = extendFromTo(i, freePos, freeLen);
+					freePos += filled;
+					if (freePos > i) {
+						freePos = -1;
+						freeLen = -1;
+					} else {
+						freeLen = i+1-freePos;
+					}
+				}*/
+			}
+			
+			
+			if (freePos > 0) {
+				// There are free spots left, let's expand the last
+				//extendFromTo(freePos-1, freePos-1, workUnits-freePos-1);
+			}
+			
+			while (starts.size() < workUnits && starts.size() > 0) {
+				int diff = workUnits - starts.size();
+				extendFirst(diff+1);
 			}
 			
 			if (System.getenv("DEBUG") != null) {
-				System.out.println("Done:" + done + ", q: " + stack.size()
-						+ ", next: " + processNext + ", workunits: " + workUnits);
+				System.out.println("WorkUnits: " + workUnits + ", Done: " + done + ", Partial: " + partial + ", Zero: " + zero);
 			}
-
-			if (stack.isEmpty()) {
-				isDone = true;
-			} else {
-				if (processNext == -1) {
-					processNext = stack.size() / 2;
-				} else if (done == workUnits) {
-					processNext *= 2;
-				} else {
-					processNext /= 2;
-					if (processNext < 1)
-						processNext = 1;
-				}
-				int pNext = (processNext > stack.size()) ? stack.size()
-						: processNext;
-				int steps = DEFAULT_SPLIT_VALUE / pNext;
-				for (int k = 0; k < pNext; k++) {
-					Quad<R, R2> p = stack.pop();
-					int left = DEFAULT_SPLIT_VALUE - workUnits;
-					workUnits = prepareReadBuffers(p.s, p.e, p.t, p.b,
-							Math.min(steps, left), k * steps);
-				}
-			}
-		}
+			
+			if (done == workUnits) isDone = true;
+		} while (!isDone);
 		rbuffer.release();
 		abuffer.release();
 	}
@@ -218,7 +255,7 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 				.getClass().getSimpleName());
 		ends = (PList<R>) CollectionFactory.listFromType(strategy.getEnd()
 				.getClass().getSimpleName());
-		if (strategy.getTop() != null) {
+		if (is2D) {
 			tops = (PList<R2>) CollectionFactory.listFromType(strategy.getTop()
 					.getClass().getSimpleName());
 			bottoms = (PList<R2>) CollectionFactory.listFromType(strategy
@@ -259,6 +296,11 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 	@Override
 	public Recursive2DStrategy<R, R2, T> getRecursiveStrategy() {
 		return strategy;
+	}
+
+	@Override
+	public int getRecursionLimit() {
+		return RECURSION_LIMIT;
 	}
 
 }

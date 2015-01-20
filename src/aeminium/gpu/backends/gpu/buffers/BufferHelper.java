@@ -15,6 +15,7 @@ import com.nativelibs4java.opencl.LocalSize;
 
 public class BufferHelper {
 
+	
 	private static HashMap<String, IBufferFactory> factories = new HashMap<String, IBufferFactory>();
 
 	private static HashMap<String, String> clTypes = new HashMap<String, String>();
@@ -137,6 +138,16 @@ public class BufferHelper {
 		IBufferFactory f = getFactory(type);
 		return f.extractElementFromBuffer(outbuffer, q, ev);
 	}
+	
+	public static CLBuffer<?> createInputOutputBufferFor(CLContext ctx,
+			PObject o) {
+		if (o instanceof PList) {
+			PList<?> l = (PList<?>) o;
+			return createInputOutputBufferFor(ctx, l);
+		}
+		return null;
+	}
+
 
 	public static String getCLTypeOf(String type) {
 		return clTypes.get(type);
@@ -151,15 +162,6 @@ public class BufferHelper {
 			return BooleanList.decode((Character) in);
 		}
 		return in;
-	}
-
-	public static CLBuffer<?> createInputOutputBufferFor(CLContext ctx,
-			PObject o) {
-		if (o instanceof PList) {
-			PList<?> l = (PList<?>) o;
-			return createInputOutputBufferFor(ctx, l);
-		}
-		return null;
 	}
 
 	public static String getCLTypeOfObject(PObject o) {

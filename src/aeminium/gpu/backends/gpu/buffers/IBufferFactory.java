@@ -10,6 +10,9 @@ import com.nativelibs4java.opencl.LocalSize;
 
 public interface IBufferFactory {
 
+	public CLBuffer<?> createInputOutputBufferFor(CLContext context,
+			String outputType, int size);
+	
 	public <T> CLBuffer<?> createInputOutputBufferFor(CLContext context,
 			PList<T> list);
 
@@ -25,7 +28,4 @@ public interface IBufferFactory {
 
 	public Object extractElementFromBuffer(CLBuffer<?> outbuffer, CLQueue q,
 			CLEvent ev);
-
-	public CLBuffer<?> createInputOutputBufferFor(CLContext context,
-			String outputType, int size);
 }

@@ -13,12 +13,13 @@ public class RecursiveCodeGen<R extends Number, R2, T> extends AbstractCodeGen {
 	private String clSource;
 	private String splitSource;
 	private String[] parameters;
-	
+	private int recLimit;
 	
 	public RecursiveCodeGen(RecursiveTemplateSource<R, R2, T> r) {
 		this.rType = r.getRType();
 		this.r2Type = r.getR2Type();
 		this.tType = r.getTType();
+		this.recLimit = r.getRecursionLimit();
 		this.splitSource = r.getRecursiveStrategy().getSplitSource();
 		this.clSource = r.getRecursiveStrategy().getSource();
 		this.parameters = r.getRecursiveStrategy().getParameters();
@@ -63,7 +64,7 @@ public class RecursiveCodeGen<R extends Number, R2, T> extends AbstractCodeGen {
 		mapping.put("r2_type", r2Type);
 		mapping.put("t_type", tType);
 		
-		mapping.put("limit", "4096");
+		mapping.put("limit", "" + recLimit);
 
 		mapping.put("recursive_kernel_name", getRecursiveKernelName());
 		mapping.put("iter_lambda_name", getIterativeLambdaName());
