@@ -16,7 +16,7 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 	__local int counter;
 	counter = 0;
 	
-	__local {{r_type}} start, end, stepX;
+	__local {{r_type}} start, end, stepX, stepXb;
 	start = starts[iter_global_id];
 	end = ends[iter_global_id];
 	
@@ -43,7 +43,7 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 			starts[iter_global_id] = start;
 			acc = acc + tacc;
 			accs[iter_global_id] = acc;
-		} else {
+		} else {	
 			{{split}}
 		}
 		counter++;

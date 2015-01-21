@@ -87,22 +87,6 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 		}
 	}
 	
-	public int extendFromTo(int from, int to, int size) {
-		Range2D<R, R2> ranges;
-		if (is2D) {
-			ranges = strategy.split(starts.get(from), ends.get(from), tops.get(from), bottoms.get(from), size);
-		} else {
-			ranges = strategy.split(starts.get(from), ends.get(from), null, null, size);
-		}
-		starts.extendAt(to, ranges.starts);
-		ends.extendAt(to, ranges.ends);
-		if (is2D) {
-			tops.extendAt(to, ranges.tops);
-			bottoms.extendAt(to, ranges.bottoms);
-		}
-		return ranges.size();
-	}
-	
 	public int extendFirst(int size) {
 		Range2D<R, R2> ranges;
 		if (is2D) {
@@ -154,7 +138,7 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 			reuseControlBuffers = true;
 			rs = rbuffer.read(q, eventsArr[0]).getInts();
 			for (int i=0; i<workUnits; i++) {
-				if (rs[i] > 0) {
+				if (rs[i] == 2) {
 					reuseControlBuffers = false;
 					break;
 				}
@@ -170,64 +154,44 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 					eventsArr[0], strategy.getSeed().getClass()
 							.getSimpleName(), workUnits);
 			
-			int freePos = -1;
-			int freeLen = -1;
-			int done = 0;
-			int partial = 0;
-			int zero = 0;
-			int removed = 0;
-			
-			for (int i=0; i<workUnits; i++) {
-				if (rs[i] == 2) {
-					done++;
-					output = strategy.combine(output, accs.get(i));
-					starts.remove(i - removed);
-					ends.remove(i - removed);
-					removed++;
-					/*if (freePos == -1) {
-						freePos = i;
-						freeLen = 1;
-						ends.set(i, starts.get(i)); // Stupid
-					}
-					else freeLen++;*/
-				} else if (rs[i] == 1) {
-					partial++;
-					output = strategy.combine(output, accs.get(i));
-				}else {
-					zero++;
-				}
-				/*if (rs[i] < 2 && freePos != -1) {
-					freeLen++; // Include current position
-					int filled = extendFromTo(i, freePos, freeLen);
-					freePos += filled;
-					if (freePos > i) {
-						freePos = -1;
-						freeLen = -1;
-					} else {
-						freeLen = i+1-freePos;
-					}
-				}*/
-			}
+			filterAndSplitFirst(workUnits, rs, accs);
 			
 			
-			if (freePos > 0) {
-				// There are free spots left, let's expand the last
-				//extendFromTo(freePos-1, freePos-1, workUnits-freePos-1);
-			}
-			
-			while (starts.size() < workUnits && starts.size() > 0) {
-				int diff = workUnits - starts.size();
-				extendFirst(diff+1);
-			}
-			
-			if (System.getenv("DEBUG") != null) {
-				System.out.println("WorkUnits: " + workUnits + ", Done: " + done + ", Partial: " + partial + ", Zero: " + zero);
-			}
-			
-			if (done == workUnits) isDone = true;
 		} while (!isDone);
 		rbuffer.release();
 		abuffer.release();
+	}
+	
+	private void filterAndSplitFirst(int workUnits, int[] rs, PList<T> accs) {
+		int done = 0;
+		int partial = 0;
+		int zero = 0;
+		int removed = 0;
+		
+		for (int i=0; i<workUnits; i++) {
+			if (rs[i] == 2) {
+				done++;
+				output = strategy.combine(output, accs.get(i));
+				starts.remove(i - removed);
+				ends.remove(i - removed);
+				removed++;
+			} else if (rs[i] == 1) {
+				partial++;
+				output = strategy.combine(output, accs.get(i));
+			}else {
+				zero++;
+			}
+		}
+		if (done == workUnits) isDone = true;
+		
+		while (starts.size() < workUnits && starts.size() > 0) {
+			int diff = workUnits - starts.size();
+			extendFirst(diff+1);
+		}
+		
+		if (System.getenv("DEBUG") != null) {
+			System.out.println("WorkUnits: " + workUnits + ", Done: " + done + ", Partial: " + partial + ", Zero: " + zero);
+		}
 	}
 
 	@Override

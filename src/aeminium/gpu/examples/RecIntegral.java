@@ -69,7 +69,7 @@ public class RecIntegral {
 			}
 			@Override
 			public String getSplitSource() {
-				return "stepX = (end-start)/2;";
+				return "stepX = stepX/2;";
 			}
 			
 			@Override
