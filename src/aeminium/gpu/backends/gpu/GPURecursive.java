@@ -20,7 +20,7 @@ import com.nativelibs4java.opencl.CLQueue;
 public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 		implements RecursiveTemplateSource<R, R2, T> {
 
-	public static final int NUM_WORKERS = 512;
+	public static final int NUM_WORKERS = 128;
 	private static final int RECURSION_LIMIT = 512;
 
 	public T output;
@@ -32,6 +32,7 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 	PList<Boolean> results;
 	Stack<Quad<R, R2>> stack = new Stack<Quad<R, R2>>();
 	
+	int maxWorkUnits = 0;
 	boolean isDone;
 	boolean is2D = true;
 
@@ -62,14 +63,13 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 		createEmptyLists();
 	}
 
-	public int prepareReadBuffers(R st, R end, R2 top, R2 bottom, int splits,
-			int index) {
+	public int prepareReadBuffers(R st, R end, R2 top, R2 bottom, int splits) {
 		Range2D<R, R2> ranges = strategy.split(st, end, top, bottom, splits);
-		starts.extendAt(index, ranges.starts);
-		ends.extendAt(index, ranges.ends);
+		starts = ranges.starts;
+		ends = ranges.ends;
 		if (is2D) {
-			tops.extendAt(index, ranges.tops);
-			bottoms.extendAt(index, ranges.bottoms);
+			tops = ranges.tops;
+			bottoms = ranges.bottoms;
 		}
 		return ranges.size();
 	}
@@ -112,28 +112,24 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 		
 		int workUnits = prepareReadBuffers(strategy.getStart(),
 				strategy.getEnd(), strategy.getTop(), strategy.getBottom(),
-				NUM_WORKERS, 0);
-		
-		pbuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getStart().getClass().getSimpleName(), NUM_WORKERS);
-		
+				NUM_WORKERS);
+		copyRangeBuffers(ctx);
+		pbuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getStart().getClass().getSimpleName(), workUnits);
+		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", workUnits);
+		int counter = 0;
 		do {
-			if (!reuseControlBuffers) {
-				rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", workUnits);
-				abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), workUnits);
-				copyRangeBuffers(ctx);
-			}
-			
+			abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), workUnits);
 			synchronized(kernel) {
-				int isRepeat = reuseControlBuffers ? 1 : 0;
 				if (is2D) {
-					kernel.setArgs(sbuffer, ebuffer, tbuffer, bbuffer,
-							abuffer, rbuffer, isRepeat);
+					// TODO
 				} else {
-					kernel.setArgs(sbuffer, ebuffer, abuffer, rbuffer, isRepeat, pbuffer);
+					int reuse_steps = reuseControlBuffers ? 1 : 0;
+					kernel.setArgs(sbuffer, ebuffer, abuffer, rbuffer, 0, reuse_steps, pbuffer);
 				}
 				setExtraDataArgs(kernel);
 				eventsArr[0] = kernel.enqueueNDRange(q, new int[] { workUnits }, eventsArr);
 			}
+			counter++;
 			
 			reuseControlBuffers = true;
 			rs = rbuffer.read(q, eventsArr[0]).getInts();
@@ -145,49 +141,69 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 			}
 			if (reuseControlBuffers) {
 				if (System.getenv("DEBUG") != null) {
-					System.out.println("Repeating with more granularity");
+					R stepXprobe = (R) BufferHelper.extractElementFromBuffer(pbuffer, q, eventsArr[0], strategy.getStart().getClass().getSimpleName());
+					System.out.println("Repeating with more granularity: " + stepXprobe + " with control " + rs[0]);
 				}
 				continue;
 			}
 			
-			PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
+			PList<T> accs2 = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
 					eventsArr[0], strategy.getSeed().getClass()
 							.getSimpleName(), workUnits);
 			
-			filterAndSplitFirst(workUnits, rs, accs);
+			T a = strategy.getSeed();
+			for (T acc : accs2) {
+				a = strategy.combine(a, acc);
+			}
+			output = strategy.combine(a, output);
+			System.out.println("Row: " + a);
 			
+			filterAndSplitFirst(workUnits, rs);
+			//copyRangeBuffers(ctx);
+			workUnits = starts.size(); // TODO: Remove this 
 			
 		} while (!isDone);
 		rbuffer.release();
+		PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
+				eventsArr[0], strategy.getSeed().getClass()
+						.getSimpleName(), workUnits);
+		
+		//output = strategy.getSeed();
+		for (T acc : accs) {
+			output = strategy.combine(output, acc);
+		}
 		abuffer.release();
+		
 	}
 	
-	private void filterAndSplitFirst(int workUnits, int[] rs, PList<T> accs) {
+	private void filterAndSplitFirst(int workUnits, int[] rs) {
 		int done = 0;
 		int partial = 0;
 		int zero = 0;
 		int removed = 0;
 		
+		
+
 		for (int i=0; i<workUnits; i++) {
 			if (rs[i] == 2) {
 				done++;
-				output = strategy.combine(output, accs.get(i));
 				starts.remove(i - removed);
 				ends.remove(i - removed);
 				removed++;
 			} else if (rs[i] == 1) {
 				partial++;
-				output = strategy.combine(output, accs.get(i));
 			}else {
 				zero++;
 			}
 		}
 		if (done == workUnits) isDone = true;
 		
+		/*
 		while (starts.size() < workUnits && starts.size() > 0) {
 			int diff = workUnits - starts.size();
 			extendFirst(diff+1);
 		}
+		*/
 		
 		if (System.getenv("DEBUG") != null) {
 			System.out.println("WorkUnits: " + workUnits + ", Done: " + done + ", Partial: " + partial + ", Zero: " + zero);
