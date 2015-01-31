@@ -17,7 +17,7 @@ import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
 import com.nativelibs4java.opencl.CLQueue;
 
-public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
+public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericKernel
 		implements RecursiveTemplateSource<R, R2, T> {
 
 	public static final int NUM_WORKERS = 128;
@@ -46,7 +46,7 @@ public class GPURecursive<R extends Number, R2, T> extends GPUGenericKernel
 
 	private RecursiveCodeGen<R, R2, T> gen;
 
-	public GPURecursive(Recursive2DStrategy<R, R2, T> recursiveStrategy) {
+	public GPURangedRecursiveCall(Recursive2DStrategy<R, R2, T> recursiveStrategy) {
 		strategy = recursiveStrategy;
 		gen = new RecursiveCodeGen<R, R2, T>(this);
 		output = strategy.getSeed();

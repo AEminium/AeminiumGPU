@@ -1,25 +1,25 @@
 package aeminium.gpu.operations;
 
-import aeminium.gpu.backends.gpu.GPURecursive;
-import aeminium.gpu.backends.mcpu.MCPURecursive;
+import aeminium.gpu.backends.gpu.GPURangedRecursiveCall;
+import aeminium.gpu.backends.mcpu.MCPURangedRecursiveCall;
 import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.contracts.Program;
 import aeminium.gpu.operations.functions.Recursive2DStrategy;
 
-public class RecursiveOp<R extends Number, R2, T> extends GenericProgram implements Program {
+public class RangedRecursiveCall<R extends Number, R2, T> extends GenericProgram implements Program {
 	
 	public Recursive2DStrategy<R, R2, T> strategy;
 	private T output;
 	
-	protected GPURecursive<R, R2, T> gpuOp;
-	protected MCPURecursive<R, R2, T> cpuOp;
+	protected GPURangedRecursiveCall<R, R2, T> gpuOp;
+	protected MCPURangedRecursiveCall<R, R2, T> cpuOp;
 
-	public RecursiveOp(Recursive2DStrategy<R, R2, T> recursiveStrategy) {
+	public RangedRecursiveCall(Recursive2DStrategy<R, R2, T> recursiveStrategy) {
 		this.strategy = recursiveStrategy;
 		this.device = recursiveStrategy.getDevice();
 		
-		cpuOp = new MCPURecursive<R, R2, T>(recursiveStrategy);
-		gpuOp = new GPURecursive<R, R2, T>(recursiveStrategy);
+		cpuOp = new MCPURangedRecursiveCall<R, R2, T>(recursiveStrategy);
+		gpuOp = new GPURangedRecursiveCall<R, R2, T>(recursiveStrategy);
 		gpuOp.setDevice(device);
 	}
 

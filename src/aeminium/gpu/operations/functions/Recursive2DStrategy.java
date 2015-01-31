@@ -2,7 +2,7 @@ package aeminium.gpu.operations.functions;
 
 import aeminium.gpu.collections.AbstractPObject;
 import aeminium.gpu.collections.properties.operations.ReducerWithSeed;
-import aeminium.gpu.operations.RecursiveOp;
+import aeminium.gpu.operations.RangedRecursiveCall;
 import aeminium.gpu.utils.UniqCounter;
 
 public abstract class Recursive2DStrategy<R extends Number, R2, T> extends AbstractPObject implements ReducerWithSeed<T> {
@@ -17,7 +17,7 @@ public abstract class Recursive2DStrategy<R extends Number, R2, T> extends Abstr
 	public abstract R2 getBottom();
 	
 	public T evaluate() {
-		RecursiveOp<R, R2, T> op = new RecursiveOp<R, R2, T>(this);
+		RangedRecursiveCall<R, R2, T> op = new RangedRecursiveCall<R, R2, T>(this);
 		return op.getOutput();
 	}	
 	

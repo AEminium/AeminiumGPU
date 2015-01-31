@@ -12,7 +12,7 @@ import aeminium.runtime.Hints;
 import aeminium.runtime.Runtime;
 import aeminium.runtime.Task;
 
-public class MCPURecursive<R extends Number, R2, T> extends MCPUGenericKernel {
+public class MCPURangedRecursiveCall<R extends Number, R2, T> extends MCPUGenericKernel {
 
 	public T output;
 	public final Recursive2DStrategy<R, R2, T> strategy;
@@ -20,7 +20,7 @@ public class MCPURecursive<R extends Number, R2, T> extends MCPUGenericKernel {
 	public RecursiveBody<R, R2, T> cBody;
 	
 	
-	public MCPURecursive(Recursive2DStrategy<R, R2, T> recursiveStrategy) {
+	public MCPURangedRecursiveCall(Recursive2DStrategy<R, R2, T> recursiveStrategy) {
 		strategy = recursiveStrategy;
 	}
 
@@ -47,9 +47,9 @@ public class MCPURecursive<R extends Number, R2, T> extends MCPUGenericKernel {
 		R2 top;
 		R2 bottom;
 		boolean isDone;
-		MCPURecursive<R, R2, T> op;
+		MCPURangedRecursiveCall<R, R2, T> op;
 		
-		public RecursiveBody(MCPURecursive<R, R2, T> op, T accumulator, R start, R end, R2 top, R2 bottom) {
+		public RecursiveBody(MCPURangedRecursiveCall<R, R2, T> op, T accumulator, R start, R end, R2 top, R2 bottom) {
 			this.acc = accumulator;
 			this.st = start;
 			this.end = end;
