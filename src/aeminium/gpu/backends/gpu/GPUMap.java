@@ -66,7 +66,7 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 			// setArgs will throw an exception at runtime if the types / sizes
 			// of the arguments are incorrect
 			kernel.setArgs(inbuffer, outbuffer);
-			setExtraDataArgs(kernel);
+			setExtraDataArgs(2, kernel);
 
 			// Ask for 1-dimensional execution of length dataSize, with auto
 			// choice of local workgroup size :

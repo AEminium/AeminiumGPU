@@ -61,6 +61,7 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 		accbuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed()
 				.getClass().getSimpleName(), MAX_ITEMS);
 
+		int counter = 0;
 		while (!isDone) {
 			
 			workUnits = args.length(); //end - start; // Using Limits from Decider
@@ -70,12 +71,13 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 					bufferSize);
 
 			synchronized (kernel) {
-				kernel.setArgs(workUnits, rbuffer, accbuffer, argbuffer);
-				setExtraDataArgs(kernel);
+				kernel.setArgs(counter, workUnits, rbuffer, accbuffer, argbuffer);
+				setExtraDataArgs(5, kernel);
 
 				eventsArr[0] = kernel.enqueueNDRange(q,
 						new int[] { workUnits }, eventsArr);
 			}
+			counter++;
 			
 			PList<Integer> rs = (PList<Integer>) BufferHelper
 					.extractFromBuffer(rbuffer, q, eventsArr[0], "Integer",
@@ -83,17 +85,7 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 			PList<A> argsBack = (PList<A>) BufferHelper.extractFromBuffer(
 					argbuffer, q, eventsArr[0], bufferSize, args);
 			
-			
-			PList<R> accs = (PList<R>) BufferHelper.extractFromBuffer(
-					accbuffer, q, eventsArr[0], strategy.getSeed().getClass()
-							.getSimpleName(), workUnits);
-			
-			
-			
 			for (int i = 0; i < bufferSize; i++) {
-				if (i < workUnits) {
-					output = strategy.combine(output, accs.get(i));
-				} 
 				if (rs.get(i) == 0){
 					argsNext.add(argsBack.get(i));
 				}
@@ -115,7 +107,13 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 				}
 			}
 		}
-
+		
+		PList<R> accs = (PList<R>) BufferHelper.extractFromBuffer(
+				accbuffer, q, eventsArr[0], strategy.getSeed().getClass()
+						.getSimpleName(), workUnits);
+		for (int i = 0; i < MAX_ITEMS; i++) {
+			output = strategy.combine(output, accs.get(i));
+		}
 	}
 	
 	@Override

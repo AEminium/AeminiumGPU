@@ -69,7 +69,7 @@ public class GPUPartialReduce<O> extends GPUGenericKernel implements ReduceTempl
 		synchronized (kernel) {
 			kernel.setArgs(inbuffer, outbuffer, (long) input.size(),
 					(long) end, (long) (input.size() / outputSize));
-			setExtraDataArgs(kernel);
+			setExtraDataArgs(5, kernel);
 			kernelCompletion = kernel.enqueueNDRange(q,
 					new int[] { end }, null, new CLEvent[] {});
 		}

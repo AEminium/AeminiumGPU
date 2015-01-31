@@ -125,7 +125,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 					int reuse_steps = reuseControlBuffers ? 1 : 0;
 					kernel.setArgs(sbuffer, ebuffer, abuffer, rbuffer, 0, reuse_steps, pbuffer);
 				}
-				setExtraDataArgs(kernel);
+				setExtraDataArgs(7, kernel);
 				eventsArr[0] = kernel.enqueueNDRange(q, new int[] { workUnits }, eventsArr);
 			}
 			

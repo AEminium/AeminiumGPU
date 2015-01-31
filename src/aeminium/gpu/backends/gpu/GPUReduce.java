@@ -129,12 +129,13 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 					kernel.setArgs(inbuffer, currentInput, outbuffer,
 							(long) current_size, (long) blocksInCurrentDepth,
 							(long) DEFAULT_MAX_REDUCTION_SIZE, (depth == 0) ? 1 : 0);
+					setExtraDataArgs(7, kernel);
 				} else {
 					kernel.setArgs(currentInput, outbuffer, (long) current_size,
 						(long) blocksInCurrentDepth,
 						(long) DEFAULT_MAX_REDUCTION_SIZE);
+					setExtraDataArgs(5, kernel);
 				}
-				setExtraDataArgs(kernel);
 				int workgroupSize = blocksInCurrentDepth;
 				if (workgroupSize == 1)
 					workgroupSize = 2;
