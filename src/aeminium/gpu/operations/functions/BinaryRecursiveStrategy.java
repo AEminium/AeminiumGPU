@@ -32,6 +32,16 @@ public abstract class BinaryRecursiveStrategy<R, A> extends AbstractPObject impl
 			id = UniqCounter.getNewId();
 		return id;
 	}
+	
+	/* This method should be overridden by the Aeminium GPU Compiler */
+	public String getCombineSource() {
+		return null;
+	}
+	
+	/* This method should be overridden by the Aeminium GPU Compiler */
+	public String[] getCombineParameters() {
+		return new String[] { "first", "second" };
+	}
 
 	public abstract A getArgument();
 }

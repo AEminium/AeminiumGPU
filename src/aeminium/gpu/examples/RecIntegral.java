@@ -57,6 +57,16 @@ public class RecIntegral {
 			public Double combine(Double input, Double other) {
 				return input+other;
 			}
+			
+			@Override
+			public String getCombineSource() {
+				return "return first + second;";
+			}
+			
+			public String[] getCombineParameters() {
+				return new String[] { "first", "second" };
+			}
+			
 			@Override
 			public Range2D<Double, Void> split(Double start, Double end, int n) {
 				double step = (end-start)/((double) n);

@@ -41,8 +41,8 @@ __kernel void {{recursive_kernel_name}}(int workers, __global int* results, __gl
 		tacc = {{iter_lambda_name}}(args[iter_global_id + workers * counter], &rs {{extra_args_call}});
 		if (rs == 1) {
 			rs = 0;
-			results[iter_global_id + workers * counter] = 1;
-			accs[iter_global_id + workers * counter] = tacc;
+			results[iter_global_id + workers * counter] = -1;
+			accs[iter_global_id] = accs[iter_global_id] + tacc;
 			counter = (counter + 1) % {{max_spawn}};
 		} else {
 			if (spawn(args[iter_global_id + workers * counter], &args[iter_global_id + workers * counter], &args[iter_global_id + workers * nextSpawn] {{extra_args_call}})) {

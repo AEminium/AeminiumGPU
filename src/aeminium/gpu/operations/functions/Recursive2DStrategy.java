@@ -30,6 +30,11 @@ public abstract class Recursive2DStrategy<R extends Number, R2, T> extends Abstr
 	public String getSplitSource() {
 		return null;
 	}
+	
+	/* This method should be overridden by the Aeminium GPU Compiler */
+	public String getCombineSource() {
+		return null;
+	}
 
 	/* This method should be overridden by the Aeminium GPU Compiler */
 	public String getSourceComplexity() {
@@ -39,6 +44,11 @@ public abstract class Recursive2DStrategy<R extends Number, R2, T> extends Abstr
 	/* This method should be overridden by the Aeminium GPU Compiler */
 	public String[] getParameters() {
 		return new String[] { "start", "end", "top", "bottom", "result" };
+	}
+	
+	/* This method should be overridden by the Aeminium GPU Compiler */
+	public String[] getCombineParameters() {
+		return new String[] { "first", "second" };
 	}
 
 	/* This method should be overridden by the Aeminium GPU Compiler */

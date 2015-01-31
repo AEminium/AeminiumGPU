@@ -37,6 +37,15 @@ public class RecFibonacci {
 				return new String[] { "n", "result" };
 			}
 			
+			@Override
+			public String getCombineSource() {
+				return "return first + second;";
+			}
+			
+			public String[] getCombineParameters() {
+				return new String[] { "first", "second" };
+			}
+			
 			
 			@Override
 			public Integer combine(Integer input, Integer other) {

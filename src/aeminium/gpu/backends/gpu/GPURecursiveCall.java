@@ -59,7 +59,7 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx,
 				"Integer", MAX_ITEMS * DEFAULT_SPAWN);
 		accbuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed()
-				.getClass().getSimpleName(), MAX_ITEMS * DEFAULT_SPAWN);
+				.getClass().getSimpleName(), MAX_ITEMS);
 
 		while (!isDone) {
 			
@@ -86,14 +86,15 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 			
 			PList<R> accs = (PList<R>) BufferHelper.extractFromBuffer(
 					accbuffer, q, eventsArr[0], strategy.getSeed().getClass()
-							.getSimpleName(), bufferSize);
+							.getSimpleName(), workUnits);
 			
 			
 			
 			for (int i = 0; i < bufferSize; i++) {
-				if (rs.get(i) == 1) {
+				if (i < workUnits) {
 					output = strategy.combine(output, accs.get(i));
-				} else if (rs.get(i) == 0){
+				} 
+				if (rs.get(i) == 0){
 					argsNext.add(argsBack.get(i));
 				}
 			}
