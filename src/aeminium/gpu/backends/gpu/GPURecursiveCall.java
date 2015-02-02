@@ -67,8 +67,8 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 			workUnits = args.length(); //end - start; // Using Limits from Decider
 			bufferSize = workUnits * DEFAULT_SPAWN;
 			
-			argbuffer = BufferHelper.createInputOutputBufferFor(ctx, args,
-					bufferSize);
+			args.set(bufferSize-1 , args.get(0));
+			argbuffer = BufferHelper.createInputOutputBufferFor(ctx, args);
 
 			synchronized (kernel) {
 				kernel.setArgs(counter, workUnits, rbuffer, accbuffer, argbuffer);
