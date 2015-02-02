@@ -40,8 +40,9 @@ public class RecursiveCall<R, A> extends GenericProgram implements Program {
 			if (futureArgs.size() <= 0) break;
 			A o = futureArgs.remove(0);
 			PList<A> more = strategy.split(o);
-			futureArgs.add(more.get(0));
-			futureArgs.add(more.get(1));
+			for (A m : more) {
+				futureArgs.add(m);
+			}
 		}
 		
 		cpuOp.setArgs(futureArgs);
