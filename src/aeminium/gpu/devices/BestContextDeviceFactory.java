@@ -14,6 +14,7 @@ public class BestContextDeviceFactory implements DeviceFactory {
 		if (JavaCL.listGPUPoweredPlatforms().length > 0) {
 			try {
 				d = new GPUDevice(JavaCL.createBestContext());
+				if (System.getenv("DEBUG") != null) System.out.println(JavaCL.createBestContext());
 				return d;
 			} catch (CLException e) {
 				return null;
