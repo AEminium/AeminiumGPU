@@ -89,6 +89,9 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 				if (rs.get(i) == 0){
 					argsNext.add(argsBack.get(i));
 				}
+				if (rs.get(i) == -2) {
+					System.out.println("There was an error");
+				}
 			}
 			
 			if (System.getenv("DEBUG") != null) {
