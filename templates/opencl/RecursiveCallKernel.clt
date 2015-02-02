@@ -37,7 +37,7 @@ __kernel void {{recursive_kernel_name}}(int global_counter, int workers, __globa
 		if (rs == 1) {
 			rs = 0;
 			results[iter_global_id + workers * counter] = -1;
-			accs[iter_global_id] = tacc;
+			accs[iter_global_id] += tacc;
 			counter = (counter + 1) % {{max_spawn}};
 		} else {
 			if (results[iter_global_id + workers * nextSpawn] > -1) break; 
