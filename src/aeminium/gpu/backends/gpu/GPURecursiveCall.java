@@ -104,10 +104,10 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 					System.out.print(a + "/");
 					for (int j=0; j<DEFAULT_SPAWN;j++)
 						System.out.print(args.get(i + j * workUnits) + "´" + rs.get(i + j * workUnits) + "|");
-					System.out.print(", ");
+					System.out.println(", ");
 					i++;
 				}
-				System.out.println();
+				System.out.println("_______");
 				
 			}
 			
