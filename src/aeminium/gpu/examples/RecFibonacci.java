@@ -21,7 +21,7 @@ public class RecFibonacci {
 			
 			@Override
 			public Integer call(Integer n, RecursiveCallback result) {
-				if (n < 2) {
+				if (n <= 2) {
 					result.markDone();
 					return 1;
 				} 
@@ -30,7 +30,7 @@ public class RecFibonacci {
 			
 			@Override
 			public String getSource() {
-				return "if (n < 2) { result[0] = 1; return 1; } return 0;"; 
+				return "if (n <= 2) { result[0] = 1; return 1; } return 0;"; 
 			}
 			
 			public String[] getParameters() {
@@ -60,7 +60,7 @@ public class RecFibonacci {
 			@Override
 			public PList<Integer> split(Integer n) {
 				PList<Integer> l = new IntList();
-				if (n < 2) {
+				if (n <= 2) {
 					l.add(n);
 				} else {
 					l.add(n-1);
@@ -70,7 +70,7 @@ public class RecFibonacci {
 			}
 			
 			public String getSplitSource() {
-				return "if (n < 2) { return 0; } else { current[0] = n-1; next[0] = n-2; return 1;}";
+				return "if (n <= 2) { return 0; } else { current[0] = n-1; next[0] = n-2; return 1;}";
 			}
 
 			@Override
