@@ -26,8 +26,6 @@ __kernel void {{recursive_kernel_name}}(int global_counter, int workers, __globa
 	__local int nextSpawn;
 	nextSpawn = 1;
 	
-	__local {{r_type}} acc;
-	acc = accs[iter_global_id];
 	__local {{r_type}} tacc;
 	
 	while (nextSpawn != counter) {
