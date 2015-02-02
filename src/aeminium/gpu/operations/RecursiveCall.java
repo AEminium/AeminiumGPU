@@ -43,6 +43,7 @@ public class RecursiveCall<R, A> extends GenericProgram implements Program {
 			for (A m : more) {
 				futureArgs.add(m);
 			}
+			if (more.length() == 0) futureArgs.add(o);
 		}
 		
 		cpuOp.setArgs(futureArgs);
