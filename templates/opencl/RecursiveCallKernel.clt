@@ -46,7 +46,7 @@ __kernel void {{recursive_kernel_name}}(int global_counter, int workers, __globa
 				nextSpawn = (nextSpawn + 1) % {{max_spawn}};
 				if (results[iter_global_id + workers * nextSpawn] > -1) break; 
 			} else {
-				results[iter_global_id + workers * counter] = -2;
+				results[iter_global_id + workers * counter] = -1;
 				counter = (counter + 1) % {{max_spawn}};
 			}
 			
