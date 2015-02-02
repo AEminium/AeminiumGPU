@@ -36,7 +36,7 @@ public class RecursiveCall<R, A> extends GenericProgram implements Program {
 	protected int getParallelUnits() {
 		
 		futureArgs = strategy.split(arg);
-		for (int i=0; i < 10; i++) {
+		for (int i=0; i < 512; i++) {
 			if (futureArgs.size() <= 0) break;
 			A o = futureArgs.remove(0);
 			PList<A> more = strategy.split(o);
