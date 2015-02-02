@@ -40,11 +40,11 @@ __kernel void {{recursive_kernel_name}}(int global_counter, int workers, __globa
 			accs[iter_global_id] = accs[iter_global_id] + tacc;
 			counter = (counter + 1) % {{max_spawn}};
 		} else {
+			if (results[iter_global_id + workers * nextSpawn] > -1) break; 
 			if (spawn(args[iter_global_id + workers * counter], &args[iter_global_id + workers * counter], &args[iter_global_id + workers * nextSpawn] {{extra_args_call}})) {
 				results[iter_global_id + workers * counter] = 0;
 				results[iter_global_id + workers * nextSpawn] = 0;
 				nextSpawn = (nextSpawn + 1) % {{max_spawn}};
-				if (results[iter_global_id + workers * nextSpawn] > -1) break; 
 			} else {
 				results[iter_global_id + workers * counter] = -1;
 				counter = (counter + 1) % {{max_spawn}};
