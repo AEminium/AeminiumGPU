@@ -1,4 +1,3 @@
-#pragma OPENCL EXTENSION cl_khr_fp64: enable
 
 // Other Sources Required
 {{other_sources}}
@@ -30,8 +29,6 @@ __kernel void {{recursive_kernel_name}}(int global_counter, int workers, __globa
 	__local {{r_type}} acc;
 	acc = accs[iter_global_id];
 	__local {{r_type}} tacc;
-	
-	__local {{a_type}} current, next;
 	
 	while (nextSpawn != counter) {
 		if (results[iter_global_id + workers * counter] == -1 || results[iter_global_id + workers * counter] == 1) {
