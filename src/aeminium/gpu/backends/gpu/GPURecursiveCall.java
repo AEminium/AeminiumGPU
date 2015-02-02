@@ -98,7 +98,7 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 			if (argsNext.isEmpty()) {
 				isDone = true;
 			} else {
-				if (argsNext.size() < MAX_ITEMS) {
+				if (argsNext.size() <= MAX_ITEMS) {
 					args = argsNext;
 					argsNext = args.subList(0, 0);
 				} else {
