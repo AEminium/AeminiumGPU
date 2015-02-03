@@ -126,6 +126,14 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 						acc = strategy.combine(acc, a);
 					}
 					System.out.println("Acc: " + acc);
+					
+					int k = 0;
+					for (int i=0;i<workUnits;i++) {
+						if (rs.get(i) == 0) {
+							k += fib((Integer) argsBack.get(i));
+						}
+					}
+					System.out.println("Left: " + k);
 				}
 			}
 
@@ -184,6 +192,11 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 
 	public BinaryRecursiveStrategy<R, A> getRecursiveStrategy() {
 		return strategy;
+	}
+	
+	public static int fib(int n) {
+		if (n <= 2) return 1;
+		return fib(n-1) + fib(n-2);
 	}
 
 }
