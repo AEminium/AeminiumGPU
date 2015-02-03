@@ -54,12 +54,6 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 
 		args = args.subList(start, end);
 		
-		int w = 0;
-		for (A a : args) {
-			w += fib((Integer) a);
-		}
-		System.out.println("Result should be " + w);
-		
 		if (args.size() > MAX_ITEMS) {
 			argsNext = args.subList(MAX_ITEMS, args.size());
 			args = args.subList(0, MAX_ITEMS);
@@ -139,6 +133,9 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 						if (rs.get(i) == 0) {
 							k += fib((Integer) argsBack.get(i));
 						}
+					}
+					for (A a: argsNext) {
+						k += fib((Integer) a);
 					}
 					System.out.println("Left: " + k);
 				}
