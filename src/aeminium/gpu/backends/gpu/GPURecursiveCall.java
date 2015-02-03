@@ -126,7 +126,7 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 					for (R a : accs) {
 						acc = strategy.combine(acc, a);
 					}
-					System.out.println("Acc: " + acc);
+					
 					
 					int k = 0;
 					for (int i=0;i<bufferSize;i++) {
@@ -134,10 +134,11 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 							k += fib((Integer) argsBack.get(i));
 						}
 					}
+					int k2 = 0;
 					for (A a: argsNext) {
-						k += fib((Integer) a);
+						k2 += fib((Integer) a);
 					}
-					System.out.println("Left: " + k);
+					System.out.println("Acc: " + acc + ", l1: " + k + ", l2" + k2);
 				}
 			}
 
