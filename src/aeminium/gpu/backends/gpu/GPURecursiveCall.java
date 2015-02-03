@@ -117,6 +117,16 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 					}
 					System.out.println("_______");
 				}
+				if (System.getenv("DEBUG").equals("3")) {
+					PList<R> accs = (PList<R>) BufferHelper.extractFromBuffer(
+							accbuffer, q, eventsArr[0], strategy.getSeed()
+									.getClass().getSimpleName(), MAX_ITEMS);
+					R acc = strategy.getSeed();
+					for (R a : accs) {
+						acc = strategy.combine(acc, a);
+					}
+					System.out.println("Acc: " + acc);
+				}
 			}
 
 			if (argsNext.isEmpty()) {
