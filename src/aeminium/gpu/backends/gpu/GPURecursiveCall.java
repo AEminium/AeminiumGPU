@@ -53,6 +53,13 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 		CLEvent[] eventsArr = new CLEvent[1];
 
 		args = args.subList(start, end);
+		
+		int w = 0;
+		for (A a : args) {
+			w += fib((Integer) a);
+		}
+		System.out.println("Result should be " + w);
+		
 		if (args.size() > MAX_ITEMS) {
 			argsNext = args.subList(MAX_ITEMS, args.size());
 			args = args.subList(0, MAX_ITEMS);
