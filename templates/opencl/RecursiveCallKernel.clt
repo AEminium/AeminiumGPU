@@ -29,14 +29,14 @@ __kernel void {{recursive_kernel_name}}(int global_counter, int workers, __globa
 	__local {{r_type}} tacc;
 	
 	while (nextSpawn != counter) {
-		if (results[iter_global_id + workers * counter] == -1 || results[iter_global_id + workers * counter] == 1) {
+		if (results[iter_global_id + workers * counter] <= -1 || results[iter_global_id + workers * counter] == 1) {
 			counter = (counter + 1) % {{max_spawn}};
 			continue;
 		}
 		tacc = {{iter_lambda_name}}(args[iter_global_id + workers * counter], &rs {{extra_args_call}});
 		if (rs == 1) {
 			rs = 0;
-			results[iter_global_id + workers * counter] = -1;
+			results[iter_global_id + workers * counter] = -3;
 			accs[iter_global_id] += tacc;
 			counter = (counter + 1) % {{max_spawn}};
 		} else {
