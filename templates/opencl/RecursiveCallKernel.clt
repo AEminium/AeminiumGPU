@@ -16,7 +16,7 @@ __kernel void {{recursive_kernel_name}}(int global_counter, int workers, __globa
 	if (iter_global_id >= workers) return;
 	
 	results[iter_global_id] = 0;
-	for (int i=1; i<={{max_spawn}};i++) {
+	for (int i=1; i<{{max_spawn}};i++) {
 		results[iter_global_id + workers * i] = -1;
 	}
 	
