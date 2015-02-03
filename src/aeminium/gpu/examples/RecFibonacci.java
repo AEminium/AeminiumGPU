@@ -30,7 +30,7 @@ public class RecFibonacci {
 			
 			@Override
 			public String getSource() {
-				return "if (n <= 2) { result[0] = 1; return 1; } return 0;"; 
+				return "if (n <= 2) { *result = 1; return 1; } return 0;"; 
 			}
 			
 			public String[] getParameters() {
