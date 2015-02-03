@@ -12,11 +12,13 @@ inline int spawn({{a_type}} {{spawn_arg}}, __global {{a_type}}* current, __globa
 
 __kernel void {{recursive_kernel_name}}(int global_counter, int workers, __global int* results, __global {{r_type}}* accs, __global {{a_type}}* args  {{extra_args}}) {
 	int iter_global_id = get_global_id(0);
+	if (global_counter == 0) accs[iter_global_id] = 0;
+	if (iter_global_id >= workers) return;
+	
 	results[iter_global_id] = 0;
 	for (int i=1; i<={{max_spawn}};i++) {
 		results[iter_global_id + workers * i] = -1;
 	}
-	if (global_counter == 0) accs[iter_global_id] = 0;
 	
 	__local int rs;
 	

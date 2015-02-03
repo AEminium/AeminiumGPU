@@ -81,7 +81,7 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 				setExtraDataArgs(5, kernel);
 
 				eventsArr[0] = kernel.enqueueNDRange(q,
-						new int[] { workUnits }, eventsArr);
+						new int[] { MAX_ITEMS }, eventsArr);
 			}
 			counter++;
 
