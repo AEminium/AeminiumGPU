@@ -128,7 +128,7 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 					System.out.println("Acc: " + acc);
 					
 					int k = 0;
-					for (int i=0;i<workUnits;i++) {
+					for (int i=0;i<bufferSize;i++) {
 						if (rs.get(i) == 0) {
 							k += fib((Integer) argsBack.get(i));
 						}
