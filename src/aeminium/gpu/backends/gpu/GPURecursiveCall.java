@@ -53,6 +53,10 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 		CLEvent[] eventsArr = new CLEvent[1];
 
 		args = args.subList(start, end);
+		if (args.size() > MAX_ITEMS) {
+			argsNext = args.subList(MAX_ITEMS, args.size());
+			args = args.subList(0, MAX_ITEMS);
+		}
 		int workUnits = args.length();
 		int bufferSize = workUnits * DEFAULT_SPAWN;
 
