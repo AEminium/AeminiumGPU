@@ -144,7 +144,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 					System.out.println("Repeating with more granularity: " + stepXprobe + " with control " + rs[0]);
 				}
 				continue;
-			}
+			}	
 			
 			filterAndSplitFirst(workUnits, rs);
 			copyRangeBuffers(ctx);
@@ -167,16 +167,12 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 		int done = 0;
 		int partial = 0;
 		int zero = 0;
-		int removed = 0;
 		
-		
-
-		for (int i=0; i<workUnits; i++) {
+		for (int i=workUnits-1; i>=0; i--) {
 			if (rs[i] == 2) {
 				done++;
-				starts.remove(i - removed);
-				ends.remove(i - removed);
-				removed++;
+				starts.remove(i);
+				ends.remove(i);
 			} else if (rs[i] == 1) {
 				partial++;
 			}else {
