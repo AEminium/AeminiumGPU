@@ -29,6 +29,7 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 		stepX = steps[iter_global_id];
 	} else {
 		stepX = ends[iter_global_id] - starts[iter_global_id];
+		steps[iter_global_id] = stepX;
 	}
 	
 	while (starts[iter_global_id] < ends[iter_global_id]) {
