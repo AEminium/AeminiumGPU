@@ -114,8 +114,8 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 				strategy.getEnd(), strategy.getTop(), strategy.getBottom(),
 				NUM_WORKERS);
 		copyRangeBuffers(ctx);
-		pbuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getStart().getClass().getSimpleName(), workUnits);
-		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", workUnits);
+		pbuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getStart().getClass().getSimpleName(), NUM_WORKERS);
+		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", NUM_WORKERS);
 		do {
 			abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), workUnits);
 			synchronized(kernel) {
