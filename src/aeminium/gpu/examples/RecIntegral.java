@@ -45,7 +45,7 @@ public class RecIntegral {
 			
 			@Override
 			public String getSource() {
-				return "__local double h = (r - l) * 0.5;\n __local double c = l + h;\n __local double fr = (r * r + 1.0) * r;\n __local double fl = (l * l + 1.0) * l;\n __local double fc = (c * c + 1.0) * c;\n __local double hh = h * 0.5;\n __local double al = (fl + fc) * hh;\n __local double ar = (fr + fc) * hh;\n __local double alr = al + ar;\n __local double prev = (fl+fr) * hh;\n if (fabs(alr - prev) <= 1.0e-" + depthi + ") { result[0] = 1; }\n return alr;"; 
+				return "__local double h, hh, c, fr, fl, fc, ar, al, alr, prev;\n h = (r - l) * 0.5;\n c = l + h;\n fr = (r * r + 1.0) * r;\n fl = (l * l + 1.0) * l;\n fc = (c * c + 1.0) * c;\n hh = h * 0.5;\n al = (fl + fc) * hh;\n ar = (fr + fc) * hh;\n alr = al + ar;\n prev = (fl+fr) * hh;\n if (fabs(alr - prev) <= 1.0e-" + depthi + ") { result[0] = 1; }\n return alr;"; 
 			}
 			
 			public String[] getParameters() {
