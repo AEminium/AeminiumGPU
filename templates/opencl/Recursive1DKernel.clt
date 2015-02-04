@@ -21,7 +21,6 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 	
 	{{r_type}} stepX, end;
 	
-	//__local {{t_type}} tacc;
 	accs[iter_global_id] = 0;
 	
 	if (reuse_steps) {
