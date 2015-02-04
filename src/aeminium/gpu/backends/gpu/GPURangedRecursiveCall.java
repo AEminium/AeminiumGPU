@@ -90,9 +90,9 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 	public int extendFirst(int size) {
 		Range2D<R, R2> ranges;
 		if (is2D) {
-			ranges = strategy.split(starts.remove(0), ends.remove(0), tops.remove(0), bottoms.remove(0), size);
+			ranges = strategy.split(starts.remove(0), ends.remove(0), tops.remove(0), bottoms.remove(0), size+1);
 		} else {
-			ranges = strategy.split(starts.remove(0), ends.remove(0), null, null, size);
+			ranges = strategy.split(starts.remove(0), ends.remove(0), null, null, size+1);
 		} 
 		starts.extend(ranges.starts);
 		ends.extend(ranges.ends);
@@ -187,6 +187,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 		while (starts.size() < workUnits && starts.size() > 0) {
 			int diff = workUnits - starts.size();
 			extendFirst(diff);
+			System.out.println(starts.size() + "<--");
 		}
 		
 		if (System.getenv("DEBUG") != null) {
