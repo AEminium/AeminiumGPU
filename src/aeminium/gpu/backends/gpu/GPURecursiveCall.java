@@ -15,11 +15,16 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 
 	public PList<A> args;
 	public PList<A> argsNext;
-	public static final int DEFAULT_SPAWN = 8;
-	public static final int MAX_ITEMS = 512;
+	public static int DEFAULT_SPAWN = 8;
+	public static int MAX_ITEMS = 512;
 	public R output;
 	public BinaryRecursiveStrategy<R, A> strategy;
 	boolean isDone;
+	
+	static {
+		if (System.getenv("WORKERS") != null) MAX_ITEMS = Integer.parseInt(System.getenv("WORKERS"));
+		if (System.getenv("SPAWNS") != null) DEFAULT_SPAWN = Integer.parseInt(System.getenv("SPAWNS"));
+	}
 
 	protected CLBuffer<?> argbuffer;
 	protected CLBuffer<?> accbuffer;
