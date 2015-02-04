@@ -17,7 +17,7 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 	
 	__local {{r_type}} stepX, end;
 	
-	__local {{t_type}} tacc;
+	//__local {{t_type}} tacc;
 	accs[iter_global_id] = 0;
 	
 	if (reuse_steps) {
@@ -33,7 +33,7 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 		}
 		end = starts[iter_global_id] + stepX;
 		if (end > ends[iter_global_id]) end = ends[iter_global_id];
- 		tacc = {{iter_lambda_name}}( starts[iter_global_id], end, &rs {{extra_args_call}});
+ 		{{t_type}} tacc = {{iter_lambda_name}}( starts[iter_global_id], end, &rs {{extra_args_call}});
 		if (rs == 1) {
 			results[iter_global_id] = 1;
 			starts[iter_global_id] = end;
