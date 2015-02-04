@@ -130,6 +130,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 				eventsArr[0] = kernel.enqueueNDRange(q, new int[] { NUM_WORKERS }, eventsArr);
 			}
 			
+			System.out.println("Acc: " + extractAccs(q, eventsArr));
 			reuseControlBuffers = true;
 			rs = rbuffer.read(q, eventsArr[0]).getInts();
 			for (int i=0; i<workUnits; i++) {
@@ -145,22 +146,26 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 				}
 				continue;
 			}	
-			
 			filterAndSplitFirst(workUnits, rs);
 			copyRangeBuffers(ctx);
 			workUnits = starts.size();
 		} while (!isDone);
 		rbuffer.release();
+		extractAccs(q, eventsArr);
+		abuffer.release();
+		
+	}
+
+	private T extractAccs(CLQueue q, CLEvent[] eventsArr) {
+		@SuppressWarnings("unchecked")
 		PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
 				eventsArr[0], strategy.getSeed().getClass()
 						.getSimpleName(), NUM_WORKERS);
-		
 		output = strategy.getSeed();
 		for (T acc : accs) {
 			output = strategy.combine(output, acc);
 		}
-		abuffer.release();
-		
+		return output;
 	}
 	
 	private void filterAndSplitFirst(int workUnits, int[] rs) {
