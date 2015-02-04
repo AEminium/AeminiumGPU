@@ -150,15 +150,10 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 							.getSimpleName(), workUnits);
 			
 			T a = strategy.getSeed();
-			int i=0;
 			for (T acc : accs2) {
-				System.out.print(starts.get(i) + "|" + ends.get(i) + "|" + acc + ", ");
 				a = strategy.combine(a, acc);
-				i++;
 			}
-			System.out.println();
 			output = strategy.combine(a, output);
-			System.out.println("Row: " + a);
 			
 			filterAndSplitFirst(workUnits, rs);
 			copyRangeBuffers(ctx);
