@@ -153,7 +153,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 		rbuffer.release();
 		PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
 				eventsArr[0], strategy.getSeed().getClass()
-						.getSimpleName(), workUnits);
+						.getSimpleName(), NUM_WORKERS);
 		
 		output = strategy.getSeed();
 		for (T acc : accs) {
