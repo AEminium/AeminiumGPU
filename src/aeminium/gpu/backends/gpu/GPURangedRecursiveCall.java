@@ -146,7 +146,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 				continue;
 			}	
 			
-			filterAndSplitFirst(workUnits, rs);
+			//filterAndSplitFirst(workUnits, rs);
 			copyRangeBuffers(ctx);
 			workUnits = starts.size(); 
 		} while (!isDone);
