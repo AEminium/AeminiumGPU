@@ -146,9 +146,9 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 				continue;
 			}	
 			
-			//filterAndSplitFirst(workUnits, rs);
+			filterAndSplitFirst(workUnits, rs);
 			copyRangeBuffers(ctx);
-			workUnits = starts.size(); 
+			workUnits = starts.size();
 		} while (!isDone);
 		rbuffer.release();
 		PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
@@ -182,11 +182,10 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 		if (done == workUnits) isDone = true;
 		
 		
-		while (starts.size() < workUnits && starts.size() > 0) {
+		/*while (starts.size() < workUnits && starts.size() > 0) {
 			int diff = workUnits - starts.size();
 			extendFirst(diff);
-			
-		}
+		}*/
 		
 		if (System.getenv("DEBUG") != null) {
 			System.out.println("WorkUnits: " + workUnits + ", Done: " + done + ", Partial: " + partial + ", Zero: " + zero);
