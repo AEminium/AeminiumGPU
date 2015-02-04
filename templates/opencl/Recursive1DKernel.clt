@@ -11,7 +11,6 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 	
 	results[iter_global_id] = 0;
 	__local int rs;
-	rs = 0;
 	
 	__local int counter;
 	counter = 0;
@@ -40,7 +39,7 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 		if (rs == 1) {
 			results[iter_global_id] = 1;
 			starts[iter_global_id] = end;
-			accs[iter_global_id] = accs[iter_global_id] + tacc;
+			accs[iter_global_id] += tacc;
 		} else {	
 			{{split}}
 			steps[iter_global_id] = stepX;
