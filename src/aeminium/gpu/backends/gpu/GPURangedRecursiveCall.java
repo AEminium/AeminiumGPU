@@ -117,6 +117,16 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 		pbuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getStart().getClass().getSimpleName(), NUM_WORKERS);
 		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", NUM_WORKERS);
 		do {
+			for (R a : starts) {
+				System.out.print(a + ", ");
+			}
+			System.out.println("< -- Starts");
+			
+			for (R a : ends) {
+				System.out.print(a + ", ");
+			}
+			System.out.println("< -- Ends");
+			
 			abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), workUnits);
 			synchronized(kernel) {
 				if (is2D) {
@@ -151,10 +161,10 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 			
 			T a = strategy.getSeed();
 			for (T acc : accs2) {
-				System.out.print(acc + ", ");
+				//System.out.print(acc + ", ");
 				a = strategy.combine(a, acc);
 			}
-			System.out.println();
+			//System.out.println();
 			output = strategy.combine(a, output);
 			System.out.println("Row: " + a);
 			
