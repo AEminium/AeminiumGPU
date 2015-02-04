@@ -2,7 +2,7 @@
 
 export i=40
 
-for w in 256 512 768 1024 2048
+for w in 512 768 1024 2048
 do
 	for s in 4 6 8 10 12
 	do
