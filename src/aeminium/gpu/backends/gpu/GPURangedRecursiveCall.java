@@ -116,14 +116,15 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 		copyRangeBuffers(ctx);
 		pbuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getStart().getClass().getSimpleName(), NUM_WORKERS);
 		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", NUM_WORKERS);
+		abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), NUM_WORKERS);
+		int global_counter = 0;
 		do {
-			abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), workUnits);
 			synchronized(kernel) {
 				if (is2D) {
 					// TODO
 				} else {
 					int reuse_steps = reuseControlBuffers ? 1 : 0;
-					kernel.setArgs(sbuffer, ebuffer, abuffer, rbuffer, starts.size(), 0, reuse_steps, pbuffer);
+					kernel.setArgs(sbuffer, ebuffer, abuffer, rbuffer, starts.size(), global_counter++, reuse_steps, pbuffer);
 				}
 				setExtraDataArgs(7, kernel);
 				eventsArr[0] = kernel.enqueueNDRange(q, new int[] { NUM_WORKERS }, eventsArr);
@@ -145,38 +146,16 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 				continue;
 			}
 			
-			PList<T> accs2 = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
-					eventsArr[0], strategy.getSeed().getClass()
-							.getSimpleName(), workUnits);
-			
-			T a = strategy.getSeed();
-			int i=0;
-			
-			
-			for (T acc : accs2) {
-				if (System.getenv("DEBUG") != null) {
-					System.out.print(starts.get(i) + "|" + ends.get(i) + "|" + acc + ", ");
-					i++;
-				}
-				a = strategy.combine(a, acc);
-			}
-			output = strategy.combine(a, output);
-			if (System.getenv("DEBUG") != null) {
-				System.out.println();
-				System.out.println("Row: " + a);
-			}
-			
 			filterAndSplitFirst(workUnits, rs);
 			copyRangeBuffers(ctx);
 			workUnits = starts.size(); // TODO: Remove this 
-			
 		} while (!isDone);
 		rbuffer.release();
 		PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
 				eventsArr[0], strategy.getSeed().getClass()
 						.getSimpleName(), workUnits);
 		
-		//output = strategy.getSeed();
+		output = strategy.getSeed();
 		for (T acc : accs) {
 			output = strategy.combine(output, acc);
 		}

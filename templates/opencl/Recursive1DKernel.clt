@@ -6,8 +6,12 @@
 // Specific Map Lambda Function
 {{iter_lambda_def}}
 
-__kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global const {{r_type}}* ends, __global {{t_type}}* accs, __global int* results, const int max_workers, const int rec_counter, const int reuse_steps, __global {{r_type}}* steps {{extra_args}}) {
+__kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global const {{r_type}}* ends, __global {{t_type}}* accs, __global int* results, const int max_workers, const int global_counter, const int reuse_steps, __global {{r_type}}* steps {{extra_args}}) {
 	int iter_global_id = get_global_id(0);
+	
+	if (global_counter == 0) {
+		accs[iter_global_id] = 0;
+	}
 	
 	if (iter_global_id >= max_workers) {
 		return;
@@ -20,8 +24,6 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 	counter = 0;
 	
 	{{r_type}} stepX, end;
-	
-	accs[iter_global_id] = 0;
 	
 	if (reuse_steps) {
 		stepX = steps[iter_global_id];
