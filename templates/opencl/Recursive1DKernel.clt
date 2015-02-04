@@ -39,7 +39,6 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
  		tacc = {{iter_lambda_name}}( starts[iter_global_id], end, &rs {{extra_args_call}});
 		if (rs == 1) {
 			results[iter_global_id] = 1;
-			rs = 0;
 			starts[iter_global_id] = end;
 			accs[iter_global_id] = accs[iter_global_id] + tacc;
 		} else {	

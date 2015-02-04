@@ -1,3 +1,4 @@
 inline {{t_type}} {{iter_lambda_name}}({{r_type}} {{iter_lambda_par1}}, {{r_type}} {{iter_lambda_par2}}, __local int* {{iter_lambda_par5}} {{extra_args}}) {
+	*{{iter_lambda_par5}} = 0;
 	{{source}}
 }
