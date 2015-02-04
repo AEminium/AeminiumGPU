@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export i=40
+export i=36
 
 for w in 64 128 256 512 768 1024 2048
 do
