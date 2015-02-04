@@ -196,10 +196,10 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 		}
 		if (done == workUnits) isDone = true;
 		
-		while (starts.size() < workUnits && starts.size() > 0) {
+		/*while (starts.size() < workUnits && starts.size() > 0) {
 			int diff = workUnits - starts.size();
 			extendFirst(diff+1);
-		}
+		*/
 		
 		if (System.getenv("DEBUG") != null) {
 			System.out.println("WorkUnits: " + workUnits + ", Done: " + done + ", Partial: " + partial + ", Zero: " + zero);
