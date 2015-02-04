@@ -72,8 +72,13 @@ public class RecIntegral {
 				double step = (end-start)/((double) n);
 				Range1D<Double> r = new Range1D<Double>("Double");
 				while (start < end) {
-					r.add(start, start+step);
-					start = start+step;
+					if (r.size() == n-1) {
+						r.add(start, end);
+						break;
+					} else {
+						r.add(start, start+step);
+						start = start+step;
+					}
 				}
 				return r;
 			}
