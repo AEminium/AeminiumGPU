@@ -103,7 +103,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 					itemsLeft++;
 				}
 			}
-			System.out.println();
+			System.out.println("========");
 			workUnits = itemsLeft;
 		}
 		
