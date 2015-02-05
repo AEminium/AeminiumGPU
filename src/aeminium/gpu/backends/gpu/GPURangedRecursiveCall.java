@@ -96,18 +96,30 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 				if (System.getenv("DEBUG") != null) System.out.print(rs[i] + "|" + starts.get(i) + "|" + ends.get(i) + "|" + accs.get(i) + ", ");
 				
 				if (rs[i] == 2) {
-					ends.remove(i);
-					starts.remove(i);
+					removeRangeIndex(i);
 					output = strategy.combine(output, accs.get(i));
 				} else {
 					itemsLeft++;
 				}
 			}
-			if (System.getenv("DEBUG") != null) System.out.println("========");
-			workUnits = itemsLeft;
+			
+			while (itemsLeft < MAX_WORKERS) {
+				int removeIndex = itemsLeft-1;
+				Range2D<R, R2> range = strategy.split(starts.get(removeIndex), ends.get(removeIndex), null, null, MAX_WORKERS-itemsLeft+1);
+				removeRangeIndex(removeIndex);
+				extendRange(range);
+			}
+			
+			if (System.getenv("DEBUG") != null) System.out.println("===== " + starts.size()  + "===");
+			workUnits = starts.size();
 		}
 		
 				
+	}
+
+	private void removeRangeIndex(int i) {
+		ends.remove(i);
+		starts.remove(i);
 	}
 
 
