@@ -17,8 +17,8 @@ import com.nativelibs4java.opencl.CLQueue;
 public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericKernel
 		implements RecursiveTemplateSource<R, R2, T> {
 
-	public static final int MAX_WORKERS = 128;
-	private static final int KERNEL_RECURSION_LIMIT = 512;
+	public static final int MAX_WORKERS = 4096;
+	private static final int KERNEL_RECURSION_LIMIT = 1024;
 
 	public T output;
 	public Recursive2DStrategy<R, R2, T> strategy;
