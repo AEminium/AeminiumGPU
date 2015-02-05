@@ -60,7 +60,7 @@ public class DoubleList extends AbstractList<Double> implements
 	@Override
 	public Double remove(int index) {
 		double e = box[index];
-		System.arraycopy(box, index + 1, box, index, size - index);
+		System.arraycopy(box, index + 1, box, index, size - index + 1);
 		size--;
 		return e;
 	}
