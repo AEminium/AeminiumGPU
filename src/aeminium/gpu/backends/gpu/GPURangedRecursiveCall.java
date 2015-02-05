@@ -17,8 +17,13 @@ import com.nativelibs4java.opencl.CLQueue;
 public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericKernel
 		implements RecursiveTemplateSource<R, R2, T> {
 
-	public static final int MAX_WORKERS = 4096;
-	private static final int KERNEL_RECURSION_LIMIT = 1024;
+	public static int MAX_WORKERS = 4096;
+	private static int KERNEL_RECURSION_LIMIT = 1024;
+	
+	static {
+		if (System.getenv("WORKERS") != null) MAX_WORKERS = Integer.parseInt(System.getenv("WORKERS"));
+		if (System.getenv("RECs") != null) KERNEL_RECURSION_LIMIT = Integer.parseInt(System.getenv("RECS"));
+	}
 
 	public T output;
 	public Recursive2DStrategy<R, R2, T> strategy;
@@ -104,7 +109,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 			}
 			
 			while (itemsLeft < MAX_WORKERS && itemsLeft > 0) {
-				int removeIndex = itemsLeft-1;
+				int removeIndex = 0;
 				int diff = MAX_WORKERS-itemsLeft+1;
 				Range2D<R, R2> range = strategy.split(starts.get(removeIndex), ends.get(removeIndex), null, null, diff);
 				System.out.println(range.starts.size() + ".");
