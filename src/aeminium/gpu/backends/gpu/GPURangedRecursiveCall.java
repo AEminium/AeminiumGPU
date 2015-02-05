@@ -106,6 +106,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 			while (itemsLeft < MAX_WORKERS) {
 				int removeIndex = itemsLeft-1;
 				Range2D<R, R2> range = strategy.split(starts.get(removeIndex), ends.get(removeIndex), null, null, MAX_WORKERS-itemsLeft+1);
+				System.out.println(range.starts.size() + ".");
 				removeRangeIndex(removeIndex);
 				extendRange(range);
 			}
