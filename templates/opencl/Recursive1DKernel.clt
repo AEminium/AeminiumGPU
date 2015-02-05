@@ -6,7 +6,7 @@
 // Specific Map Lambda Function
 {{iter_lambda_def}}
 
-__kernel void {{recursive_kernel_name}}(__global int workUnits, __global {{r_type}}* starts, __global const {{r_type}}* ends, __global {{t_type}}* accs, __global int* results, __global {{r_type}}* steps, __global int global_counter {{extra_args}}) {
+__kernel void {{recursive_kernel_name}}(int workUnits, __global {{r_type}}* starts, __global const {{r_type}}* ends, __global {{t_type}}* accs, __global int* results, __global {{r_type}}* steps, int global_counter {{extra_args}}) {
 	int iter_global_id = get_global_id(0);
 	accs[iter_global_id] = 0;
 	results[iter_global_id] = 0;
@@ -38,7 +38,7 @@ __kernel void {{recursive_kernel_name}}(__global int workUnits, __global {{r_typ
 		} else {
 			stepX = steps[iter_global_id];
 			{{split}}
-			steps[iter_global_id]; = stepX;
+			steps[iter_global_id] = stepX;
 		}
 	}
 	results[iter_global_id] = 2;
