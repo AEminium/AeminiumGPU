@@ -109,6 +109,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 				System.out.println(range.starts.size() + ".");
 				removeRangeIndex(removeIndex);
 				extendRange(range);
+				itemsLeft += range.size()-1;
 			}
 			
 			if (System.getenv("DEBUG") != null) System.out.println("===== " + starts.size()  + "===");
