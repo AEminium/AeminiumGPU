@@ -93,7 +93,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 			PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q, eventsArr[0], tType, workUnits);
 			itemsLeft = 0;
 			for (int i=workUnits-1; i>=0; i--) {
-				if (System.getenv("DEBUG") != null) System.out.print(rs[i] + "|" + starts.get(i) + "|" + ends.get(i) + "|" + accs.get(i) + ", ");
+				if (System.getenv("DEBUG") != null && System.getenv("DEBUG").equals("2")) System.out.print(rs[i] + "|" + starts.get(i) + "|" + ends.get(i) + "|" + accs.get(i) + ", ");
 				
 				if (rs[i] == 2) {
 					removeRangeIndex(i);
