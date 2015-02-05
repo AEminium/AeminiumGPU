@@ -6,18 +6,19 @@
 // Specific Map Lambda Function
 {{iter_lambda_def}}
 
-__kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global const {{r_type}}* ends, __global {{t_type}}* accs, __global int* results, const int max_workers, const int global_counter, const int reuse_steps, __global {{r_type}}* steps {{extra_args}}) {
+__kernel void {{recursive_kernel_name}}(__global int workUnits, __global {{r_type}}* starts, __global const {{r_type}}* ends, __global {{t_type}}* accs, __global int* results, __global {{r_type}}* steps, __global int global_counter {{extra_args}}) {
 	int iter_global_id = get_global_id(0);
+	accs[iter_global_id] = 0;
+	results[iter_global_id] = 0;
 	
-	if (global_counter == 0) {
-		accs[iter_global_id] = 0;
-	}
-	
-	if (iter_global_id >= max_workers) {
+	if (iter_global_id >= workUnits) {
 		return;
 	}
 	
-	results[iter_global_id] = 0;
+	if (global_counter == 0) {
+		steps[iter_global_id] = ends[iter_global_id] - starts[iter_global_id];
+	}
+	
 	int rs;
 	
 	int counter;
@@ -25,28 +26,19 @@ __kernel void {{recursive_kernel_name}}(__global {{r_type}}* starts, __global co
 	
 	{{r_type}} stepX, end;
 	
-	if (reuse_steps) {
-		stepX = steps[iter_global_id];
-	} else {
-		stepX = ends[iter_global_id] - starts[iter_global_id];
-		steps[iter_global_id] = stepX;
-	}
-	
-	while (starts[iter_global_id] < ends[iter_global_id]) {
+	while (starts[iter_global_id] < ends[iter_global_id] && counter < {{limit}} ) {
 		counter++;
-		if (counter > {{limit}}) {
-			return;
-		}
-		end = starts[iter_global_id] + stepX;
+		end = starts[iter_global_id] + steps[iter_global_id];
 		if (end > ends[iter_global_id]) end = ends[iter_global_id];
  		{{t_type}} tacc = {{iter_lambda_name}}( starts[iter_global_id], end, &rs {{extra_args_call}});
 		if (rs == 1) {
 			results[iter_global_id] = 1;
 			starts[iter_global_id] = end;
 			accs[iter_global_id] += tacc;
-		} else {	
+		} else {
+			stepX = steps[iter_global_id];
 			{{split}}
-			steps[iter_global_id] = stepX;
+			steps[iter_global_id]; = stepX;
 		}
 	}
 	results[iter_global_id] = 2;

@@ -1,7 +1,5 @@
 package aeminium.gpu.backends.gpu;
 
-import java.util.Stack;
-
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
 import aeminium.gpu.backends.gpu.buffers.OtherData;
 import aeminium.gpu.backends.gpu.generators.RecursiveCodeGen;
@@ -10,7 +8,6 @@ import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.Range2D;
 import aeminium.gpu.operations.functions.Recursive2DStrategy;
-import aeminium.gpu.utils.Quad;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -20,8 +17,8 @@ import com.nativelibs4java.opencl.CLQueue;
 public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericKernel
 		implements RecursiveTemplateSource<R, R2, T> {
 
-	public static final int NUM_WORKERS = 128;
-	private static final int RECURSION_LIMIT = 512;
+	public static final int MAX_WORKERS = 128;
+	private static final int KERNEL_RECURSION_LIMIT = 512;
 
 	public T output;
 	public Recursive2DStrategy<R, R2, T> strategy;
@@ -29,20 +26,17 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 	PList<R> ends;
 	PList<R2> tops;
 	PList<R2> bottoms;
-	PList<Boolean> results;
-	Stack<Quad<R, R2>> stack = new Stack<Quad<R, R2>>();
-	
-	int maxWorkUnits = 0;
-	boolean isDone;
-	boolean is2D = true;
 
 	protected CLBuffer<?> sbuffer;
-	protected CLBuffer<?> pbuffer;
 	protected CLBuffer<?> ebuffer;
-	protected CLBuffer<?> tbuffer = null;
-	protected CLBuffer<?> bbuffer = null;
 	protected CLBuffer<?> abuffer;
+	protected CLBuffer<?> stepbuffer;
 	protected CLBuffer<Integer> rbuffer;
+	
+	protected String tType;
+	protected String rType;
+	
+	protected int workUnits = 0;
 
 	private RecursiveCodeGen<R, R2, T> gen;
 
@@ -50,159 +44,69 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 		strategy = recursiveStrategy;
 		gen = new RecursiveCodeGen<R, R2, T>(this);
 		output = strategy.getSeed();
-		
-		if (strategy.getTop() == null) is2D = false;
 
 		otherData = OtherData.extractOtherData(recursiveStrategy);
 		gen.setOtherData(otherData);
+		
+		tType = strategy.getSeed().getClass().getSimpleName();
+		rType = strategy.getStart().getClass().getSimpleName();
 	}
 
 	@Override
 	public void prepareBuffers(CLContext ctx) {
 		super.prepareBuffers(ctx);
 		createEmptyLists();
+		Range2D<R, R2> range = strategy.split(strategy.getStart(), strategy.getEnd(), null, null, MAX_WORKERS);
+		extendRange(range);
 	}
-
-	public int prepareReadBuffers(R st, R end, R2 top, R2 bottom, int splits) {
-		Range2D<R, R2> ranges = strategy.split(st, end, top, bottom, splits);
-		starts = ranges.starts;
-		ends = ranges.ends;
-		if (is2D) {
-			tops = ranges.tops;
-			bottoms = ranges.bottoms;
-		}
-		return ranges.size();
-	}
-
 	
+	private void extendRange(Range2D<R, R2> range) {
+		starts.extend(range.starts);
+		ends.extend(range.ends);
+		workUnits += range.size();
+	}
+
 	public void copyRangeBuffers(CLContext ctx) {
-		sbuffer = BufferHelper.createInputOutputBufferFor(ctx, starts,
-				starts.size());
+		sbuffer = BufferHelper.createInputOutputBufferFor(ctx, starts, starts.size());
 		ebuffer = BufferHelper.createInputBufferFor(ctx, ends, ends.size());
-		if (is2D) {
-			tbuffer = BufferHelper.createInputOutputBufferFor(ctx, tops,
-					tops.size());
-			bbuffer = BufferHelper.createInputBufferFor(ctx, bottoms,
-					bottoms.size());
-		}
 	}
 	
-	public int extendFirst(int size) {
-		Range2D<R, R2> ranges;
-		if (is2D) {
-			ranges = strategy.split(starts.remove(0), ends.remove(0), tops.remove(0), bottoms.remove(0), size+1);
-		} else {
-			ranges = strategy.split(starts.remove(0), ends.remove(0), null, null, size+1);
-		} 
-		starts.extend(ranges.starts);
-		ends.extend(ranges.ends);
-		if (is2D) {
-			tops.extend(ranges.tops);
-			bottoms.extend(ranges.bottoms);
-		}
-		return ranges.size();
-	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(CLContext ctx, CLQueue q) {
 		CLEvent[] eventsArr = new CLEvent[1];
-		int[] rs;
-		boolean reuseControlBuffers = false;
 		
-		int workUnits = prepareReadBuffers(strategy.getStart(),
-				strategy.getEnd(), strategy.getTop(), strategy.getBottom(),
-				NUM_WORKERS);
-		copyRangeBuffers(ctx);
-		pbuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getStart().getClass().getSimpleName(), NUM_WORKERS);
-		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", NUM_WORKERS);
-		abuffer = BufferHelper.createOutputBufferFor(ctx, strategy.getSeed().getClass().getSimpleName(), NUM_WORKERS);
+		int itemsLeft = workUnits;
+		rbuffer = (CLBuffer<Integer>) BufferHelper.createOutputBufferFor(ctx, "Integer", MAX_WORKERS);
+		abuffer = BufferHelper.createOutputBufferFor(ctx, tType, MAX_WORKERS);
+		stepbuffer = BufferHelper.createOutputBufferFor(ctx, rType, MAX_WORKERS);
 		int global_counter = 0;
-		do {
-			synchronized(kernel) {
-				if (is2D) {
-					// TODO
-				} else {
-					int reuse_steps = reuseControlBuffers ? 1 : 0;
-					kernel.setArgs(sbuffer, ebuffer, abuffer, rbuffer, starts.size(), global_counter++, reuse_steps, pbuffer);
-				}
-				setExtraDataArgs(8, kernel);
-				eventsArr[0] = kernel.enqueueNDRange(q, new int[] { NUM_WORKERS }, eventsArr);
-			}
-			
-			reuseControlBuffers = true;
-			rs = rbuffer.read(q, eventsArr[0]).getInts();
-			for (int i=0; i<workUnits; i++) {
-				if (rs[i] == 2) {
-					reuseControlBuffers = false;
-					break;
-				}
-			}
-			if (reuseControlBuffers) {
-				if (System.getenv("DEBUG") != null) {
-					R stepXprobe = (R) BufferHelper.extractElementFromBuffer(pbuffer, q, eventsArr[0], strategy.getStart().getClass().getSimpleName());
-					System.out.println("Repeating with more granularity: " + stepXprobe + " with control " + rs[0]);
-				}
-				continue;
-			}	
-			
-			PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
-					eventsArr[0], strategy.getSeed().getClass()
-							.getSimpleName(), NUM_WORKERS);
-			for (int i=0; i<workUnits; i++) {
-				System.out.print(accs.get(i) + "|" + starts.get(i) + "|" + ends.get(i) + ", ");
-			}
-			System.out.println();
-			filterAndSplitFirst(workUnits, rs);
+		while (itemsLeft > 0) {
 			copyRangeBuffers(ctx);
-			workUnits = starts.size();
-		} while (!isDone);
-		rbuffer.release();
-		extractAccs(q, eventsArr);
-		abuffer.release();
+			synchronized(kernel) {
+				kernel.setArgs(workUnits, sbuffer, ebuffer, abuffer, rbuffer, stepbuffer, global_counter++);
+				setExtraDataArgs(5, kernel);
+				eventsArr[0] = kernel.enqueueNDRange(q, new int[] { MAX_WORKERS }, eventsArr);
+			}
+			int[] rs = rbuffer.read(q, eventsArr[0]).getInts();
+			PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q, eventsArr[0], tType, workUnits);
+			itemsLeft = 0;
+			for (int i=workUnits-1; i>=0; i--) {
+				if (rs[i] == 2) {
+					ends.remove(i);
+					starts.remove(i);
+					output = strategy.combine(output, accs.get(i));
+				} else {
+					itemsLeft++;
+				}
+			}
+			workUnits = itemsLeft;
+		}
 		
+				
 	}
 
-	private T extractAccs(CLQueue q, CLEvent[] eventsArr) {
-		@SuppressWarnings("unchecked")
-		PList<T> accs = (PList<T>) BufferHelper.extractFromBuffer(abuffer, q,
-				eventsArr[0], strategy.getSeed().getClass()
-						.getSimpleName(), NUM_WORKERS);
-		output = strategy.getSeed();
-		for (T acc : accs) {
-			output = strategy.combine(output, acc);
-		}
-		return output;
-	}
-	
-	private void filterAndSplitFirst(int workUnits, int[] rs) {
-		int done = 0;
-		int partial = 0;
-		int zero = 0;
-		
-		for (int i=workUnits-1; i>=0; i--) {
-			if (rs[i] == 2) {
-				done++;
-				starts.remove(i);
-				ends.remove(i);
-			} else if (rs[i] == 1) {
-				partial++;
-			}else {
-				zero++;
-			}
-		}
-		if (done == workUnits) isDone = true;
-		
-		
-		while (starts.size() < workUnits && starts.size() > 0) {
-			int diff = workUnits - starts.size();
-			extendFirst(diff);
-		}
-		
-		if (System.getenv("DEBUG") != null) {
-			System.out.println("WorkUnits: " + workUnits + ", Done: " + done + ", Partial: " + partial + ", Zero: " + zero);
-		}
-	}
 
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
@@ -225,16 +129,8 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 
 	@SuppressWarnings("unchecked")
 	public void createEmptyLists() {
-		starts = (PList<R>) CollectionFactory.listFromType(strategy.getStart()
-				.getClass().getSimpleName());
-		ends = (PList<R>) CollectionFactory.listFromType(strategy.getEnd()
-				.getClass().getSimpleName());
-		if (is2D) {
-			tops = (PList<R2>) CollectionFactory.listFromType(strategy.getTop()
-					.getClass().getSimpleName());
-			bottoms = (PList<R2>) CollectionFactory.listFromType(strategy
-					.getBottom().getClass().getSimpleName());
-		}
+		starts = (PList<R>) CollectionFactory.listFromType(rType);
+		ends = (PList<R>) CollectionFactory.listFromType(rType);
 	}
 
 	class Pair {
@@ -274,8 +170,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 
 	@Override
 	public int getRecursionLimit() {
-		return RECURSION_LIMIT;
+		return KERNEL_RECURSION_LIMIT;
 	}
 
 }
-	
