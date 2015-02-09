@@ -1,5 +1,7 @@
 package aeminium.gpu.backends.gpu;
 
+import java.util.ArrayList;
+
 import aeminium.gpu.backends.gpu.buffers.OtherData;
 import aeminium.gpu.devices.GPUDevice;
 
@@ -16,7 +18,7 @@ public abstract class GPUGenericKernel implements GPUKernel {
 	protected CLKernel kernel;
 	protected CLEvent kernelCompletion;
 	
-	protected OtherData[] otherData;
+	protected ArrayList<OtherData> otherData;
 	
 	protected String otherSources;
 

@@ -37,22 +37,22 @@ public class OtherData {
 		return obj.isNative();
 	}
 	
-	public static OtherData[] extractOtherData(Object fun, Object fun2) {
+	public static ArrayList<OtherData> extractOtherData(Object fun, Object fun2) {
 		Field[] fs = fun.getClass().getFields();
 		Field[] fs2 = fun2.getClass().getFields();
 		ArrayList<OtherData> otherData = new ArrayList<OtherData>();
 		int i = 0;
 		i = fill(otherData, fun, fs, i);
 		i = fill(otherData, fun2, fs2, i);
-		return (OtherData[]) otherData.toArray();
+		return otherData;
 	}
 	
-	public static OtherData[] extractOtherData(Object fun) {
+	public static ArrayList<OtherData> extractOtherData(Object fun) {
 		Field[] fs = fun.getClass().getFields();
 		ArrayList<OtherData> otherData = new ArrayList<OtherData>();
 		int i = 0;
 		i = fill(otherData, fun, fs, i);
-		return (OtherData[]) otherData.toArray();
+		return otherData;
 	}
 
 	private static int fill(ArrayList<OtherData> otherData, Object oi, Field[] fs, int i) {

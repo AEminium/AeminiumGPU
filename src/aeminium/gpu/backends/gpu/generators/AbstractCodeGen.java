@@ -1,14 +1,16 @@
 package aeminium.gpu.backends.gpu.generators;
 
+import java.util.ArrayList;
+
 import aeminium.gpu.backends.gpu.buffers.OtherData;
 
 public abstract class AbstractCodeGen {
-	protected OtherData[] otherData;
+	protected ArrayList<OtherData> otherData;
 	protected String otherSources = "";
 	protected boolean isRange = false;
 	protected String id;
 	
-	public void setOtherData(OtherData[] ods) {
+	public void setOtherData(ArrayList<OtherData> ods) {
 		this.otherData = ods;
 	}
 	
@@ -21,7 +23,7 @@ public abstract class AbstractCodeGen {
 	}
 	
 	public String getExtraArgs() {
-		if (otherData == null || otherData.length == 0) {
+		if (otherData == null || otherData.size() == 0) {
 			return "";
 		} else {
 			StringBuilder b = new StringBuilder();
@@ -37,7 +39,7 @@ public abstract class AbstractCodeGen {
 	}
 	
 	public String getExtraArgsCall() {
-		if (otherData == null || otherData.length == 0) {
+		if (otherData == null || otherData.size() == 0) {
 			return "";
 		} else {
 			StringBuilder b = new StringBuilder();
