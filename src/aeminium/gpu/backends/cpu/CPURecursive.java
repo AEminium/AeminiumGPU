@@ -29,7 +29,47 @@ public class CPURecursive<R extends Number,T> extends CPUGenericKernel implement
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute() {
-		// TODO: Equal to GPU
+		if (strategy.getStart() instanceof Double) {
+			executeDouble((Recursive1DStrategy<Double, T>) strategy);
+		}
+		if (strategy.getStart() instanceof Integer) {
+			executeInt((Recursive1DStrategy<Integer, T>) strategy);
+		}
+	}
+	
+	public void executeDouble(Recursive1DStrategy<Double, T> strat) {
+		double s = start.doubleValue();
+		double e = end.doubleValue();
+		double step = e - s;
+		while (s < e) {
+			T a = strat.iterative(s, e, this);
+			if (isDone) {
+				output = strategy.combine(output, a);
+				this.isDone = false;
+				e = e + step;
+				s = e;
+			} else {
+				step = step/2;
+			}
+		}
+	}
+	
+	public void executeInt(Recursive1DStrategy<Integer, T> strat) {
+		int s = start.intValue();
+		int e = end.intValue();
+		int step = e - s;
+		while (s < e) {
+			T a = strat.iterative(s, e, this);
+			if (isDone) {
+				output = strategy.combine(output, a);
+				this.isDone = false;
+				e = e + step;
+				s = e;
+			} else {
+				step = step/2;
+				if (step < 1) step = 1;
+			}
+		}
 	}
 
 	@Override
