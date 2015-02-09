@@ -101,7 +101,7 @@ public class RecHeat {
 			}
 			@Override
 			public String getSplitSource() {
-				return "stepX = stepX/2;";
+				return "stepX = stepX/2; if (stepX < 1) stepX=1;";
 			}
 			
 			@Override
