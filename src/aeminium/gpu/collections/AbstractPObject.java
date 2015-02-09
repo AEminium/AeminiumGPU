@@ -3,7 +3,7 @@ package aeminium.gpu.collections;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
 
-public class AbstractPObject {
+public abstract class AbstractPObject {
 	
 	protected GPUDevice device;
 	
