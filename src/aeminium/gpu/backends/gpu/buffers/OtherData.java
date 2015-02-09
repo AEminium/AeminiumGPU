@@ -3,6 +3,7 @@ package aeminium.gpu.backends.gpu.buffers;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import aeminium.gpu.collections.AbstractCollection;
 import aeminium.gpu.collections.PNativeWrapper;
 import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.factories.CollectionFactory;
@@ -100,7 +101,7 @@ public class OtherData {
 	public void readFromBuffer(CLContext ctx, CLQueue q) {
 		if (!isNative()) {
 			Object target;
-			PList<?> newList = BufferHelper.extractFromBuffer(buffer, q, null, obj.getClass().getSimpleName(), buffer.getElementSize());
+			PList<?> newList = BufferHelper.extractFromBuffer(buffer, q, null, ((AbstractCollection<?>) obj).getContainingType().getSimpleName(), buffer.getElementSize());
 			if (obj instanceof AbstractMatrix) {
 				PMatrix<?> newMatrix = CollectionFactory.matrixfromPList(newList, ((AbstractMatrix<?>) obj).rows(), ((AbstractMatrix<?>) obj).cols());
 				target = newMatrix;
