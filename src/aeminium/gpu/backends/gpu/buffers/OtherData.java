@@ -23,8 +23,8 @@ public class OtherData {
 	
 	public void createBuffer(CLContext ctx) {
 		if (!isNative()) {
-			System.out.println("Creating buffer for " + name);
 			buffer = BufferHelper.createInputOutputBufferFor(ctx, obj);
+			System.out.println("Creating buffer for " + name + " ==> " + buffer);
 		}
 	}
 	
@@ -75,7 +75,7 @@ public class OtherData {
 
 	public void setArg(CLKernel kernel, int i) {
 		if (!isNative()) {
-			System.out.println("Using buffer for " + name);
+			System.out.println("Using buffer for " + name + " ==> " + getBuffer());
 			kernel.setArg(i, getBuffer());
 			return;
 		}
