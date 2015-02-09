@@ -144,7 +144,6 @@ public class BufferHelper {
 	
 	public static CLBuffer<?> createInputOutputBufferFor(CLContext ctx,
 			PObject o) {
-		System.out.println(o.getClass() + ".-");
 		if (o instanceof AbstractList) {
 			PList<?> l = (PList<?>) o;
 			return createInputOutputBufferFor(ctx, l);

@@ -24,7 +24,6 @@ public class OtherData {
 	public void createBuffer(CLContext ctx) {
 		if (!isNative()) {
 			buffer = BufferHelper.createInputOutputBufferFor(ctx, obj);
-			System.out.println("Creating buffer for " + name + " ==> " + buffer);
 		}
 	}
 	
