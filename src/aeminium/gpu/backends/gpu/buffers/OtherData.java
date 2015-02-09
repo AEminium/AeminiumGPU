@@ -1,6 +1,7 @@
 package aeminium.gpu.backends.gpu.buffers;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import aeminium.gpu.collections.PNativeWrapper;
 import aeminium.gpu.collections.PObject;
@@ -39,31 +40,31 @@ public class OtherData {
 	public static OtherData[] extractOtherData(Object fun, Object fun2) {
 		Field[] fs = fun.getClass().getFields();
 		Field[] fs2 = fun2.getClass().getFields();
-		OtherData[] otherData = new OtherData[fs.length + fs2.length];
+		ArrayList<OtherData> otherData = new ArrayList<OtherData>();
 		int i = 0;
 		i = fill(otherData, fun, fs, i);
 		i = fill(otherData, fun2, fs2, i);
-		return otherData;
+		return (OtherData[]) otherData.toArray();
 	}
 	
 	public static OtherData[] extractOtherData(Object fun) {
 		Field[] fs = fun.getClass().getFields();
-		OtherData[] otherData = new OtherData[fs.length];
+		ArrayList<OtherData> otherData = new ArrayList<OtherData>();
 		int i = 0;
 		i = fill(otherData, fun, fs, i);
-		return otherData;
+		return (OtherData[]) otherData.toArray();
 	}
 
-	private static int fill(OtherData[] otherData, Object oi, Field[] fs, int i) {
+	private static int fill(ArrayList<OtherData> otherData, Object oi, Field[] fs, int i) {
 		for (Field f : fs) {
 			f.setAccessible(true);
 			try {
 				Object o = f.get(oi);
 				if (o instanceof Integer) o = new PNativeWrapper<Integer>((Integer) o);
 				if (o instanceof Double) o = new PNativeWrapper<Double>((Double) o);
-				otherData[i++] = new OtherData(f.getName(), (PObject) o);
+				otherData.add(new OtherData(f.getName(), (PObject) o));
 				if (o instanceof AbstractMatrix) {
-					otherData[i++] = new OtherData("__" + f.getName() + "_cols", new PNativeWrapper<Integer>(((AbstractMatrix<?>) o).cols()));
+					otherData.add(new OtherData("__" + f.getName() + "_cols", new PNativeWrapper<Integer>(((AbstractMatrix<?>) o).cols())));
 				}
 			} catch (IllegalArgumentException e) {
 				// Avoided
