@@ -107,6 +107,7 @@ public class OtherData {
 			} else {
 				target = newList;
 			}
+			System.out.println(target);
 			try {
 				f.set(name, target);
 			} catch (IllegalArgumentException e) {
