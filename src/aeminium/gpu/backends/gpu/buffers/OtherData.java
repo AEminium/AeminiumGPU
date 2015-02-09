@@ -80,7 +80,7 @@ public class OtherData {
 		PNativeWrapper<?> wrapper = (PNativeWrapper<?>) obj;
 		Object c = wrapper.getVal();
 		
-		if (c instanceof Integer) kernel.setArg(i, ((Integer) c).intValue());
+		if (c instanceof Integer) {System.out.println(i + " => " + c); kernel.setArg(i, ((Integer) c).intValue()); }
 		if (c instanceof Double) kernel.setArg(i, ((Double) c).doubleValue());
 		if (c instanceof Float) kernel.setArg(i, ((Float) c).floatValue());
 		
