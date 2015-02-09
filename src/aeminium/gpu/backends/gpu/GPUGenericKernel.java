@@ -58,7 +58,7 @@ public abstract class GPUGenericKernel implements GPUKernel {
 		int i = nArgs - otherData.length;
 		for (OtherData o : otherData) {
 			if (o == null) continue;
-			kernel.setArg(i++, o.getBuffer());
+			o.setArg(kernel, i++);
 		}
 	}
 

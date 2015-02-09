@@ -17,4 +17,6 @@ public class PNativeWrapper<T extends Number> extends AbstractPObject implements
 
 	public boolean isNative() { return true; }
 	
+	public T getVal() { return cont; }
+	
 }

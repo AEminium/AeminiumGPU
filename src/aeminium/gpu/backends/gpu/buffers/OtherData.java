@@ -7,6 +7,7 @@ import aeminium.gpu.collections.PObject;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
+import com.nativelibs4java.opencl.CLKernel;
 
 public class OtherData {
 	public String name;
@@ -21,11 +22,16 @@ public class OtherData {
 	}
 	
 	public void createBuffer(CLContext ctx) {
-		buffer = BufferHelper.createInputOutputBufferFor(ctx, obj);
+		if (!isNative())
+			buffer = BufferHelper.createInputOutputBufferFor(ctx, obj);
 	}
 	
 	public CLBuffer<?> getBuffer() {
 		return buffer;
+	}
+	
+	public boolean isNative() {
+		return obj.isNative();
 	}
 	
 	public static OtherData[] extractOtherData(Object fun, Object fun2) {
@@ -63,5 +69,19 @@ public class OtherData {
 			}
 		}
 		return i;
+	}
+
+	public void setArg(CLKernel kernel, int i) {
+		if (!isNative()) {
+			kernel.setArg(i, getBuffer());
+			return;
+		}
+		PNativeWrapper<?> wrapper = (PNativeWrapper<?>) obj;
+		Object c = wrapper.getVal();
+		
+		if (c instanceof Integer) kernel.setArg(i, ((Integer) c).intValue());
+		if (c instanceof Double) kernel.setArg(i, ((Double) c).doubleValue());
+		if (c instanceof Float) kernel.setArg(i, ((Float) c).floatValue());
+		
 	}
 }
