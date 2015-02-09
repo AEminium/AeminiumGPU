@@ -150,7 +150,7 @@ public class BufferHelper {
 		}
 		if (o instanceof AbstractMatrix) {
 			PMatrix<?> l = (PMatrix<?>) o;
-			return createInputOutputBufferFor(ctx, l);
+			return createInputOutputBufferFor(ctx, l.elements());
 		}
 		return null;
 	}
