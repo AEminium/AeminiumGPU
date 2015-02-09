@@ -66,7 +66,11 @@ public abstract class GPUGenericKernel implements GPUKernel {
 
 	abstract public void execute(CLContext ctx, CLQueue q);
 
-	abstract public void retrieveResults(CLContext ctx, CLQueue q);
+	public void retrieveResults(CLContext ctx, CLQueue q) {
+		for (OtherData o : otherData) {
+			o.readFromBuffer(ctx, q);
+		}
+	}
 	
 	@Override
 	public void waitExecution(CLContext context, CLQueue queue) {

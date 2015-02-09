@@ -132,7 +132,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 
 	@Override
 	public void retrieveResults(CLContext ctx, CLQueue q) {
-		// Nothing to do!
+		super.retrieveResults(ctx, q);
 	}
 
 	@Override
