@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 
 import aeminium.gpu.collections.PNativeWrapper;
 import aeminium.gpu.collections.PObject;
+import aeminium.gpu.collections.matrices.AbstractMatrix;
 
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
@@ -61,6 +62,9 @@ public class OtherData {
 				if (o instanceof Integer) o = new PNativeWrapper<Integer>((Integer) o);
 				if (o instanceof Double) o = new PNativeWrapper<Double>((Double) o);
 				otherData[i++] = new OtherData(f.getName(), (PObject) o);
+				if (o instanceof AbstractMatrix) {
+					otherData[i++] = new OtherData("__" + f.getName() + "_cols", new PNativeWrapper<Integer>(((AbstractMatrix<?>) o).cols()));
+				}
 			} catch (IllegalArgumentException e) {
 				// Avoided
 				e.printStackTrace();
