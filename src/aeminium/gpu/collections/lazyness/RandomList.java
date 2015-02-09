@@ -24,6 +24,8 @@ import com.nativelibs4java.opencl.CLContext;
 
 public class RandomList implements PList<Float>, LazyCollection {
 
+	public boolean isNative() { return false; }
+	
 	protected class FloatIdentityMapper extends LambdaMapper<Float, Float> {
 		@Override
 		public Float map(Float input) {

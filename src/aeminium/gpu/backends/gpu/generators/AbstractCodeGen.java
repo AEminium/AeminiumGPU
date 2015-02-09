@@ -26,7 +26,11 @@ public abstract class AbstractCodeGen {
 		} else {
 			StringBuilder b = new StringBuilder();
 			for (OtherData o : otherData) {
-				b.append(", __global " + o.type + " " + o.name);
+				if (o.obj.isNative()) {
+					b.append(", " + o.type + " " + o.name);
+				} else {
+					b.append(", __global " + o.type + " " + o.name);
+				}
 			}
 			return b.toString();
 		}

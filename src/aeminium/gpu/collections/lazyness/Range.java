@@ -21,6 +21,8 @@ import com.nativelibs4java.opencl.CLMem;
 
 public class Range implements PList<Integer>, LazyCollection {
 
+	public boolean isNative() { return false; }
+	
 	protected class IntegerIdentityMapper extends
 			LambdaMapper<Integer, Integer> {
 		@Override

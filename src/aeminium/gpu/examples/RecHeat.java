@@ -16,10 +16,6 @@ public class RecHeat {
 		if (args.length > 0) width = Integer.parseInt(args[0]);
 		final int widthi = width;
 		
-		int depth = 2;
-		if (args.length > 1) depth = Integer.parseInt(args[1]);
-		final int depthi = depth;
-		
 		long startTime = System.nanoTime();
 		
 		final PMatrix<Double> m = new DoubleMatrix(width, width);
