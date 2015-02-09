@@ -15,6 +15,6 @@ public class PNativeWrapper<T extends Number> extends AbstractPObject implements
 		return BufferHelper.getCLTypeOf(cont.getClass());
 	}
 
-	public boolean isNative() { return false; }
+	public boolean isNative() { return true; }
 	
 }
