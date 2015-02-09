@@ -6,6 +6,8 @@ import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.lists.AbstractList;
 import aeminium.gpu.collections.lists.BooleanList;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.collections.matrices.AbstractMatrix;
+import aeminium.gpu.collections.matrices.PMatrix;
 import aeminium.gpu.collections.properties.evaluation.LazyCollection;
 
 import com.nativelibs4java.opencl.CLBuffer;
@@ -145,6 +147,10 @@ public class BufferHelper {
 		System.out.println(o.getClass() + ".-");
 		if (o instanceof AbstractList) {
 			PList<?> l = (PList<?>) o;
+			return createInputOutputBufferFor(ctx, l);
+		}
+		if (o instanceof AbstractMatrix) {
+			PMatrix<?> l = (PMatrix<?>) o;
 			return createInputOutputBufferFor(ctx, l);
 		}
 		return null;
