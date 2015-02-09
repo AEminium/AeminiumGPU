@@ -214,4 +214,8 @@ public class GPURecursiveCall<R, A> extends GPUGenericKernel {
 		return fib(n-1) + fib(n-2);
 	}
 
+	public int getNumWorkers() {
+		return MAX_ITEMS;
+	}
+	
 }

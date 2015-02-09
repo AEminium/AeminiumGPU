@@ -30,12 +30,12 @@ public class RangedRecursiveCall<R extends Number, R2, T> extends GenericProgram
 
 	@Override
 	protected int getParallelUnits() {
-		return 1024;
+		return gpuOp.getNumWorkers()*2;
 	}
 
 	@Override
 	protected int getBalanceSplitPoint() {
-		return 1024;
+		return gpuOp.getNumWorkers();
 	}
 
 	@Override

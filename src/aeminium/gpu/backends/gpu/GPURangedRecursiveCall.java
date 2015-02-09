@@ -194,5 +194,9 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 	public int getRecursionLimit() {
 		return KERNEL_RECURSION_LIMIT;
 	}
+	
+	public int getNumWorkers() {
+		return MAX_WORKERS;
+	}
 
 }
