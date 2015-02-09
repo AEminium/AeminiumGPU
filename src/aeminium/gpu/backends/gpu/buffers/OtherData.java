@@ -22,8 +22,9 @@ public class OtherData {
 	public CLBuffer<?> buffer;
 	public String type;
 	public Field f;
-	
-	public OtherData(Field f, String n, PObject o) {
+	public Object oi; 
+	public OtherData(Object oi, Field f, String n, PObject o) {
+		this.oi = oi;
 		this.f = f;
 		this.name = n;
 		this.obj = o;
@@ -69,9 +70,9 @@ public class OtherData {
 				Object o = f.get(oi);
 				if (o instanceof Integer) o = new PNativeWrapper<Integer>((Integer) o);
 				if (o instanceof Double) o = new PNativeWrapper<Double>((Double) o);
-				otherData.add(new OtherData(f, f.getName(), (PObject) o));
+				otherData.add(new OtherData(oi, f, f.getName(), (PObject) o));
 				if (o instanceof AbstractMatrix) {
-					otherData.add(new OtherData(f, "__" + f.getName() + "_cols", new PNativeWrapper<Integer>(((AbstractMatrix<?>) o).cols())));
+					otherData.add(new OtherData(oi, f, "__" + f.getName() + "_cols", new PNativeWrapper<Integer>(((AbstractMatrix<?>) o).cols())));
 				}
 			} catch (IllegalArgumentException e) {
 				// Avoided
@@ -108,9 +109,8 @@ public class OtherData {
 			} else {
 				target = newList;
 			}
-			System.out.println(target);
 			try {
-				f.set(name, target);
+				f.set(oi, target);
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
