@@ -91,7 +91,7 @@ public class GPURangedRecursiveCall<R extends Number, R2, T> extends GPUGenericK
 			copyRangeBuffers(ctx);
 			synchronized(kernel) {
 				kernel.setArgs(workUnits, sbuffer, ebuffer, abuffer, rbuffer, stepbuffer, global_counter++);
-				setExtraDataArgs(5, kernel);
+				setExtraDataArgs(7, kernel);
 				eventsArr[0] = kernel.enqueueNDRange(q, new int[] { MAX_WORKERS }, eventsArr);
 			}
 			int[] rs = rbuffer.read(q, eventsArr[0]).getInts();
