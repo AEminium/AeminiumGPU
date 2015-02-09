@@ -137,5 +137,11 @@ public class CharList extends AbstractList<Character> implements
 		}
 		return null;
 	}
+	
+	@Override
+	public void replaceBy(PList<?> newList) {
+		box = ((CharList) newList).box;
+		size = newList.size();
+	}
 
 }

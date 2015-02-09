@@ -129,4 +129,10 @@ public class LongList extends AbstractList<Long> implements ConcreteCollection {
 		}
 		return null;
 	}
+	
+	@Override
+	public void replaceBy(PList<?> newList) {
+		box = ((LongList) newList).box;
+		size = newList.size();
+	}
 }

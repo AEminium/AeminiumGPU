@@ -21,4 +21,6 @@ public interface PMatrix<T> extends PCollection<T>, MappableToMatrix<T>,
 
 	public PList<T> elements();
 
+	public void replaceBy(PMatrix<?> newMatrix);
+
 }

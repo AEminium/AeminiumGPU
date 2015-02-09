@@ -133,4 +133,10 @@ public class FloatList extends AbstractList<Float> implements
 		return null;
 	}
 
+	@Override
+	public void replaceBy(PList<?> newList) {
+		box = ((FloatList) newList).box;
+		size = newList.size();
+	}
+	
 }

@@ -132,4 +132,10 @@ public class IntList extends AbstractList<Integer> implements
 		return null;
 	}
 	
+	@Override
+	public void replaceBy(PList<?> newList) {
+		box = ((IntList) newList).box;
+		size = newList.size();
+	}
+	
 }

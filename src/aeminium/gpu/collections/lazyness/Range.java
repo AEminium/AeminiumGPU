@@ -104,6 +104,11 @@ public class Range implements PList<Integer>, LazyCollection {
 	public void clear() {
 		throw new ReadOnlyListException();
 	}
+	
+	@Override
+	public void replaceBy(PList<?> newList) {
+		throw new ReadOnlyListException();
+	}
 
 	@Override
 	public PList<Integer> subList(int fromIndex, int toIndex) {

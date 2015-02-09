@@ -37,5 +37,10 @@ public class DoubleMatrix extends AbstractMatrix<Double> implements
 	public PList<Double> elements() {
 		return new DoubleList(box, size);
 	}
+	
+	public void replaceBy(PMatrix<?> newMatrix) {
+		DoubleMatrix nb = (DoubleMatrix) newMatrix;
+		box = nb.box;
+	}
 
 }

@@ -101,22 +101,12 @@ public class OtherData {
 
 	public void readFromBuffer(CLContext ctx, CLQueue q) {
 		if (!isNative()) {
-			Object target;
 			PList<?> newList = BufferHelper.extractFromBuffer(buffer, q, null, ((AbstractCollection<?>) obj).getContainingType().getSimpleName(), buffer.getElementSize());
 			if (obj instanceof AbstractMatrix) {
 				PMatrix<?> newMatrix = CollectionFactory.matrixfromPList(newList, ((AbstractMatrix<?>) obj).rows(), ((AbstractMatrix<?>) obj).cols());
-				target = newMatrix;
+				((PMatrix<?>) obj).replaceBy(newMatrix);
 			} else {
-				target = newList;
-			}
-			try {
-				f.set(oi, target);
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				((PList<?>) obj).replaceBy(newList);
 			}
 		}
 	}

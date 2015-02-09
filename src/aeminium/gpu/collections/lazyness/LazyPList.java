@@ -133,4 +133,10 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 		return actual.extendAt(i, extra);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public void replaceBy(PList<?> newList) {
+		actual = (PList<T>) newList;
+	}
+
 }

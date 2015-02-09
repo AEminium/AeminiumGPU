@@ -125,6 +125,11 @@ public class RandomList implements PList<Float>, LazyCollection {
 	public void clear() {
 		throw new ReadOnlyListException();
 	}
+	
+	@Override
+	public void replaceBy(PList<?> newList) {
+		throw new ReadOnlyListException();
+	}
 
 	@Override
 	public PList<Float> subList(int fromIndex, int toIndex) {

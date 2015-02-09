@@ -2,6 +2,7 @@ package aeminium.gpu.collections.lazyness;
 
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.matrices.AbstractMatrix;
+import aeminium.gpu.collections.matrices.PMatrix;
 
 public class LazyPMatrix<T> extends AbstractMatrix<T> {
 
@@ -30,5 +31,11 @@ public class LazyPMatrix<T> extends AbstractMatrix<T> {
 	@Override
 	public Class<?> getContainingType() {
 		return source.getContainingType();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void replaceBy(PMatrix<?> newMatrix) {
+		source = (PList<T>) newMatrix.elements();
 	}
 }
