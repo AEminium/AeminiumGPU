@@ -75,7 +75,6 @@ public class OtherData {
 
 	public void setArg(CLKernel kernel, int i) {
 		if (!isNative()) {
-			System.out.println("Using buffer for " + name + " ==> " + getBuffer());
 			kernel.setArg(i, getBuffer());
 			return;
 		}
