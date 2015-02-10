@@ -3,9 +3,11 @@ package aeminium.gpu.collections;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
 
-public class AbstractPObject {
+public abstract class AbstractPObject {
 	
 	protected GPUDevice device;
+	
+	public boolean isNative() { return false; }
 	
 	public GPUDevice getDevice() {
 		if (device == null) device = (new DefaultDeviceFactory()).getDevice();
@@ -15,4 +17,6 @@ public class AbstractPObject {
 	public void setDevice(GPUDevice device) {
 		this.device = device;
 	}
+	
+	
 }

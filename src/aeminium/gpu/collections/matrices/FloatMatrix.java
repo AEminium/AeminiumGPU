@@ -38,4 +38,8 @@ public class FloatMatrix extends AbstractMatrix<Float> implements
 		return new FloatList(box, size);
 	}
 
+	public void replaceBy(PMatrix<?> newMatrix) {
+		FloatMatrix nb = (FloatMatrix) newMatrix;
+		box = nb.box;
+	}
 }

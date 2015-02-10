@@ -143,4 +143,10 @@ public class BooleanList extends AbstractList<Boolean> implements
 		}
 		return null;
 	}
+	
+	@Override
+	public void replaceBy(PList<?> newList) {
+		box = ((BooleanList) newList).box;
+		size = newList.size();
+	}
 }

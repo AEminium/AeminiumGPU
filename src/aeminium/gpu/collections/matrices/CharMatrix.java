@@ -37,5 +37,10 @@ public class CharMatrix extends AbstractMatrix<Character> implements
 	public PList<Character> elements() {
 		return new CharList(box, size);
 	}
+	
+	public void replaceBy(PMatrix<?> newMatrix) {
+		CharMatrix nb = (CharMatrix) newMatrix;
+		box = nb.box;
+	}
 
 }

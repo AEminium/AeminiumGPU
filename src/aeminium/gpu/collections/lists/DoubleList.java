@@ -132,5 +132,11 @@ public class DoubleList extends AbstractList<Double> implements
 		}
 		return null;
 	}
+	
+	@Override
+	public void replaceBy(PList<?> newList) {
+		box = ((DoubleList) newList).box;
+		size = newList.size();
+	}
 
 }

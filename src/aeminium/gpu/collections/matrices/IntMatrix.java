@@ -38,4 +38,9 @@ public class IntMatrix extends AbstractMatrix<Integer> implements
 		return new IntList(box, size);
 	}
 
+	public void replaceBy(PMatrix<?> newMatrix) {
+		IntMatrix nb = (IntMatrix) newMatrix;
+		box = nb.box;
+	}
+	
 }

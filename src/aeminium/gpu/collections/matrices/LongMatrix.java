@@ -37,5 +37,10 @@ public class LongMatrix extends AbstractMatrix<Long> implements
 	public PList<Long> elements() {
 		return new LongList(box, size);
 	}
+	
+	public void replaceBy(PMatrix<?> newMatrix) {
+		LongMatrix nb = (LongMatrix) newMatrix;
+		box = nb.box;
+	}
 
 }

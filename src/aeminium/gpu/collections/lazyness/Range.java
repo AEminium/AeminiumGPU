@@ -21,6 +21,8 @@ import com.nativelibs4java.opencl.CLMem;
 
 public class Range implements PList<Integer>, LazyCollection {
 
+	public boolean isNative() { return false; }
+	
 	protected class IntegerIdentityMapper extends
 			LambdaMapper<Integer, Integer> {
 		@Override
@@ -100,6 +102,11 @@ public class Range implements PList<Integer>, LazyCollection {
 
 	@Override
 	public void clear() {
+		throw new ReadOnlyListException();
+	}
+	
+	@Override
+	public void replaceBy(PList<?> newList) {
 		throw new ReadOnlyListException();
 	}
 

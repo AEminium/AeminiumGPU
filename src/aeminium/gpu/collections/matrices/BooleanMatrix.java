@@ -38,4 +38,9 @@ public class BooleanMatrix extends AbstractMatrix<Boolean> implements
 		return new BooleanList(box, size);
 	}
 
+	public void replaceBy(PMatrix<?> newMatrix) {
+		BooleanMatrix nb = (BooleanMatrix) newMatrix;
+		box = nb.box;
+	}
+	
 }

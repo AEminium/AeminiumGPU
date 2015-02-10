@@ -24,6 +24,8 @@ import com.nativelibs4java.opencl.CLContext;
 
 public class RandomList implements PList<Float>, LazyCollection {
 
+	public boolean isNative() { return false; }
+	
 	protected class FloatIdentityMapper extends LambdaMapper<Float, Float> {
 		@Override
 		public Float map(Float input) {
@@ -121,6 +123,11 @@ public class RandomList implements PList<Float>, LazyCollection {
 
 	@Override
 	public void clear() {
+		throw new ReadOnlyListException();
+	}
+	
+	@Override
+	public void replaceBy(PList<?> newList) {
 		throw new ReadOnlyListException();
 	}
 

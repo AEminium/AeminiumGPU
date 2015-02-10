@@ -1,5 +1,7 @@
 package aeminium.gpu.backends.gpu;
 
+import java.util.ArrayList;
+
 import aeminium.gpu.backends.gpu.buffers.OtherData;
 import aeminium.gpu.devices.GPUDevice;
 
@@ -16,7 +18,7 @@ public abstract class GPUGenericKernel implements GPUKernel {
 	protected CLKernel kernel;
 	protected CLEvent kernelCompletion;
 	
-	protected OtherData[] otherData;
+	protected ArrayList<OtherData> otherData;
 	
 	protected String otherSources;
 
@@ -55,16 +57,20 @@ public abstract class GPUGenericKernel implements GPUKernel {
 	
 	protected void setExtraDataArgs(int nArgs, CLKernel kernel) {
 		if (kernel == null) return;
-		int i = nArgs - otherData.length;
+		int i = nArgs;
 		for (OtherData o : otherData) {
 			if (o == null) continue;
-			kernel.setArg(i++, o.getBuffer());
+			o.setArg(kernel, i++);
 		}
 	}
 
 	abstract public void execute(CLContext ctx, CLQueue q);
 
-	abstract public void retrieveResults(CLContext ctx, CLQueue q);
+	public void retrieveResults(CLContext ctx, CLQueue q) {
+		for (OtherData o : otherData) {
+			o.readFromBuffer(ctx, q);
+		}
+	}
 	
 	@Override
 	public void waitExecution(CLContext context, CLQueue queue) {
