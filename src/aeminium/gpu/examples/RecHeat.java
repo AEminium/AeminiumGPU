@@ -9,6 +9,7 @@ import aeminium.gpu.operations.functions.RecursiveCallback;
 
 public class RecHeat {
 	
+	private static final int COLUMNS = 5000;
 	private static final long NPS = (1000L * 1000 * 1000);
 	
 	public static void main(String[] args) {
@@ -18,8 +19,8 @@ public class RecHeat {
 		
 		long startTime = System.nanoTime();
 		
-		final PMatrix<Double> m = new DoubleMatrix(width, 5000);
-		final PMatrix<Double> n = new DoubleMatrix(width, 5000);
+		final PMatrix<Double> m = new DoubleMatrix(width, COLUMNS);
+		final PMatrix<Double> n = new DoubleMatrix(width, COLUMNS);
 		
 		fill(m, width);
 		
@@ -39,7 +40,7 @@ public class RecHeat {
 				int lb = (r <= 0) ? 1 : r;
 				int ub = (l >= size-1) ? size-2 : l;
 				for (int a = lb; a < ub; a++) {
-					for (int b = 1; b < 5000-1; b++) {
+					for (int b = 1; b < COLUMNS-1; b++) {
 						double val = 1/dx * (old.get(a+1, b) - 2 * old.get(a,b) + old.get(a-1,b)) + 1/dx * ( old.get(a, b+1) - 2 * old.get(a, b) + old.get(a, b-1)) + old.get(a, b);
 						newM.set(a, b, val);
 					}
@@ -52,9 +53,9 @@ public class RecHeat {
 			public String getSource() {
 				return "if (l - r > 10) return 0.0;"
 						+ "int lb = (r<=0) ? 1 : r;"
-						+ "int ub = (l>=5000-1) ? size -2 : l;"
+						+ "int ub = (l>=size-1) ? size -2 : l;"
 						+ "for (int a = lb; a<ub; a++) {"
-						+ "for (int b=1; b<5000-1; b++) {"
+						+ "for (int b=1; b<"+COLUMNS+"-1; b++) {"
 						+ "double val = 1/dx * ( old[(a+1) * __old_cols + b] - 2 * old[a * __old_cols + b] + old[(a-1) * __old_cols + b]) + "
 						+ "1/dx * ( old[a * __old_cols + (b+1)] - 2 * old[a * __old_cols + b] + old[a * __old_cols + (b-1)]) + old[a * __old_cols + b];"
 						+ "newM[a * __newM_cols + b] = val;"
@@ -141,7 +142,7 @@ public class RecHeat {
 	private static void fill(PMatrix<Double> m, int size) {
 		double dx = 1.570796326794896558;
 		for (int a=0; a < size; a++) {
-			for (int b=0; b < size; b++) {
+			for (int b=0; b < COLUMNS; b++) {
 				if (a == 0) {
 					m.set(a, b, randa(a * dx, 0));
 				} else if (a == size-1) {
