@@ -68,7 +68,7 @@ public class MCPURecursiveCall<R, A> extends MCPUGenericKernel {
 		public void execute(Runtime rt, Task current) throws Exception {
 			R itacc = op.strategy.call(arg, this);
 			if (!isDone) {
-				PList<A> next = op.strategy.split(arg);
+				PList<A> next = op.strategy.split(arg, itacc);
 				List<RecursiveCallBody<R, A>> bodies = new ArrayList<RecursiveCallBody<R, A>>();
 				List<Task> tasks = new ArrayList<Task>();
 				

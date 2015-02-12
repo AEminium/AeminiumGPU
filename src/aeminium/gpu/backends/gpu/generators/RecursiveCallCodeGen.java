@@ -35,6 +35,9 @@ public class RecursiveCallCodeGen extends AbstractCodeGen {
 	
 	public String getRecursiveLambdaSource() {
 		HashMap<String, String> mapping = new HashMap<String, String>();
+		
+		System.out.println(rType);
+		
 		mapping.put("r_type", rType);
 		mapping.put("a_type", aType);
 		mapping.put("iter_lambda_name", getIterativeLambdaName());

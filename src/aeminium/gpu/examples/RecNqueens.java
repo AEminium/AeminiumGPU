@@ -62,7 +62,7 @@ public class RecNqueens {
 			}
 			
 			@Override
-			public PList<Stack2<Integer,IntList>> split(Stack2<Integer,IntList> stack) {
+			public PList<Stack2<Integer,IntList>> split(Stack2<Integer,IntList> stack, Integer acc) {
 				PList<Stack2<Integer,IntList>> l = new StackList2<Integer, IntList>("Integer", "IntList");
 				for (int i=0; i < size; i++) {
 					Stack2<Integer,IntList> s = stack.copy();

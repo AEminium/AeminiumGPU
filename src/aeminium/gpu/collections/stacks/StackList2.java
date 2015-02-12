@@ -82,7 +82,22 @@ public class StackList2<A,B> implements PList<Stack2<A,B>> {
 
 	@Override
 	public Iterator<Stack2<A, B>> iterator() {
-		throw new RuntimeException("Not implemented");
+		return new Iterator<Stack2<A, B>>() {
+			
+			private int counter = 0;
+			private int size = as.size();
+
+			@Override
+			public boolean hasNext() {
+				return counter < size;
+			}
+
+			@Override
+			public Stack2<A, B> next() {
+				return new Stack2<A,B>(as.get(counter), bs.get(counter++));
+			}
+			
+		};
 	}
 
 	@Override

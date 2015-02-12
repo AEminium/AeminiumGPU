@@ -7,6 +7,7 @@ import aeminium.gpu.operations.RecursiveCall;
 import aeminium.gpu.utils.UniqCounter;
 
 public abstract class BinaryRecursiveStrategy<R, A> extends AbstractPObject implements ReducerWithSeed<R> {
+
 	
 	protected String id = null;
 	
@@ -18,7 +19,7 @@ public abstract class BinaryRecursiveStrategy<R, A> extends AbstractPObject impl
 	public abstract R combine(R input, R other);
 	public abstract R getSeed();
 	
-	public abstract PList<A> split(A n);
+	public abstract PList<A> split(A n, R tmp);
 	public abstract String getSplitSource();
 	
 	public R evaluate() {

@@ -58,7 +58,7 @@ public class RecFibonacci {
 			}
 			
 			@Override
-			public PList<Integer> split(Integer n) {
+			public PList<Integer> split(Integer n, Integer acc) {
 				PList<Integer> l = new IntList();
 				if (n <= 2) {
 					l.add(n);

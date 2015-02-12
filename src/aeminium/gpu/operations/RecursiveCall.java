@@ -34,17 +34,17 @@ public class RecursiveCall<R, A> extends GenericProgram implements Program {
 	
 	@Override
 	protected int getParallelUnits() {
-		
-		futureArgs = strategy.split(arg);
-		for (int i=1; i < gpuOp.getNumWorkers()*2; i++) {
-			if (futureArgs.size() <= 0) break;
-			A o = futureArgs.remove(0);
-			PList<A> more = strategy.split(o);
-			for (A m : more) {
-				futureArgs.add(m);
+		futureArgs = strategy.split(arg, null);
+		if (futureArgs.size() > 1) { 
+			for (int i=1; i < gpuOp.getNumWorkers()*2; i++) {
+				if (futureArgs.size() <= 0) break;
+				A o = futureArgs.remove(0);
+				PList<A> more = strategy.split(o, null);
+				for (A m : more) {
+					futureArgs.add(m);
+				}
 			}
 		}
-		
 		cpuOp.setArgs(futureArgs);
 		gpuOp.setArgs(futureArgs);
 		return futureArgs.size();
