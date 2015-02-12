@@ -9,7 +9,7 @@ import aeminium.gpu.operations.functions.RecursiveCallback;
 
 public class RecHeat {
 	
-	private static final int COLUMNS = 5000;
+	private static final int COLUMNS = 1000;
 	private static final long NPS = (1000L * 1000 * 1000);
 	
 	public static void main(String[] args) {
