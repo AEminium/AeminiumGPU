@@ -2,6 +2,7 @@ package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
 public class CharList extends AbstractList<Character> implements
@@ -144,4 +145,9 @@ public class CharList extends AbstractList<Character> implements
 		size = newList.size();
 	}
 
+	@Override
+	public PObject copy() {
+		return new CharList(box, size);
+	}
+	
 }

@@ -1,5 +1,6 @@
 package aeminium.gpu.collections.matrices;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.lists.DoubleList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
@@ -43,4 +44,9 @@ public class DoubleMatrix extends AbstractMatrix<Double> implements
 		box = nb.box;
 	}
 
+	@Override
+	public PObject copy() {
+		return new DoubleMatrix(box, cols, rows);
+	}
+	
 }

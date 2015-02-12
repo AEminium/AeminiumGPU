@@ -2,6 +2,7 @@ package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
 public class IntList extends AbstractList<Integer> implements
@@ -136,6 +137,11 @@ public class IntList extends AbstractList<Integer> implements
 	public void replaceBy(PList<?> newList) {
 		box = ((IntList) newList).box;
 		size = newList.size();
+	}
+	
+	@Override
+	public PObject copy() {
+		return new IntList(box, size);
 	}
 	
 }

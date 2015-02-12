@@ -2,6 +2,7 @@ package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
 public class BooleanList extends AbstractList<Boolean> implements
@@ -148,5 +149,10 @@ public class BooleanList extends AbstractList<Boolean> implements
 	public void replaceBy(PList<?> newList) {
 		box = ((BooleanList) newList).box;
 		size = newList.size();
+	}
+
+	@Override
+	public PObject copy() {
+		return new BooleanList(box, size);
 	}
 }

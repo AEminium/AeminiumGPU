@@ -2,6 +2,7 @@ package aeminium.gpu.collections.lists;
 
 import java.util.Arrays;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
 
 public class LongList extends AbstractList<Long> implements ConcreteCollection {
@@ -134,5 +135,10 @@ public class LongList extends AbstractList<Long> implements ConcreteCollection {
 	public void replaceBy(PList<?> newList) {
 		box = ((LongList) newList).box;
 		size = newList.size();
+	}
+	
+	@Override
+	public PObject copy() {
+		return new LongList(box, size);
 	}
 }

@@ -1,5 +1,6 @@
 package aeminium.gpu.collections.lazyness;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.AbstractList;
 import aeminium.gpu.collections.lists.PList;
@@ -137,6 +138,12 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 	@Override
 	public void replaceBy(PList<?> newList) {
 		actual = (PList<T>) newList;
+	}
+
+	@Override
+	public PObject copy() {
+		this.evaluate();
+		return actual.copy();
 	}
 
 }

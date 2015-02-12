@@ -6,6 +6,7 @@ import java.util.Random;
 import aeminium.gpu.backends.cpu.MersenneTwisterFast;
 import aeminium.gpu.backends.gpu.MersenneTwisterGPU;
 import aeminium.gpu.backends.mcpu.MersenneTwister;
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.matrices.PMatrix;
@@ -204,5 +205,10 @@ public class RandomList implements PList<Float>, LazyCollection {
 	@Override
 	public String getCLType() {
 		return "float[]";
+	}
+
+	@Override
+	public PObject copy() {
+		return new RandomList(max);
 	}
 }

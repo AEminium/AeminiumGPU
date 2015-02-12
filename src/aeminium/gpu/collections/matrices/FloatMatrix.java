@@ -1,5 +1,6 @@
 package aeminium.gpu.collections.matrices;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.lists.FloatList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
@@ -41,5 +42,10 @@ public class FloatMatrix extends AbstractMatrix<Float> implements
 	public void replaceBy(PMatrix<?> newMatrix) {
 		FloatMatrix nb = (FloatMatrix) newMatrix;
 		box = nb.box;
+	}
+	
+	@Override
+	public PObject copy() {
+		return new FloatMatrix(box, cols, rows);
 	}
 }

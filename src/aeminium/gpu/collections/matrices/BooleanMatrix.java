@@ -1,5 +1,6 @@
 package aeminium.gpu.collections.matrices;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.lists.BooleanList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
@@ -41,6 +42,11 @@ public class BooleanMatrix extends AbstractMatrix<Boolean> implements
 	public void replaceBy(PMatrix<?> newMatrix) {
 		BooleanMatrix nb = (BooleanMatrix) newMatrix;
 		box = nb.box;
+	}
+	
+	@Override
+	public PObject copy() {
+		return new BooleanMatrix(box, cols, rows);
 	}
 	
 }

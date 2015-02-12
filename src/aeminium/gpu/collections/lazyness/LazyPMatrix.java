@@ -1,5 +1,6 @@
 package aeminium.gpu.collections.lazyness;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.matrices.AbstractMatrix;
 import aeminium.gpu.collections.matrices.PMatrix;
@@ -37,5 +38,11 @@ public class LazyPMatrix<T> extends AbstractMatrix<T> {
 	@Override
 	public void replaceBy(PMatrix<?> newMatrix) {
 		source = (PList<T>) newMatrix.elements();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public PObject copy() {
+		return new LazyPMatrix<T>((PList<T>) source.copy(), cols, rows);
 	}
 }

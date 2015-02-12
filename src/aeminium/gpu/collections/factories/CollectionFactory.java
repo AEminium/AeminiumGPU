@@ -32,6 +32,7 @@ public class CollectionFactory {
 			return new CharList();
 		if (outputType.equals("Boolean"))
 			return new BooleanList();
+
 		return null;
 	}
 

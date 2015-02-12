@@ -1,5 +1,6 @@
 package aeminium.gpu.collections.matrices;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.lists.IntList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
@@ -41,6 +42,11 @@ public class IntMatrix extends AbstractMatrix<Integer> implements
 	public void replaceBy(PMatrix<?> newMatrix) {
 		IntMatrix nb = (IntMatrix) newMatrix;
 		box = nb.box;
+	}
+	
+	@Override
+	public PObject copy() {
+		return new IntMatrix(box, cols, rows);
 	}
 	
 }

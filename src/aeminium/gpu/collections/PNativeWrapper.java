@@ -19,4 +19,9 @@ public class PNativeWrapper<T extends Number> extends AbstractPObject implements
 	
 	public T getVal() { return cont; }
 	
+	@Override
+	public PObject copy() {
+		return new PNativeWrapper<T>(cont);
+	}
+	
 }

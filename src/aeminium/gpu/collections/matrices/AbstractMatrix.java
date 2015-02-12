@@ -13,7 +13,7 @@ public abstract class AbstractMatrix<T> extends AbstractCollection<T> implements
 	protected int cols;
 	protected int rows;
 
-	public AbstractMatrix(int cols, int rows) {
+	public AbstractMatrix(int rows, int cols) {
 		this.cols = cols;
 		this.rows = rows;
 		this.size = cols * rows;

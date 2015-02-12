@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import org.bridj.Pointer;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.matrices.PMatrix;
@@ -175,5 +176,10 @@ public class Range implements PList<Integer>, LazyCollection {
 	@Override
 	public String getCLType() {
 		return "int[]";
+	}
+
+	@Override
+	public PObject copy() {
+		return new Range(max);
 	}
 }

@@ -1,5 +1,6 @@
 package aeminium.gpu.collections.matrices;
 
+import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.lists.CharList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
@@ -41,6 +42,11 @@ public class CharMatrix extends AbstractMatrix<Character> implements
 	public void replaceBy(PMatrix<?> newMatrix) {
 		CharMatrix nb = (CharMatrix) newMatrix;
 		box = nb.box;
+	}
+	
+	@Override
+	public PObject copy() {
+		return new CharMatrix(box, cols, rows);
 	}
 
 }
