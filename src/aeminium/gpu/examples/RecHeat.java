@@ -36,7 +36,7 @@ public class RecHeat {
 			
 			@Override
 			public Double iterative(Integer r, Integer l, RecursiveCallback result) {
-				if (l - r > 10) return 0.0;
+				if (l - r > 100) return 0.0;
 				int lb = (r <= 0) ? 1 : r;
 				int ub = (l >= size-1) ? size-2 : l;
 				for (int a = lb; a < ub; a++) {
@@ -51,7 +51,7 @@ public class RecHeat {
 			
 			@Override
 			public String getSource() {
-				return "if (l - r > 10) return 0.0;"
+				return "if (l - r > 100) return 0.0;"
 						+ "int lb = (r<=0) ? 1 : r;"
 						+ "int ub = (l>=size-1) ? size -2 : l;"
 						+ "for (int a = lb; a<ub; a++) {"
