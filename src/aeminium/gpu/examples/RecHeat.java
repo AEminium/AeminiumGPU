@@ -114,7 +114,7 @@ public class RecHeat {
 		
 		double val = heat.evaluate();
 		double time = (System.nanoTime() - startTime) * 1.0 / NPS;
-		System.out.println("# R: " + val + " : " + n.get(5, 4));
+		System.out.println("# R: " + val + " : " + n.get(0, 0));
 		System.out.println(time);
 
 	}
