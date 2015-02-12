@@ -35,8 +35,8 @@ public class RecFactorial {
 			
 			@Override
 			public String getSource() {
-				return "if (r - l < 10) { long acc = 1; for (int i=l;i<r;i++) { acc *= i }"
-						+ "*result = 1; return acc }\n return 1;"; 
+				return "if (r - l < 10) { long acc = 1; for (int i=l;i<r;i++) { acc *= i; }"
+						+ "*result = 1; return acc; }\n return 1;"; 
 			}
 			
 			public String[] getParameters() {
