@@ -55,7 +55,9 @@ public class MapReduce<I, O> extends GenericProgram {
 				1,
 				mapFun.getSource() + reduceFun.getSource(),
 				mergeComplexities(mapFun.getSourceComplexity(),
-						reduceFun.getSourceComplexity()));
+						reduceFun.getSourceComplexity()),
+				getFeatures()
+				);
 		if (s < GPUReduce.DEFAULT_MAX_REDUCTION_SIZE) return 0;
 		return s;
 	}

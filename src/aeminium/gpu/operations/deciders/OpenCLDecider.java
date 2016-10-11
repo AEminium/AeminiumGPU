@@ -20,14 +20,14 @@ import weka.core.converters.ConverterUtils.DataSource;
 public class OpenCLDecider {
 
 	private static final int LOOP_LIMIT = 20;
+	private static final boolean USE_ML = System.getenv().containsKey("ML");
 
 	public static int getSplitPoint(int units, int size, int rsize, String code,
-			String complexity) {
+			String complexity, String features) {
+		if (USE_ML) {
+			return OpenCLDecider.decide(units, size, features);
+		}
 		return OpenCLDecider.decide(units, size, rsize, code, complexity, false);
-	}
-	
-	public static int getSplitPoint(int units, int size, String features) {
-		return OpenCLDecider.decide(units, size, features);
 	}
 	
 	

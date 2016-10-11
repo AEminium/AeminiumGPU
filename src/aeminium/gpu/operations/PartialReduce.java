@@ -50,7 +50,7 @@ public class PartialReduce<O> extends GenericProgram {
 	@Override
 	protected int getBalanceSplitPoint() {
 		int s = OpenCLDecider.getSplitPoint(getParallelUnits(), input.size(), outputSize,
-				reduceFun.getSource(), reduceFun.getSourceComplexity());
+				reduceFun.getSource(), reduceFun.getSourceComplexity(), getFeatures());
 		if (s < GPUReduce.DEFAULT_MAX_REDUCTION_SIZE) return 0;
 		return s;
 	}

@@ -52,7 +52,7 @@ public class Map<I, O> extends GenericProgram implements Program {
 	@Override
 	protected int getBalanceSplitPoint() {
 		return OpenCLDecider.getSplitPoint(input.size(), input.size(), input.size(),
-				mapFun.getSource(), mapFun.getSourceComplexity());
+				mapFun.getSource(), mapFun.getSourceComplexity(), getFeatures());
 	}
 	
 	public String getFeatures() {
