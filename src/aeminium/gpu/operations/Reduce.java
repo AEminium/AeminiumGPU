@@ -8,6 +8,7 @@ import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.contracts.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
+import aeminium.gpu.operations.utils.FeatureHelper;
 
 public class Reduce<O> extends GenericProgram implements Program {
 
@@ -47,8 +48,6 @@ public class Reduce<O> extends GenericProgram implements Program {
 		this(reduceFun2, null, other, dev);
 	}
 
-	
-	
 	@Override
 	public int getParallelUnits() {
 		return this.input.size();
@@ -96,7 +95,6 @@ public class Reduce<O> extends GenericProgram implements Program {
 	}
 	
 	// Getters and Setters
-
 	public void setOutput(PList<O> output) {
 		this.output = output.get(0);
 	}
@@ -115,5 +113,10 @@ public class Reduce<O> extends GenericProgram implements Program {
 	
 	public GPUReduce<O, O> getGPUReduce() {
 		return gpuOp;
+	}
+	
+	public String getFeatures() {
+		return FeatureHelper.getFullFeatures(reduceFun.getFeatures(), input.size(),
+				input.getCLType(), 1, reduceFun.getSeed().getClass().toString(), 1);
 	}
 }

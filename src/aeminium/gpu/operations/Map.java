@@ -14,6 +14,7 @@ import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 import aeminium.gpu.operations.mergers.MapToMapMerger;
 import aeminium.gpu.operations.mergers.MapToReduceMerger;
+import aeminium.gpu.operations.utils.FeatureHelper;
 import aeminium.gpu.utils.ExtractTypes;
 
 public class Map<I, O> extends GenericProgram implements Program {
@@ -54,7 +55,11 @@ public class Map<I, O> extends GenericProgram implements Program {
 				mapFun.getSource(), mapFun.getSourceComplexity());
 	}
 	
-
+	public String getFeatures() {
+		return FeatureHelper.getFullFeatures(mapFun.getFeatures(), input.size(),
+				input.getContainingType().toString(), input.size(), ExtractTypes.getMapOutputType(mapFun, input), 0);
+	}
+	
 	@Override
 	public void cpuExecution(int start, int end) {
 		cpuOp.setLimits(start, end);

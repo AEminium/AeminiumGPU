@@ -3,6 +3,20 @@ package aeminium.gpu.operations.deciders;
 import aeminium.gpu.devices.CPUDevice;
 import aeminium.gpu.recorder.Configuration;
 
+
+/*
+import java.util.StringTokenizer;
+
+import weka.classifiers.Classifier;
+import weka.classifiers.CostMatrix;
+import weka.classifiers.meta.CostSensitiveClassifier;
+import weka.classifiers.rules.DecisionTable;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.converters.ConverterUtils.DataSource;
+*/
+
 public class OpenCLDecider {
 
 	private static final int LOOP_LIMIT = 20;
@@ -11,14 +25,65 @@ public class OpenCLDecider {
 			String complexity) {
 		return OpenCLDecider.decide(units, size, rsize, code, complexity, false);
 	}
-
+	
+	public static int getSplitPoint(int units, int size, String features) {
+		return OpenCLDecider.decide(units, size, features);
+	}
+	
+	
+	// DECIDES
+	public static int decide(int units, int size, String features) {
+		if (System.getProperties().containsKey("DEBUG_ML")) {
+			System.out.print("Features:");
+			System.out.println(features);
+		}
+		
+		if (System.getProperties().containsKey("FORCE")) {
+			if (System.getProperties().getProperty("FORCE").equals("GPU")) {
+				return 0;
+			} else {
+				return units;
+			}
+		}
+		
+		if (size < 5000) { // Small sizes are for CPU
+			return units;
+		}
+		
+		if (features == null || features.length() == 0) {
+			// Dumb heuristic in case features are absent
+			if (size > 10000) {
+				return 0;
+			}
+			return units;
+		}
+		/*
+		try {
+			Classifier classifier = OpenCLDecider.getClassifier();
+			Instance i = new DenseInstance(30);
+			StringTokenizer split = new StringTokenizer(features);
+			int c = 0;
+			while (split.hasMoreElements()) {
+				i.setValue(c, Integer.parseInt(split.nextToken()));
+				c++;
+			}
+			return classifier.classifyInstance(i) == 1;
+		} catch (Exception e) {
+			return false;
+		} */
+		return units;
+	}
+	
 	public static int decide(int units, int size, int rsize, String code,
 			String complexity, boolean isRange) {
-		if (System.getProperties().containsKey("ForceGPU"))
-			return 0;
-		if (System.getProperties().containsKey("ForceCPU"))
-			return units;
-
+		
+		if (System.getProperties().containsKey("FORCE")) {
+			if (System.getProperties().getProperty("FORCE").equals("GPU")) {
+				return 0;
+			} else {
+				return units;
+			}
+		}
 		int tasks_per_cpu_core = units / (10 * CPUDevice.getParallelism());
 		int defaultSplit = units - (tasks_per_cpu_core * CPUDevice.getParallelism());
 		
@@ -49,6 +114,7 @@ public class OpenCLDecider {
 			}
 			return 0;
 		}
+
 	}
 
 	public static long getCPUEstimation(int size, int rsize, String code,
@@ -165,5 +231,25 @@ public class OpenCLDecider {
 			return 0;
 		}
 	}
-
+	/*
+	private static Classifier classifier = null;
+	private static Classifier getClassifier() throws Exception {
+		if (OpenCLDecider.classifier != null) return OpenCLDecider.classifier; 
+		// Alcides Fonseca and Bruno Cabral,AeminiumGPU: An Intelligent Framework for GPU Programming, in Facing the Multicore-Challenge III, 2012
+	    Instances randData = DataSource.read("dataset/features_processed.arff");
+	    randData.setClassIndex(randData.numAttributes() - 1);
+	    
+	    CostSensitiveClassifier c = new CostSensitiveClassifier();
+	    c.setMinimizeExpectedCost(true);
+	    c.setClassifier(new DecisionTable());
+	    
+	    CostMatrix cm = new CostMatrix(2);
+	    cm.initialize();
+	    cm.setElement(0, 1, 0.4);
+	    cm.setElement(1, 0, 0.6);
+	    c.setCostMatrix(cm);
+	    OpenCLDecider.classifier = c;
+		return c;
+	}*/
+	
 }

@@ -9,6 +9,7 @@ import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
+import aeminium.gpu.operations.utils.FeatureHelper;
 
 public class PartialReduce<O> extends GenericProgram {
 
@@ -124,6 +125,11 @@ public class PartialReduce<O> extends GenericProgram {
 
 	public void setReduceFun(LambdaReducer<O> reduceFun) {
 		this.reduceFun = reduceFun;
+	}
+	
+	public String getFeatures() {
+		return FeatureHelper.getFullFeatures(reduceFun.getFeatures(), input.size(),
+				getInputType(), outputSize, getOutputType(), 2);
 	}
 
 }

@@ -8,6 +8,7 @@ import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
+import aeminium.gpu.operations.utils.FeatureHelper;
 
 public class MapReduce<I, O> extends GenericProgram {
 
@@ -21,7 +22,6 @@ public class MapReduce<I, O> extends GenericProgram {
 	
 
 	// Constructors
-
 	public MapReduce(LambdaMapper<I, O> mapper,
 			LambdaReducerWithSeed<O> reducer, PList<I> list, String other,
 			GPUDevice dev) {
@@ -43,7 +43,7 @@ public class MapReduce<I, O> extends GenericProgram {
 			return one;
 		return one + "+" + two;
 	}
-	
+
 	@Override
 	public int getParallelUnits() {
 		return this.input.size();
@@ -134,5 +134,9 @@ public class MapReduce<I, O> extends GenericProgram {
 	public void setMapFun(LambdaMapper<I, O> mapFun) {
 		this.mapFun = mapFun;
 	}
-
+	
+	public String getFeatures() {
+		String sum = FeatureHelper.sumFeatures(mapFun.getFeatures(), reduceFun.getFeatures());
+		return FeatureHelper.getFullFeatures(sum, input.size(), getInputType(), 1, getOutputType(), 3);
+	}
 }

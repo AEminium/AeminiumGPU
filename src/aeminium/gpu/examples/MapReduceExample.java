@@ -14,12 +14,12 @@ public class MapReduceExample {
 
 			@Override
 			public Integer map(Integer input) {
-				return input + 1;
+				return 1;
 			}
 
 			@Override
 			public String getSource() {
-				return "return input + 1;";
+				return "return 1;";
 			}
 
 		});
