@@ -55,6 +55,7 @@ public class FloatList extends AbstractList<Float> implements
 		if (index >= box.length) {
 			ensureNMore(index + 1 - box.length);
 		}
+		System.out.println("box: " + box.length + ", index:" + index);
 		box[index] = e;
 	}
 
@@ -91,14 +92,14 @@ public class FloatList extends AbstractList<Float> implements
 		return box;
 	}
 
-	protected void ensureNMore(int n) {
+	protected synchronized void ensureNMore(int n) {
 		if (size >= box.length) {
 			int plus = (n > INCREMENT_SIZE) ? n : INCREMENT_SIZE;
 			box = Arrays.copyOf(box, box.length + plus);
 		}
 	}
 
-	protected void ensureOneMore() {
+	protected synchronized void ensureOneMore() {
 		if (size == box.length) {
 			box = Arrays.copyOf(box, box.length + INCREMENT_SIZE);
 		}
