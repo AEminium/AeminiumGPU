@@ -55,7 +55,6 @@ public class FloatList extends AbstractList<Float> implements
 		if (index >= box.length) {
 			ensureNMore(index + 1 - box.length);
 		}
-		System.out.println("box: " + box.length + ", index:" + index);
 		box[index] = e;
 	}
 
