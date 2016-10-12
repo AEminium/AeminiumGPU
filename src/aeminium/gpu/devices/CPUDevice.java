@@ -87,6 +87,7 @@ public class CPUDevice {
 	
 	public static void waitFor(Task t) {
 		rt.waitToEmpty();
+		shutdown();
 	}
 
 	public static boolean isMulticore() {
