@@ -10,7 +10,7 @@ import aeminium.runtime.Task;
 import aeminium.runtime.implementations.Factory;
 
 public class CPUDevice {
-	public static int rtcalls = 0;
+	public static volatile int rtcalls = 0;
 	public final static Runtime rt = Factory.getRuntime();
 	
 	public static void init() {
@@ -87,7 +87,6 @@ public class CPUDevice {
 	
 	public static void waitFor(Task t) {
 		rt.waitToEmpty();
-		shutdown();
 	}
 
 	public static boolean isMulticore() {

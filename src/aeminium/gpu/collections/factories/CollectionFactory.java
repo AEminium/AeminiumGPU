@@ -20,34 +20,34 @@ import aeminium.gpu.collections.properties.evaluation.LazyCollection;
 
 public class CollectionFactory {
 	public static PList<?> listFromType(String outputType) {
-		if (outputType.equals("Integer"))
+		if (outputType.equals("Integer") || outputType.equals("java.lang.Integer"))
 			return new IntList();
-		if (outputType.equals("Float"))
+		if (outputType.equals("Float") || outputType.equals("java.lang.Float"))
 			return new FloatList();
-		if (outputType.equals("Double"))
+		if (outputType.equals("Double") || outputType.equals("java.lang.Double"))
 			return new DoubleList();
-		if (outputType.equals("Long"))
+		if (outputType.equals("Long") || outputType.equals("java.lang.Long"))
 			return new LongList();
-		if (outputType.equals("Character"))
+		if (outputType.equals("Character") || outputType.equals("java.lang.Character"))
 			return new CharList();
-		if (outputType.equals("Boolean"))
+		if (outputType.equals("Boolean") || outputType.equals("java.lang.Boolean"))
 			return new BooleanList();
 
 		return null;
 	}
 
 	public static PMatrix<?> matrixFromType(String outputType, int m, int n) {
-		if (outputType.equals("Integer"))
+		if (outputType.equals("Integer") || outputType.equals("java.lang.Integer"))
 			return new IntMatrix(m, n);
-		if (outputType.equals("Float"))
+		if (outputType.equals("Float") || outputType.equals("java.lang.Float"))
 			return new FloatMatrix(m, n);
-		if (outputType.equals("Double"))
+		if (outputType.equals("Double") || outputType.equals("java.lang.Double"))
 			return new DoubleMatrix(m, n);
-		if (outputType.equals("Long"))
+		if (outputType.equals("Long") || outputType.equals("java.lang.Long"))
 			return new LongMatrix(m, n);
-		if (outputType.equals("Character"))
+		if (outputType.equals("Character") || outputType.equals("java.lang.Character"))
 			return new CharMatrix(m, n);
-		if (outputType.equals("Boolean"))
+		if (outputType.equals("Boolean") || outputType.equals("java.lang.Boolean"))
 			return new BooleanMatrix(m, n);
 		return null;
 	}

@@ -34,8 +34,10 @@ public class MCPUMap<I,O> extends MCPUGenericKernel {
 	@Override
 	public void execute() {
 		output = (PList<O>) CollectionFactory.listFromType(outputType);
+		int top = input.size()-1;
+		output.set(top, mapFun.map(input.get(top)));
 		final int start = this.start;
-		task = ForTask.createFor(CPUDevice.rt, new aeminium.runtime.helpers.loops.Range(start, input.size()), new ForBody<Integer>() {
+		task = ForTask.createFor(CPUDevice.rt, new aeminium.runtime.helpers.loops.Range(start, top), new ForBody<Integer>() {
 
 			@Override
 			public void iterate(Integer i, aeminium.runtime.Runtime rt,

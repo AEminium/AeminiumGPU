@@ -38,14 +38,6 @@ public class OpenCLDecider {
 			System.out.println(features);
 		}
 		
-		if (System.getProperties().containsKey("FORCE")) {
-			if (System.getProperties().getProperty("FORCE").equals("GPU")) {
-				return 0;
-			} else {
-				return units;
-			}
-		}
-		
 		if (size < 5000) { // Small sizes are for CPU
 			return units;
 		}

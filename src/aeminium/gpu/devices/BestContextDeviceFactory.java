@@ -13,23 +13,27 @@ public class BestContextDeviceFactory implements DeviceFactory {
 	@Override
 	public GPUDevice getDevice() {
 		if (d != null) return d;
-		for (CLPlatform p : JavaCL.listGPUPoweredPlatforms()) {
-			for (CLDevice dev : p.listDevices(CLDevice.Type.GPU, true)) {
-				if (System.getenv("DEBUGCL") != null) {
-					System.out.println(p);
-					System.out.println(dev);
-					System.out.println(dev.getVendor());
-				}
-				try {
-					CLContext ctx = JavaCL.createContext(null, dev);
-					if (dev.getType().contains(CLDevice.Type.GPU)) {
-						d = new GPUDevice(ctx);
-						return d;
+		try {
+			for (CLPlatform p : JavaCL.listGPUPoweredPlatforms()) {
+				for (CLDevice dev : p.listDevices(CLDevice.Type.GPU, true)) {
+					if (System.getenv("DEBUGCL") != null) {
+						System.out.println(p);
+						System.out.println(dev);
+						System.out.println(dev.getVendor());
 					}
-				} catch (CLException e) {
-					continue;
+					try {
+						CLContext ctx = JavaCL.createContext(null, dev);
+						if (dev.getType().contains(CLDevice.Type.GPU)) {
+							d = new GPUDevice(ctx);
+							return d;
+						}
+					} catch (CLException e) {
+						continue;
+					}
 				}
 			}
+		} catch (UnsatisfiedLinkError e) {
+			return null;
 		}
 		return null;
 	}
