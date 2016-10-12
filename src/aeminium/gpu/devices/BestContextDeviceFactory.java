@@ -34,6 +34,8 @@ public class BestContextDeviceFactory implements DeviceFactory {
 			}
 		} catch (UnsatisfiedLinkError e) {
 			return null;
+		} catch (NoClassDefFoundError e) {
+			return null;
 		}
 		return null;
 	}

@@ -20,8 +20,8 @@ public abstract class GenericProgram implements Program {
 		int units = getParallelUnits();
 		int split = 0;
 		
+		
 		/* Do we have a GPU available? */
-
 		if (device == null) {
 			if (System.getenv("DEBUG") != null) {
 				System.out.println("No GPU device available.");

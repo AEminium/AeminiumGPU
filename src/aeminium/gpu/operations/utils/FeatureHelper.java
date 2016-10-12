@@ -20,13 +20,13 @@ public class FeatureHelper {
 		parts = f1.split(",");
 		int i = 0;
 		for (String p : parts) {
-			int t = Integer.parseInt(p);
+			int t = Integer.parseInt(p.trim());
 			features[i++] = t;
 		}
 		parts = f2.split(",");
 		i = 0;
 		for (String p : parts) {
-			int t = Integer.parseInt(p);
+			int t = Integer.parseInt(p.trim());
 			features[i++] += t;
 		}
 		StringBuilder sb = new StringBuilder();
