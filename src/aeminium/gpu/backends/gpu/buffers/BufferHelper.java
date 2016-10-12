@@ -58,6 +58,9 @@ public class BufferHelper {
 	}
 
 	private static <T> IBufferFactory getFactory(String type) {
+		if (type.startsWith("java.lang.")) {
+			type = type.substring(10);
+		}
 		IBufferFactory f = factories.get(type);
 		if (f == null) {
 			System.out.println("No buffer for type " + type + ".");
