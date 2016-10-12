@@ -29,8 +29,7 @@ public class MCPUPartialReduce<O> extends MCPUGenericKernel {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute() {
-		System.out.println("t:" + input.getContainingType().toString());
-		output = (PList<O>) CollectionFactory.listFromType(input.getContainingType().toString());
+		output = (PList<O>) CollectionFactory.listFromType(input.getContainingType().getSimpleName());
 		if (end > start) {
 			output.set(end-1-start, input.get(0));
 		}
