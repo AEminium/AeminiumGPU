@@ -5,6 +5,7 @@ import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.CPUDevice;
 import aeminium.gpu.operations.functions.LambdaReducer;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
+import aeminium.gpu.utils.ExtractTypes;
 import aeminium.runtime.Runtime;
 import aeminium.runtime.Task;
 import aeminium.runtime.helpers.loops.ForBody;
@@ -29,9 +30,9 @@ public class MCPUPartialReduce<O> extends MCPUGenericKernel {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute() {
-		output = (PList<O>) CollectionFactory.listFromType(getOutputType());
+		output = (PList<O>) CollectionFactory.listFromType(input.getContainingType().toString());
 		if (end > start) {
-			output.set(end-1, input.get(0));
+			output.set(end-1-start, input.get(0));
 		}
 		cTask = ForTask.createFor(CPUDevice.rt, new aeminium.runtime.helpers.loops.Range(start, end), new ForBody<Integer>() {
 
