@@ -227,11 +227,11 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 	}
 
 	public String getOutputType() {
-		return input.getContainingType().getSimpleName().toString();
+		return reduceFun.getSeed().getClass().getSimpleName();
 	}
 
 	public int getOutputSize() {
-		return input.size();
+		return input.size(); // TODO 1
 	}
 
 	public LambdaMapper<I, O> getMapFun() {
