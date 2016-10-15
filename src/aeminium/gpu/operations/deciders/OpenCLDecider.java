@@ -121,7 +121,7 @@ public class OpenCLDecider {
 
 	private static String sameOperationAs(String op) {
 		if (op.equals("div") || op.equals("plus") || op.equals("minus")
-				|| op.equals("mod"))
+				|| op.equals("mod") || op.equals("lt") || op.equals("gt"))
 			return "mul";
 		if (op.equals("cos"))
 			return "sin";
