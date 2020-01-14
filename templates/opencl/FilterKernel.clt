@@ -1,0 +1,12 @@
+#pragma OPENCL EXTENSION cl_khr_fp64: enable
+
+// Other Sources Required
+{{other_sources}}
+
+// Specific Map Lambda Function
+{{filter_lambda_def}}
+
+__kernel void {{filter_kernel_name}}(__global const {{type}}* map_input, __global {{type}}* map_output {{extra_args}}) {
+	int map_global_id = get_global_id(0);
+	filter_output[map_global_id] = {{filter_lambda_name}}({{get_input}} {{extra_args_call}});
+}
