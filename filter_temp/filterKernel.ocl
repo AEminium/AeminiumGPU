@@ -2,9 +2,13 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define START_LENGTH 128
-#define MAX_BLOCK_SIZE 64
+// #define START_LENGTH 16384
+// #define START_LENGTH 8192
+#define START_LENGTH 4096
+// #define START_LENGTH 2048
+#define MAX_BLOCK_SIZE 1024
 
+// universal
 int predicate(int value) {
     if( (value > 7) && (value % 2) && !(value % 3) ) {
         return 1;
@@ -13,6 +17,7 @@ int predicate(int value) {
     }
 }
 
+// cpu
 int* check_array(int *array, int length) {
     int *array_out = (int*)malloc(sizeof(int) * length);
     for(int i=0; i<length; i++) {
@@ -21,6 +26,7 @@ int* check_array(int *array, int length) {
     return array_out;
 }
 
+// cpu
 int* prefix_sum(int *array, int length) {
     int *array_out = (int*)malloc(sizeof(int) * length);
     array_out[0] = array[0];
@@ -30,6 +36,7 @@ int* prefix_sum(int *array, int length) {
     return array_out;
 }
 
+// cpu
 int* sieve_out(int *values, int *booleans, int *indexes, int *length) {
     int new_length = 0;
     for(int i=0; i<*length; i++) {
@@ -59,6 +66,7 @@ void print_array(int *array, int length) {
     }
 }
 
+// cpu
 int* seq_filter(int *array, int *length) {
     int *checked = check_array(array, *length);
     int *aggregated = prefix_sum(checked, *length);
@@ -72,11 +80,9 @@ int* seq_filter(int *array, int *length) {
 __kernel void filterKernel(__global int *values, __global int *bools, __global int *prefix_sum, __global int *output, __global int *array_length, __global int *semaphore) {
     int idx = get_global_id(0);
     int covered_id = *array_length-1 - 2*idx;
-    int threads = *array_length / 2;
+    int threads = *array_length / 2 + *array_length % 2;
     int blocks = threads / MAX_BLOCK_SIZE + (threads % MAX_BLOCK_SIZE > 0);
     int modulo = 2;
-
-    // printf("Idx: %d, blockIdx.x: %d, blockDim.x: %d, threadIdx.x: %d\n", idx, blockIdx.x, blockDim.x, threadIdx.x);
 
     if((values[covered_id] > 7) && (values[covered_id] % 2) && !(values[covered_id] % 3)) {
         bools[covered_id] = 1;
@@ -96,37 +102,70 @@ __kernel void filterKernel(__global int *values, __global int *bools, __global i
         }
     }
 
-    // //synchronizing before prefix_sum;
-    barrier(CLK_GLOBAL_MEM_FENCE);
     // opencl --> int atomic_inc(volatile __global *int)
-    // if(threads > MAX_BLOCK_SIZE) {
-    //     if(threadIdx.x == 0)
-    //         atomicInc((unsigned int*)semaphore, *array_length);
-    //     while(*semaphore != blocks) {}
-    //     if(idx == 0)
-    //         atomicXor(semaphore, *semaphore);
-    // }
+    barrier(CLK_GLOBAL_MEM_FENCE);
+    if(blocks > 1) {
+        if(get_local_id(0) == 0)
+            atomic_inc(semaphore);
+        do
+            if(idx == 0)
+                if(semaphore[0] == blocks)
+                    semaphore[0] = -1;
+        while(semaphore[0] != -1);
+        if(idx == 0)
+            semaphore[0] = 0;
+    }
 
-    // counting the prefix sum
-    while(modulo < (2**array_length)) {
-        // int active_threads = (threads + (modulo/2 -1)) / (modulo/2);
+    while(modulo < *array_length) {
         if((covered_id % modulo) == ((*array_length-1) % modulo)) {
             if((covered_id - modulo/2) >= 0) {
                 prefix_sum[covered_id] += prefix_sum[covered_id-modulo/2];
             }
-
-            // sync in between levels of summing
-            barrier(CLK_GLOBAL_MEM_FENCE);
+        }
+        barrier(CLK_GLOBAL_MEM_FENCE);
+        if(blocks > 1) {
+            if(get_local_id(0) == 0)
+                atomic_inc(semaphore);
+            do
+                if(idx == 0)
+                    if(semaphore[0] == blocks)
+                        semaphore[0] = -1;
+            while(semaphore[0] != -1);
+            if(idx == 0)
+                semaphore[0] = 0;
         }
         modulo *= 2;
+    }
+
+    barrier(CLK_GLOBAL_MEM_FENCE);
+    if(blocks > 1) {
+        if(get_local_id(0) == 0)
+            atomic_inc(semaphore);
+        do
+            if(idx == 0)
+                if(semaphore[0] == blocks)
+                    semaphore[0] = -1;
+        while(semaphore[0] != -1);
+        if(idx == 0)
+            semaphore[0] = 0;
     }
 
     if(covered_id == *array_length-1) {
         prefix_sum[covered_id] = 0;
     }
 
-    // sync after up-sweep
     barrier(CLK_GLOBAL_MEM_FENCE);
+    if(blocks > 1) {
+        if(get_local_id(0) == 0)
+            atomic_inc(semaphore);
+        do
+            if(idx == 0)
+                if(semaphore[0] == blocks)
+                    semaphore[0] = -1;
+        while(semaphore[0] != -1);
+        if(idx == 0)
+            semaphore[0] = 0;
+    }
 
     while(modulo >= 2) {
         if((covered_id % modulo) == ((*array_length-1) % modulo)) {
@@ -138,23 +177,65 @@ __kernel void filterKernel(__global int *values, __global int *bools, __global i
         }
 
         barrier(CLK_GLOBAL_MEM_FENCE);
-        barrier(CLK_GLOBAL_MEM_FENCE);
+        if(blocks > 1) {
+            if(get_local_id(0) == 0)
+                atomic_inc(semaphore);
+            do
+                if(idx == 0)
+                    if(semaphore[0] == blocks)
+                        semaphore[0] = -1;
+            while(semaphore[0] != -1);
+            if(idx == 0)
+                semaphore[0] = 0;
+        }
         modulo /= 2;
     }
 
-    if(bools[covered_id])
-        prefix_sum[covered_id] += 1;
-    if((covered_id-1) >= 0)
-        if(bools[covered_id-1])
-            prefix_sum[covered_id-1] += 1;
+    barrier(CLK_GLOBAL_MEM_FENCE);
+    if(blocks > 1) {
+        if(get_local_id(0) == 0)
+            atomic_inc(semaphore);
+        do
+            if(idx == 0)
+                if(semaphore[0] == blocks)
+                    semaphore[0] = -1;
+        while(semaphore[0] != -1);
+        if(idx == 0)
+            semaphore[0] = 0;
+    }
 
     barrier(CLK_GLOBAL_MEM_FENCE);
-
+    if(blocks > 1) {
+        if(get_local_id(0) == 0)
+            atomic_inc(semaphore);
+        do
+            if(idx == 0)
+                if(semaphore[0] == blocks)
+                    semaphore[0] = -1;
+        while(semaphore[0] != -1);
+        if(idx == 0)
+            semaphore[0] = 0;
+    }
     if(bools[covered_id]) {
+        prefix_sum[covered_id] += 1;
         output[prefix_sum[covered_id]-1] = values[covered_id];
     }
     if(((covered_id - 1) >= 0) && (bools[covered_id-1])) {
+        prefix_sum[covered_id-1] += 1;
         output[prefix_sum[covered_id-1]-1] = values[covered_id-1];
+    }
+
+    barrier(CLK_GLOBAL_MEM_FENCE);
+    if(blocks > 1) {
+        if(get_local_id(0) == 0)
+            atomic_inc(semaphore);
+        do
+            if(idx == 0)
+                if(semaphore[0] == blocks)
+                    semaphore[0] = -1;
+        while(semaphore[0] != -1);
+        if(idx == 0)
+            semaphore[0] = 0;
     }
 
     if(idx == 0) {
@@ -166,8 +247,7 @@ __kernel void filterKernel(__global int *values, __global int *bools, __global i
 int* gpu_filter(int* array, int *length) {
     int *values, *bools, *prefix_sum, *output, *array_length, *semaphore;
     int size = sizeof(int) * *length;
-    /// define this ret thing...
-    cl_mem values = clCreateBuffer(context, CL_MEM_READ_WRITE, size, NULL, &ret);  // <---------<< 
+    cudaMalloc(&values, size);  // <---------<< 
     cudaMalloc(&bools, size);  // <---------<< 
     cudaMalloc(&prefix_sum, size);  // <---------<< 
     cudaMalloc(&output, size);  // <---------<< 
@@ -177,15 +257,17 @@ int* gpu_filter(int* array, int *length) {
     cudaMemcpy(array_length, length, sizeof(int), cudaMemcpyHostToDevice);  // <---------<< 
 
     
-    int threads = *length / 2;
+    int threads = *length / 2 + *length % 2;
     int blocks = threads / MAX_BLOCK_SIZE + (threads % MAX_BLOCK_SIZE > 0);
     int threads_in_block = (threads + blocks-1) / blocks;
+    // printf("length:%d -> threads:%d -> blocks:%d -> threads_per_block:%d\n", *length, threads, blocks, threads_in_block);
 
     filterKernel<<<blocks, threads_in_block>>>(values, bools, prefix_sum, output, array_length, semaphore);  // <---------<< 
 
     cudaMemcpy(length, array_length, sizeof(int), cudaMemcpyDeviceToHost);  // <---------<< 
     int new_size = *length * sizeof(int);  // <---------<< 
-    cudaMemcpy(array, output, new_size, cudaMemcpyDeviceToHost);  // <---------<< 
+    int *h_output = (int*)malloc(new_size);
+    cudaMemcpy(h_output, output, new_size, cudaMemcpyDeviceToHost);  // <---------<< 
     cudaFree(&values);  // <---------<< 
     cudaFree(&bools);  // <---------<< 
     cudaFree(&prefix_sum);  // <---------<< 
@@ -193,11 +275,11 @@ int* gpu_filter(int* array, int *length) {
     cudaFree(&array_length);  // <---------<< 
     cudaFree(&semaphore);  // <---------<< 
 
-    return array;
+    return h_output;
 }
 
 int main() {
-    srand(time(NULL));
+    srand(1920);
     int length = START_LENGTH;
 
     int *array = (int*)malloc(sizeof(int) * length);
@@ -206,24 +288,39 @@ int main() {
     }
 
     int* filtered = seq_filter(array, &length);
-    print_array(filtered, length);
+    // print_array(filtered, length);
 
-    printf("\n-------------------- array[0] = %d --------------------\n\n", array[0]);
+    // printf("\n-------------------- array[0] = %d --------------------\n\n", array[0]);
 
-    length = START_LENGTH;
-    int* gpu_filtered = gpu_filter(array, &length);
-    print_array(gpu_filtered, length);
+    int i = 0;
+    int repeats = 1000000;
+    bool broken = false;
 
-    bool coherent = true;
-    int iter = 0;
-    while(coherent && (iter < length)) {
-        if(filtered[iter] != array[iter]) {
-            coherent = false;
+    while(!broken && (i < repeats)) {
+        length = START_LENGTH;
+        int* gpu_filtered = gpu_filter(array, &length);
+        // print_array(gpu_filtered, length);
+    
+        // check
+        bool coherent = true;
+        int iter = 0;
+        while(coherent && (iter < length)) {
+            if(filtered[iter] != gpu_filtered[iter]) {
+                coherent = false;
+            }
+            iter++;
         }
-        iter++;
+        // if(coherent)
+            // printf("\x1b[1;40;32mCorrect :)\x1b[0m\n");
+        // else {
+        if(!coherent) {
+            broken = true;
+            printf("\x1b[1;40;31mIncorrect!\x1b[0m\npassed correctly %d times\n", i);
+        }
+        i++;
     }
-    if(coherent)
-        printf("\x1b[1;40;32mCorrect :)\x1b[0m\n");
-    else
-        printf("\x1b[1;40;31mIncorrect!\x1b[0m\n");
+    if(i == repeats) {
+        printf("\x1b[1;40;33mSuccess!\x1b[0m\n");
+    }
+    
 }
