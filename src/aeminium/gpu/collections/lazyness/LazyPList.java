@@ -4,8 +4,10 @@ import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.AbstractList;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.operations.Filter;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
+import aeminium.gpu.operations.functions.LambdaFilter;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
@@ -103,6 +105,19 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 		}
 	}
 
+    @Override
+    public PList<T> filter(LambdaFilter<T> filterFun) {
+        if (!evaluated && evaluator.canMergeWithFilter(filterFun)) {
+            Filter<T> f = new Filter<T>(filterFun, this, this.getDevice());
+            LazyPList<T> r = (LazyPList<T>) evaluator.mergeWithFilter(f);
+            r.setLazynessLevel(lazynessLevel + 1);
+            return r;
+        } else {
+            evaluate();
+            return actual.filter(filterFun);
+        }
+    }
+
 	@Override
 	public T reduce(LambdaReducerWithSeed<T> reducer) {
 		if (!evaluated && evaluator.canMergeWithReduce(reducer)) {
@@ -127,8 +142,8 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 		evaluate();
 		return actual.extend(extra);
 	}
-	
-	@Override
+
+    @Override
 	public PList<T> extendAt(int i, PList<T> extra) {
 		evaluate();
 		return actual.extendAt(i, extra);
@@ -145,5 +160,4 @@ public class LazyPList<T> extends AbstractList<T> implements PList<T> {
 		this.evaluate();
 		return actual.copy();
 	}
-
 }

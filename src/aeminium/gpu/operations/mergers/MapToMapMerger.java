@@ -3,8 +3,10 @@ package aeminium.gpu.operations.mergers;
 import aeminium.gpu.collections.lazyness.LazyEvaluator;
 import aeminium.gpu.collections.lazyness.LazyPList;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.operations.Filter;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
+import aeminium.gpu.operations.functions.LambdaFilter;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 import aeminium.gpu.utils.ExtractTypes;
@@ -88,6 +90,17 @@ public class MapToMapMerger<I, M, O> {
 						fakeMap(), reduceOp, current);
 				return merger.getOutput();
 			}
+
+            @Override
+            public boolean canMergeWithFilter(LambdaFilter<O> filterFun) {
+                return false;
+            }
+
+            @Override
+            public PList<O> mergeWithFilter(Filter<O> filterOp) {
+//				TODO:
+                return null;
+            }
 		};
 		return new LazyPList<O>(eval, first.getOutputSize());
 	}

@@ -1,0 +1,44 @@
+#pragma OPENCL EXTENSION cl_khr_fp64: enable
+
+// Other Sources Required
+{{other_sources}}
+
+// Specific Map Lambda Function
+{{filter_lambda_def}}
+
+// Specific Reduce Lambda Function
+{{reduce_lambda_def}}
+
+inline {{output_type}} get_accumulator() {
+	{{seed_source}}
+}
+
+__kernel void {{reduce_kernel_name}}(
+			__global const {{input_type}}* filter_input,
+			__global {{input_type}}* reduce_input,
+			__global {{output_type}}* reduce_output,
+			long dataLength,
+   			long blocks,
+   			long blockLength,
+			const int first {{extra_args}}) {
+
+	long block = get_global_id(0);
+	if (block >= blocks)
+		return;
+
+	long inputStart = block * blockLength;
+	long inputEnd = min(inputStart + blockLength, dataLength);
+
+	{{output_type}} total = ({{output_type}}) get_accumulator();
+	if (first) {
+		for (int inputOffset = inputStart; inputOffset < inputEnd; inputOffset++)
+			if ({{filter_lambda_name}}({{get_input}} {{extra_args_call}})) {
+				total = {{reduce_lambda_name}}(total, {{get_input}} {{extra_args_call}});
+			}
+	} else {
+		for (int inputOffset = inputStart; inputOffset < inputEnd; inputOffset++)
+            total = {{reduce_lambda_name}}(total, reduce_input[inputOffset] {{extra_args_call}});
+	}
+
+	reduce_output[block] = total;
+}

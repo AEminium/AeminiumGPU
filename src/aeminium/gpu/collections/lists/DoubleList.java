@@ -1,9 +1,9 @@
 package aeminium.gpu.collections.lists;
 
-import java.util.Arrays;
-
 import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
+
+import java.util.Arrays;
 
 public class DoubleList extends AbstractList<Double> implements
 		ConcreteCollection {
@@ -93,7 +93,7 @@ public class DoubleList extends AbstractList<Double> implements
 
 	protected void ensureNMore(int n) {
 		if (size+n > box.length) {
-			int plus = (n > INCREMENT_SIZE) ? n : INCREMENT_SIZE;
+            int plus = Math.max(n, INCREMENT_SIZE);
 			box = Arrays.copyOf(box, box.length + plus);
 		}
 	}

@@ -1,7 +1,5 @@
 package aeminium.gpu.recorder;
 
-import java.util.Random;
-
 import aeminium.gpu.collections.lists.FloatList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.devices.DefaultDeviceFactory;
@@ -11,11 +9,12 @@ import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.utils.TimeoutController;
 import aeminium.gpu.utils.TimeoutController.TimeoutException;
 
+import java.util.Random;
+
 public class Recorder {
 
 	int times = 10;
-	public int[] sizes = new int[] { 10, 100, 1000, 10000, 100000, 1000000,
-			10000000 };
+    public int[] sizes = new int[]{10, 100, 1000, 10000, 100000, 1000000, 10000000};
 
 	GPUDevice dev = new DefaultDeviceFactory().getDevice();
 	RecordTracker tracker = new RecordTracker();

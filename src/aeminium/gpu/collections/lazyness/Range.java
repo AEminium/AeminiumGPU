@@ -1,9 +1,5 @@
 package aeminium.gpu.collections.lazyness;
 
-import java.util.Iterator;
-
-import org.bridj.Pointer;
-
 import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.PList;
@@ -12,34 +8,39 @@ import aeminium.gpu.collections.properties.evaluation.LazyCollection;
 import aeminium.gpu.collections.properties.evaluation.LazyGPUHelper;
 import aeminium.gpu.devices.DefaultDeviceFactory;
 import aeminium.gpu.devices.GPUDevice;
+import aeminium.gpu.operations.Filter;
 import aeminium.gpu.operations.Map;
+import aeminium.gpu.operations.functions.LambdaFilter;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLMem;
+import org.bridj.Pointer;
+
+import java.util.Iterator;
 
 public class Range implements PList<Integer>, LazyCollection {
 
 	public boolean isNative() { return false; }
-	
-	protected class IntegerIdentityMapper extends
-			LambdaMapper<Integer, Integer> {
-		@Override
-		public Integer map(Integer input) {
-			return input;
-		}
 
-		@Override
-		public String getSource() {
-			return "return input;";
-		}
-	}
+    protected class IntegerIdentityMapper extends
+            LambdaMapper<Integer, Integer> {
 
+        @Override
+        public Integer map(Integer input) {
+            return input;
+        }
+
+        @Override
+        public String getSource() {
+            return "return input;";
+        }
+
+    }
 	private int max;
-	protected GPUDevice device;
 
+    protected GPUDevice device;
 	public Range(int max) {
 		this.max = max;
 		device = (new DefaultDeviceFactory()).getDevice();
@@ -50,6 +51,12 @@ public class Range implements PList<Integer>, LazyCollection {
 		Map<Integer, O> mapOperation = new Map<Integer, O>(mapper, this, device);
 		return mapOperation.getOutput();
 	}
+
+    @Override
+    public PList<Integer> filter(LambdaFilter<Integer> filter) {
+        Filter<Integer> filterOperation = new Filter<>(filter, this, device);
+        return filterOperation.getOutput();
+    }
 
 	@Override
 	public Integer reduce(LambdaReducerWithSeed<Integer> reducer) {

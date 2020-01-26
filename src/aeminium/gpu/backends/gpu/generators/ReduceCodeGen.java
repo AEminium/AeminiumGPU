@@ -1,10 +1,10 @@
 package aeminium.gpu.backends.gpu.generators;
 
-import java.util.HashMap;
-
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
 import aeminium.gpu.templates.Template;
 import aeminium.gpu.templates.TemplateWrapper;
+
+import java.util.HashMap;
 
 @SuppressWarnings("rawtypes")
 public class ReduceCodeGen extends AbstractReduceCodeGen {
@@ -93,15 +93,4 @@ public class ReduceCodeGen extends AbstractReduceCodeGen {
 	public String getReduceKernelName() {
 		return "reduce_kernel_" + id;
 	}
-
-	@Override
-	public String getMapLambdaSource() {
-		return null;
-	}
-
-	@Override
-	public String getMapLambdaName() {
-		return null;
-	}
-
 }

@@ -1,22 +1,27 @@
 package aeminium.gpu.collections.lazyness;
 
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.operations.Filter;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
+import aeminium.gpu.operations.functions.LambdaFilter;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
 public interface LazyEvaluator<T> {
-	public Object evaluate();
+    Object evaluate();
 
-	public Class<?> getType();
+    Class<?> getType();
 
-	public <O> boolean canMergeWithMap(LambdaMapper<T, O> mapFun);
+    <O> boolean canMergeWithMap(LambdaMapper<T, O> mapFun);
 
-	public <O> PList<O> mergeWithMap(Map<T, O> mapOp);
+    <O> PList<O> mergeWithMap(Map<T, O> mapOp);
 
-	public boolean canMergeWithReduce(LambdaReducerWithSeed<T> reduceFun);
+    boolean canMergeWithReduce(LambdaReducerWithSeed<T> reduceFun);
 
-	public T mergeWithReducer(Reduce<T> reduceOp);
+    T mergeWithReducer(Reduce<T> reduceOp);
 
+    boolean canMergeWithFilter(LambdaFilter<T> filterFun);
+
+    PList<T> mergeWithFilter(Filter<T> filterOp);
 }

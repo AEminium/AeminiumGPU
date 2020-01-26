@@ -1,16 +1,18 @@
 package aeminium.gpu.collections.lists;
 
-import java.util.Iterator;
-
 import aeminium.gpu.collections.AbstractCollection;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.matrices.PMatrix;
 import aeminium.gpu.collections.properties.Mappable;
 import aeminium.gpu.collections.properties.Reductionable;
+import aeminium.gpu.operations.Filter;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.Reduce;
+import aeminium.gpu.operations.functions.LambdaFilter;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
+
+import java.util.Iterator;
 
 public abstract class AbstractList<T> extends AbstractCollection<T> implements PList<T>, Mappable<T>,
 		Reductionable<T>, Iterable<T> {
@@ -36,9 +38,15 @@ public abstract class AbstractList<T> extends AbstractCollection<T> implements P
 
 	@Override
 	public <O> PList<O> map(LambdaMapper<T, O> mapper) {
-		Map<T, O> mapOperation = new Map<T, O>(mapper, this, getDevice());
+        Map<T, O> mapOperation = new Map<>(mapper, this, getDevice());
 		return mapOperation.getOutput();
 	}
+
+    @Override
+    public PList<T> filter(LambdaFilter<T> filter) {
+        Filter<T> filterOperation = new Filter<>(filter, this, getDevice());
+        return filterOperation.getOutput();
+    }
 
 	@Override
 	public T reduce(LambdaReducerWithSeed<T> reducer) {

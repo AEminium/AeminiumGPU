@@ -1,11 +1,12 @@
 package aeminium.gpu.collections.lists;
 
 import aeminium.gpu.collections.PCollection;
+import aeminium.gpu.collections.properties.Filterable;
 import aeminium.gpu.collections.properties.Groupable;
 import aeminium.gpu.collections.properties.Mappable;
 import aeminium.gpu.collections.properties.Reductionable;
 
-public interface PList<T> extends PCollection<T>, Mappable<T>,
+public interface PList<T> extends PCollection<T>, Mappable<T>, Filterable<T>,
 		Reductionable<T>, Groupable<T>, Iterable<T> {
 
 	/* Properties */

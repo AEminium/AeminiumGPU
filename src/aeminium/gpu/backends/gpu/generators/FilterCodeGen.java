@@ -8,6 +8,7 @@ import aeminium.gpu.templates.TemplateWrapper;
 import java.util.HashMap;
 
 public class FilterCodeGen extends AbstractCodeGen {
+    private int size;
     private String type;
     private String clSource;
     private String[] parameters;
@@ -17,21 +18,23 @@ public class FilterCodeGen extends AbstractCodeGen {
         clSource = filterOp.getFilterFun().getSource();
         otherSources = filterOp.getOtherSources();
         parameters = filterOp.getFilterFun().getParameters();
+        size = filterOp.getInput().size();
         id = filterOp.getFilterFun().getId();
     }
 
     public FilterCodeGen(String type, String clSource,
-                         String[] pars, String id) {
-        this(type, clSource, pars, id, "");
+                         String[] pars, String id, int size) {
+        this(type, clSource, pars, id, "", size);
     }
 
     public FilterCodeGen(String type, String clSource,
-                         String[] pars, String id, String otherSources) {
+                         String[] pars, String id, String otherSources, int size) {
         this.type = BufferHelper.getCLTypeOf(type);
         this.clSource = clSource;
         this.otherSources = otherSources;
         this.parameters = pars;
         this.id = id;
+        this.size = size;
     }
 
     public String getFilterLambdaSource() {
@@ -53,15 +56,10 @@ public class FilterCodeGen extends AbstractCodeGen {
         mapping.put("filter_kernel_name", getFilterKernelName());
 
         mapping.put("filter_lambda_def", getFilterLambdaSource());
-        mapping.put("otherSources", otherSources);
+        mapping.put("other_sources", otherSources);
         mapping.put("extra_args", getExtraArgs());
         mapping.put("extra_args_call", getExtraArgsCall());
 
-        if (isRange) {
-            mapping.put("get_input", "filter_global_id");
-        } else {
-            mapping.put("get_input", "filter_input[filter_global_id]");
-        }
         Template t = new Template(new TemplateWrapper("opencl/FilterKernel.clt"));
         return t.apply(mapping);
     }

@@ -8,8 +8,11 @@
     <property name="jar.dir"     value="dist"/>
     <property name="templates.dir"     value="templates"/>
 	<property name="verbose" value="false" />
-   
-    <property name="main-class"  value="aeminium.gpu.examples.RecIntegral"/>
+
+	<!--	<property name="main-class"  value="aeminium.gpu.examples.RecIntegral"/>-->
+	<!--    <property name="main-class" value="aeminium.gpu.examples.FilterToFilterExample"/>-->
+	<!--	<property name="main-class"  value="aeminium.gpu.recorder.FilterRecorder"/>-->
+	<property name="main-class" value="aeminium.gpu.examples.FilterExample"/>
 	<property name="info-class"  value="aeminium.gpu.utils.HardwareReport"/>
 	<property name="bench-class"  value="aeminium.gpu.recorder.Recorder"/>
      <property name="lib.dir"     value="lib"/>
