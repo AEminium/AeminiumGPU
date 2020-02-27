@@ -14,7 +14,7 @@ This is part of the Æminium Project (http://aeminium.dei.uc.pt)
 
 Author:
 Alcides Fonseca <amaf@dei.uc.pt>
-
+Maksymilian Wojczuk <maxwojczuk@gmail.com> (Filter Operation)
 
 How to execute:
 
