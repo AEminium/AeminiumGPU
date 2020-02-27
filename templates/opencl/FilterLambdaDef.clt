@@ -1,0 +1,3 @@
+inline bool {{filter_lambda_name}}({{type}} {{filter_lambda_par}} {{extra_args}}) {
+	{{source}}
+}

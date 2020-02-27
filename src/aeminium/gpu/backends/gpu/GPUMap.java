@@ -7,7 +7,6 @@ import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.utils.ExtractTypes;
-
 import com.nativelibs4java.opencl.CLBuffer;
 import com.nativelibs4java.opencl.CLContext;
 import com.nativelibs4java.opencl.CLEvent;
@@ -54,10 +53,7 @@ public class GPUMap<I,O> extends GPUGenericKernel {
 	public void prepareBuffers(CLContext ctx) {
 		super.prepareBuffers(ctx);
 		inbuffer = BufferHelper.createInputBufferFor(ctx, input, end);
-		outbuffer = BufferHelper.createOutputBufferFor(ctx, outputType,
-				end);
-		
-		
+        outbuffer = BufferHelper.createOutputBufferFor(ctx, outputType, end);
 	}
 
 	@Override

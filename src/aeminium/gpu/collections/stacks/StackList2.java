@@ -1,14 +1,15 @@
 package aeminium.gpu.collections.stacks;
 
-import java.util.Iterator;
-
 import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.factories.CollectionFactory;
 import aeminium.gpu.collections.lists.IntList;
 import aeminium.gpu.collections.lists.PList;
 import aeminium.gpu.collections.matrices.PMatrix;
+import aeminium.gpu.operations.functions.LambdaFilter;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
+
+import java.util.Iterator;
 
 public class StackList2<A,B> implements PList<Stack2<A,B>> {
 	PList<A> as;
@@ -69,6 +70,11 @@ public class StackList2<A,B> implements PList<Stack2<A,B>> {
 	public <O> PList<O> map(LambdaMapper<Stack2<A, B>, O> mapper) {
 		throw new RuntimeException("Not implemented");
 	}
+
+    @Override
+    public PList<Stack2<A, B>> filter(LambdaFilter<Stack2<A, B>> filter) {
+        throw new RuntimeException("Not implemented");
+    }
 
 	@Override
 	public Stack2<A, B> reduce(LambdaReducerWithSeed<Stack2<A, B>> reducer) {
@@ -224,5 +230,4 @@ public class StackList2<A,B> implements PList<Stack2<A,B>> {
 	public PList<B> getBs() {
 		return bs;
 	}
-
 }

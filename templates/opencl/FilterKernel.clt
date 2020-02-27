@@ -1,0 +1,94 @@
+#pragma OPENCL EXTENSION cl_khr_fp64: enable
+
+// Other Sources Required
+{{other_sources}}
+
+// Specific Filter Lambda Function
+{{filter_lambda_def}}
+
+__kernel void {{filter_kernel_name}} (
+	__global const {{type}}* filter_input,
+	__global {{type}}* filter_output,
+    __global int* booleans,
+    __global int* prefix_sum,
+	__global int* array_length {{extra_args}}) {
+
+	int MAX_BLOCK_SIZE = 256;
+
+    int threads = *array_length / 2 + *array_length % 2;
+    int blocks = threads / MAX_BLOCK_SIZE + (threads % MAX_BLOCK_SIZE > 0);
+    int threads_per_block = (threads + blocks-1) / blocks;
+    int idx = 2*((unsigned int) get_global_id(0)) + ((*array_length+1)%2);
+    int modulo = 2;
+
+	for(int i=0; i<*array_length; i+=(2*threads_per_block)) {
+        if((i+idx) < *array_length) {
+            if({{filter_lambda_name}}(filter_input[i + idx] {{extra_args_call}})) {
+                booleans[i+idx] = 1;
+                prefix_sum[i+idx] = 1;
+            } else {
+                booleans[i+idx] = 0;
+                prefix_sum[i+idx] = 0;
+            }
+
+            if(i+idx > 0) {
+                if({{filter_lambda_name}}(filter_input[i + idx - 1] {{extra_args_call}})) {
+                    booleans[i+idx-1] = 1;
+                    prefix_sum[i+idx-1] = 1;
+                } else {
+                    booleans[i+idx-1] = 0;
+                    prefix_sum[i+idx-1] = 0;
+                }
+            }
+        }
+    }
+
+    barrier(CLK_GLOBAL_MEM_FENCE);
+
+    while(modulo < 2**array_length) {
+        for(int i=0; i<*array_length; i+=(2*threads_per_block)) {
+            if(((i+idx) % modulo) == ((*array_length-1) % modulo)) {
+                if((i+idx - modulo/2) >= 0) {
+                    prefix_sum[i+idx] += prefix_sum[i+idx-modulo/2];
+                }
+            }
+        }
+        barrier(CLK_GLOBAL_MEM_FENCE);
+
+        modulo *= 2;
+    }
+
+    if(get_global_id(0) == 0) {
+        prefix_sum[*array_length-1] = 0;
+    }
+
+    while(modulo >= 2) {
+        for(int i=0; i<*array_length; i+=(2*threads_per_block)) {
+            if(((i+idx) % modulo) == ((*array_length-1) % modulo)) {
+                if((i+idx - modulo/2) >= 0) {
+                    int temp = prefix_sum[i+idx];
+                    prefix_sum[i+idx] += prefix_sum[i+idx - modulo/2];
+                    prefix_sum[i+idx - modulo/2] = temp;
+                }
+            }
+        }
+        barrier(CLK_GLOBAL_MEM_FENCE);
+        modulo /= 2;
+    }
+
+    for(int i=0; i<*array_length; i+=(2*threads_per_block)) {
+        if(booleans[i+idx]) {
+            prefix_sum[i+idx] += 1;
+            filter_output[prefix_sum[i+idx]-1] = filter_input[i+idx];
+        }
+        if(((i+idx - 1) >= 0) && (booleans[i+idx-1])) {
+            prefix_sum[i+idx-1] += 1;
+            filter_output[prefix_sum[i+idx-1]-1] = filter_input[i+idx-1];
+        }
+        barrier(CLK_GLOBAL_MEM_FENCE);
+    }
+
+    if(get_global_id(0) == 0) {
+        *array_length = prefix_sum[*array_length-1];
+    }
+}

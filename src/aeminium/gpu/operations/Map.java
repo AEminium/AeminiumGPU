@@ -10,6 +10,7 @@ import aeminium.gpu.devices.GPUDevice;
 import aeminium.gpu.operations.contracts.GenericProgram;
 import aeminium.gpu.operations.contracts.Program;
 import aeminium.gpu.operations.deciders.OpenCLDecider;
+import aeminium.gpu.operations.functions.LambdaFilter;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 import aeminium.gpu.operations.mergers.MapToMapMerger;
@@ -129,6 +130,17 @@ public class Map<I, O> extends GenericProgram implements Program {
 				MapToReduceMerger<I, O> merger = new MapToReduceMerger<I, O>(
 						innerMap, reduceOp, input);
 				return merger.getOutput();
+			}
+
+			@Override
+			public boolean canMergeWithFilter(LambdaFilter<O> filterFun) {
+				return false;
+			}
+
+			@Override
+			public PList<O> mergeWithFilter(Filter<O> filterOp) {
+//				TODO:
+				return null;
 			}
 
 		};

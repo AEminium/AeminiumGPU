@@ -2,9 +2,11 @@ package aeminium.gpu.operations.mergers;
 
 import aeminium.gpu.collections.lazyness.LazyEvaluator;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.operations.Filter;
 import aeminium.gpu.operations.Map;
 import aeminium.gpu.operations.MapReduce;
 import aeminium.gpu.operations.Reduce;
+import aeminium.gpu.operations.functions.LambdaFilter;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
 
@@ -59,6 +61,16 @@ public class MapToReduceMerger<I, O> {
 			public O mergeWithReducer(Reduce<O> reduceOp) {
 				return null;
 			}
+
+            @Override
+            public boolean canMergeWithFilter(LambdaFilter<O> filterFun) {
+                return false;
+            }
+
+            @Override
+            public PList<O> mergeWithFilter(Filter<O> filterOp) {
+                return null;
+            }
 
 		};
 		return (O) eval.evaluate();

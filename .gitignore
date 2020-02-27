@@ -2,3 +2,6 @@ bin
 dist
 aeminiumgpu.config
 .settings
+
+.idea
+*.iml

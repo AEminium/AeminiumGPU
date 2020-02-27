@@ -1,9 +1,9 @@
 package aeminium.gpu.collections.lists;
 
-import java.util.Arrays;
-
 import aeminium.gpu.collections.PObject;
 import aeminium.gpu.collections.properties.evaluation.ConcreteCollection;
+
+import java.util.Arrays;
 
 public class FloatList extends AbstractList<Float> implements
 		ConcreteCollection {
@@ -92,8 +92,8 @@ public class FloatList extends AbstractList<Float> implements
 	}
 
 	protected synchronized void ensureNMore(int n) {
-		if (size >= box.length) {
-			int plus = (n > INCREMENT_SIZE) ? n : INCREMENT_SIZE;
+        if (size + n > box.length) {
+            int plus = Math.max(n, INCREMENT_SIZE);
 			box = Arrays.copyOf(box, box.length + plus);
 		}
 	}
@@ -103,8 +103,8 @@ public class FloatList extends AbstractList<Float> implements
 			box = Arrays.copyOf(box, box.length + INCREMENT_SIZE);
 		}
 	}
-	
-	@Override
+
+    @Override
 	public PList<Float> extend(PList<Float> extra) {
 		if (extra instanceof FloatList) {
 			FloatList other = (FloatList) extra;
@@ -118,8 +118,8 @@ public class FloatList extends AbstractList<Float> implements
 		}
 		return null;
 	}
-	
-	@Override
+
+    @Override
 	public PList<Float> extendAt(int i, PList<Float> extra) {
 		if (extra instanceof FloatList) {
 			FloatList other = (FloatList) extra;
@@ -139,10 +139,9 @@ public class FloatList extends AbstractList<Float> implements
 		box = ((FloatList) newList).box;
 		size = newList.size();
 	}
-	
-	@Override
+
+    @Override
 	public PObject copy() {
 		return new FloatList(box, size);
 	}
-	
 }

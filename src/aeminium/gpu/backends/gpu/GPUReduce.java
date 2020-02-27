@@ -1,31 +1,23 @@
 package aeminium.gpu.backends.gpu;
 
-import org.bridj.Pointer;
-
 import aeminium.gpu.backends.gpu.buffers.BufferHelper;
 import aeminium.gpu.backends.gpu.buffers.OtherData;
-import aeminium.gpu.backends.gpu.generators.AbstractReduceCodeGen;
-import aeminium.gpu.backends.gpu.generators.MapReduceCodeGen;
-import aeminium.gpu.backends.gpu.generators.ReduceCodeGen;
-import aeminium.gpu.backends.gpu.generators.ReduceTemplateSource;
+import aeminium.gpu.backends.gpu.generators.*;
 import aeminium.gpu.collections.lazyness.Range;
 import aeminium.gpu.collections.lists.PList;
+import aeminium.gpu.operations.functions.LambdaFilter;
 import aeminium.gpu.operations.functions.LambdaMapper;
 import aeminium.gpu.operations.functions.LambdaReducerWithSeed;
-
-import com.nativelibs4java.opencl.CLBuffer;
-import com.nativelibs4java.opencl.CLContext;
-import com.nativelibs4java.opencl.CLEvent;
-import com.nativelibs4java.opencl.CLMem;
-import com.nativelibs4java.opencl.CLQueue;
+import com.nativelibs4java.opencl.*;
+import org.bridj.Pointer;
 
 public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateSource<O> {
-	
 	public static final int DEFAULT_MAX_REDUCTION_SIZE = 4;
 	
 	protected PList<I> input;
 	protected O output;
-	protected LambdaMapper<I, O> mapFun;
+	protected LambdaMapper<I, O> mapFun = null;
+	protected LambdaFilter<I> filterFun = null;
 	protected LambdaReducerWithSeed<O> reduceFun;
 	
 	protected CLBuffer<?> inbuffer;
@@ -40,7 +32,6 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 	
 	public GPUReduce(PList<I> input, LambdaReducerWithSeed<O> reduceFun) {
 		this.input = input;
-		this.mapFun = null;
 		this.reduceFun = reduceFun;
 		
 		gen = new ReduceCodeGen(this);
@@ -48,6 +39,22 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 			gen.setHasSeed(true);
 		}
 		otherData = OtherData.extractOtherData(reduceFun);
+		gen.setOtherData(otherData);
+	}
+
+	public GPUReduce(PList<I> input, LambdaFilter<I> filterFun, LambdaReducerWithSeed<O> reduceFun) {
+		this.input = input;
+		this.filterFun = filterFun;
+		this.reduceFun = reduceFun;
+
+		gen = new FilterReduceCodeGen(this);
+		if (reduceFun instanceof LambdaReducerWithSeed) {
+			gen.setHasSeed(true);
+		}
+		if (input instanceof Range) {
+			gen.setRange(true);
+		}
+		otherData = OtherData.extractOtherData(filterFun, reduceFun);
 		gen.setOtherData(otherData);
 	}
 	
@@ -85,7 +92,7 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 	public void prepareBuffers(CLContext ctx) {
 		super.prepareBuffers(ctx);
 		inferBestValues();
-		if (mapFun == null) {
+		if (mapFun == null && filterFun == null) {
 			if (input instanceof Range) {
 				// Fake 1 byte data.
 				Pointer<Integer> ptr = Pointer.allocateInts(1).order(
@@ -125,7 +132,7 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 				outbuffer = tempBuffers[iOutput];
 			}
 			synchronized (kernel) {
-				if (gen instanceof MapReduceCodeGen) {
+				if (gen instanceof MapReduceCodeGen || gen instanceof FilterReduceCodeGen) {
 					kernel.setArgs(inbuffer, currentInput, outbuffer,
 							(long) current_size, (long) blocksInCurrentDepth,
 							(long) DEFAULT_MAX_REDUCTION_SIZE, (depth == 0) ? 1 : 0);
@@ -242,4 +249,11 @@ public class GPUReduce<I, O> extends GPUGenericKernel implements ReduceTemplateS
 		this.mapFun = mapFun;
 	}
 
+	public LambdaFilter<I> getFilterFun() {
+		return filterFun;
+	}
+
+	public void setFilterFun(LambdaFilter<I> filterFun) {
+		this.filterFun = filterFun;
+	}
 }
